@@ -1,0 +1,35 @@
+# ==============================================
+# Pineapple 3.0 - Backend Requirements
+# ==============================================
+
+# --- Web & API Framework ---
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+pydantic-settings==2.5.2
+
+# --- Base de données & Migrations ---
+sqlalchemy>=2.0.30
+asyncpg==0.29.0
+alembic==1.13.2
+
+# --- Sécurité & Crypto ---
+passlib[argon2]==1.7.4
+argon2-cffi==23.1.0
+python-jose[cryptography]==3.3.0
+cryptography==43.0.1
+python-multipart==0.0.9
+
+# --- Cache & Task Queue ---
+redis==5.0.8
+
+# --- Utilitaires & PDFs ---
+weasyprint==62.3
+httpx==0.27.2
+python-dotenv==1.0.1
+
+# --- Quality & Testing ---
+pytest==8.3.3
+pytest-asyncio==0.24.0
+ruff==0.6.8
+black==24.8.0
