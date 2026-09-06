@@ -1,0 +1,118 @@
+/* frontend/src/index.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   Styles de base pour PWA et confort mobile
+   ============================================ */
+html {
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply font-sans antialiased bg-background-light dark:bg-background-dark text-gray-900 dark:text-gray-100;
+  user-select: none; /* Désactive la sélection de texte sur mobile pour un meilleur confort */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  touch-action: manipulation;
+}
+
+/* ============================================
+   Classes utilitaires Glassmorphism
+   ============================================ */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+}
+
+.dark .glass-panel,
+.dark .glass-card {
+  background: rgba(15, 23, 42, 0.4);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================
+   Classes utilitaires Néomorphisme
+   ============================================ */
+.neo {
+  background: #E0E5EC;
+  box-shadow: theme('boxShadow.neo-extruded');
+  transition: all 0.2s ease;
+}
+
+.neo:hover {
+  box-shadow: theme('boxShadow.neo-inset');
+}
+
+.neo-pressed {
+  background: #E0E5EC;
+  box-shadow: theme('boxShadow.neo-pressed');
+}
+
+.neo-dark {
+  background: #0F172A;
+  box-shadow: theme('boxShadow.neo-dark-extruded');
+}
+
+.neo-dark:hover {
+  box-shadow: theme('boxShadow.neo-dark-inset');
+}
+
+.neo-dark-pressed {
+  background: #0F172A;
+  box-shadow: theme('boxShadow.neo-dark-pressed');
+}
+
+/* ============================================
+   Transitions fluides
+   ============================================ */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+/* ============================================
+   Scrollbar personnalisée (optionnel)
+   ============================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.4);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.7);
+}
+
+/* ============================================
+   Focus visibles pour l'accessibilité
+   ============================================ */
+:focus-visible {
+  outline: 2px solid #10B981;
+  outline-offset: 2px;
+}
