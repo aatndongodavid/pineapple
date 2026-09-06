@@ -1,6 +1,7 @@
 import base64
 import json
 import uuid
+from datetime import datetime
 from typing import Dict, List, Optional
 
 from cryptography.hazmat.primitives import hashes, serialization
@@ -28,6 +29,7 @@ from democracy_context.infrastructure.persistence.models import (
     ElectionModel,
 )
 
+
 # ---------------------------------------------------------------------------
 # Helpers de conversion
 # ---------------------------------------------------------------------------
@@ -45,6 +47,7 @@ def _election_model_to_entity(model: ElectionModel) -> Election:
         created_at=model.created_at,
     )
 
+
 def _election_entity_to_model(election: Election) -> ElectionModel:
     return ElectionModel(
         id=election.id,
@@ -58,6 +61,7 @@ def _election_entity_to_model(election: Election) -> ElectionModel:
         created_at=election.created_at,
     )
 
+
 def _ballot_model_to_entity(model: BallotModel) -> Ballot:
     return Ballot(
         id=model.id,
@@ -66,9 +70,9 @@ def _ballot_model_to_entity(model: BallotModel) -> Ballot:
         voter_hash=VoterHash(value=model.voter_hash),
         encrypted_vote=EncryptedVote(data=base64.b64decode(model.encrypted_vote)),
         cast_at=model.cast_at,
-        # On suppose que le modèle a is_valid, sinon on met True par défaut
         is_valid=getattr(model, "is_valid", True),
     )
+
 
 def _ballot_entity_to_model(ballot: Ballot) -> BallotModel:
     return BallotModel(
@@ -78,7 +82,6 @@ def _ballot_entity_to_model(ballot: Ballot) -> BallotModel:
         voter_hash=ballot.voter_hash.value,
         encrypted_vote=base64.b64encode(ballot.encrypted_vote.data).decode("utf-8"),
         cast_at=ballot.cast_at,
-        # is_valid: à ajouter au modèle si nécessaire
     )
 
 
@@ -209,7 +212,6 @@ class PostgresAuditLedgerRepository(AuditLedgerPort):
     async def append_entry(
         self, action: str, metadata: dict, tenant_id: uuid.UUID
     ) -> AuditLedgerEntry:
-        # Calcul d'un hash simple pour l'intégrité (à renforcer avec un vrai mécanisme)
         import hashlib
         payload = f"{action}|{json.dumps(metadata, sort_keys=True)}|{tenant_id}"
         entry_hash = hashlib.sha256(payload.encode()).hexdigest()

@@ -1,0 +1,78 @@
+name: Backend CI
+
+on:
+  pull_request:
+    branches: [main, deploy]
+  push:
+    branches: [deploy]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: pineapple
+          POSTGRES_PASSWORD: pineapple_test_password
+          POSTGRES_DB: pineapple_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pineapple -d pineapple_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libcairo2 \
+            libpango-1.0-0 \
+            libpangocairo-1.0-0 \
+            libgdk-pixbuf-2.0-0 \
+            libffi-dev \
+            libpq-dev \
+            gcc
+
+      - name: Install Python dependencies
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest-cov flake8 black
+
+      - name: Lint with Flake8
+        working-directory: backend
+        run: flake8 src tests
+
+      - name: Check formatting with Black
+        working-directory: backend
+        run: black --check src tests
+
+      - name: Run tests with coverage
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql+asyncpg://pineapple:pineapple_test_password@localhost:5432/pineapple_test
+          REDIS_URL: redis://localhost:6379/0
+          JWT_SECRET_KEY: test_secret_key
+          ELECTION_PEPPER_SECRET: test_pepper_secret
+          AWS_S3_BUCKET_NAME: test-bucket
+          ENVIRONMENT: test
+        run: |
+          pytest tests/unit tests/integration \
+            --cov=src \
+            --cov-report=term-missing \
+            --cov-report=xml \
+            --cov-fail-under=80

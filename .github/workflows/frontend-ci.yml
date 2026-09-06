@@ -1,0 +1,51 @@
+name: Frontend CI
+
+on:
+  pull_request:
+    branches: [main, deploy]
+  push:
+    branches: [deploy]
+
+jobs:
+  build-and-test-frontend:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Type-check with TypeScript
+        run: npx tsc --noEmit
+
+      - name: Lint with ESLint
+        run: npm run lint
+
+      - name: Build PWA
+        run: npm run build
+
+      # (Optionnel) Tests Cypress en mode headless
+      # Décommentez cette étape si vous avez configuré Cypress dans le projet.
+      # - name: Run Cypress e2e tests
+      #   run: npx cypress run
+      #   env:
+      #     CYPRESS_BASE_URL: http://localhost:3000

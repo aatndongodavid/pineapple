@@ -102,7 +102,7 @@ class Election:
         # Vérification de la filière
         allowed_filieres = rules.get("filiere")
         if allowed_filieres and isinstance(allowed_filieres, list):
-            if user_academic_status not in allowed_filieres:  # Note: user_academic_status peut être la filière? À clarifier.
+            if user_academic_status not in allowed_filieres:
                 return False
         elif allowed_filieres and isinstance(allowed_filieres, str):
             if user_academic_status != allowed_filieres:

@@ -2,7 +2,7 @@ import hashlib
 import hmac
 from datetime import datetime
 from typing import Dict, List, Optional, Protocol
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from democracy_context.application.dtos import (
     CastVoteDTO,
