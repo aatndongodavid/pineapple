@@ -1,0 +1,77 @@
+# docker-compose.yml
+
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: pineapple_db
+    environment:
+      POSTGRES_USER: pineapple
+      POSTGRES_PASSWORD: pineapple_dev_password
+      POSTGRES_DB: pineapple
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pineapple -d pineapple"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:alpine
+    container_name: pineapple_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pineapple_backend
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      # Application
+      APP_NAME: "Pineapple OS"
+      ENVIRONMENT: development
+      DEBUG: "false"
+
+      # Base de données (asyncpg)
+      DATABASE_URL: "postgresql+asyncpg://pineapple:pineapple_dev_password@db:5432/pineapple"
+
+      # Redis
+      REDIS_URL: "redis://redis:6379/0"
+
+      # Sécurité JWT
+      JWT_SECRET_KEY: "dev_secret_key_change_me"
+      JWT_ALGORITHM: "HS256"
+      ACCESS_TOKEN_EXPIRE_MINUTES: "60"
+
+      # Sécurité électorale
+      ELECTION_PEPPER_SECRET: "dev_pepper_secret_change_me"
+
+      # Stockage S3 (à adapter)
+      AWS_S3_BUCKET_NAME: "pineapple-dev-bucket"
+
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn api.main:app --host 0.0.0.0 --port 8000"
+
+volumes:
+  postgres_data:
+  redis_data:
