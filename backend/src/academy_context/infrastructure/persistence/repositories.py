@@ -1,221 +1,244 @@
-import io
-from decimal import Decimal
-from typing import List, Optional
-from uuid import UUID
+import base64
+import json
+import uuid
+from datetime import datetime
+from typing import Dict, List, Optional
 
-from pypdf import PdfReader, PdfWriter
-from reportlab.lib.colors import Color
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from academy_context.domain.entities import LibraryDocument, PremiumPurchase
-from academy_context.domain.ports import (
-    LibraryRepositoryPort,
-    PurchaseRepositoryPort,
-    WatermarkEnginePort,
+from democracy_context.domain.entities import (
+    AuditLedgerEntry,
+    Ballot,
+    Election,
+    ElectionStatus,
+    EncryptedVote,
+    VoterHash,
 )
-from academy_context.domain.value_objects import DocumentType, WatermarkMetadata
-from academy_context.infrastructure.persistence.models import (
-    LibraryDocumentModel,
-    PurchaseModel,
+from democracy_context.domain.ports import (
+    AuditLedgerPort,
+    CryptoEnginePort,
+    ElectionRepositoryPort,
+    VoteRepositoryPort,
 )
-from shared_kernel.domain.value_objects import Money
+from democracy_context.infrastructure.persistence.models import (
+    AuditLogModel,
+    BallotModel,
+    ElectionModel,
+)
 
 
-class PostgresLibraryRepository(LibraryRepositoryPort):
-    """Implémentation PostgreSQL du port LibraryRepositoryPort."""
+# ---------------------------------------------------------------------------
+# Helpers de conversion
+# ---------------------------------------------------------------------------
+
+def _election_model_to_entity(model: ElectionModel) -> Election:
+    return Election(
+        id=model.id,
+        tenant_id=model.tenant_id,
+        title=model.title,
+        election_type=model.election_type,
+        status=model.status,
+        eligibility_rules=model.eligibility_rules,
+        voting_start_at=model.voting_start_at,
+        voting_end_at=model.voting_end_at,
+        created_at=model.created_at,
+    )
+
+
+def _election_entity_to_model(election: Election) -> ElectionModel:
+    return ElectionModel(
+        id=election.id,
+        tenant_id=election.tenant_id,
+        title=election.title,
+        election_type=election.election_type,
+        status=election.status,
+        eligibility_rules=election.eligibility_rules,
+        voting_start_at=election.voting_start_at,
+        voting_end_at=election.voting_end_at,
+        created_at=election.created_at,
+    )
+
+
+def _ballot_model_to_entity(model: BallotModel) -> Ballot:
+    return Ballot(
+        id=model.id,
+        election_id=model.election_id,
+        tenant_id=model.tenant_id,
+        voter_hash=VoterHash(value=model.voter_hash),
+        encrypted_vote=EncryptedVote(data=base64.b64decode(model.encrypted_vote)),
+        cast_at=model.cast_at,
+        is_valid=getattr(model, "is_valid", True),
+    )
+
+
+def _ballot_entity_to_model(ballot: Ballot) -> BallotModel:
+    return BallotModel(
+        id=ballot.id,
+        election_id=ballot.election_id,
+        tenant_id=ballot.tenant_id,
+        voter_hash=ballot.voter_hash.value,
+        encrypted_vote=base64.b64encode(ballot.encrypted_vote.data).decode("utf-8"),
+        cast_at=ballot.cast_at,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Repositories
+# ---------------------------------------------------------------------------
+
+class PostgresElectionRepository(ElectionRepositoryPort):
+    """Implémentation PostgreSQL du port ElectionRepositoryPort."""
 
     def __init__(self, session_factory: async_sessionmaker[AsyncSession]):
         self._session_factory = session_factory
 
-    @staticmethod
-    def _to_entity(model: LibraryDocumentModel) -> LibraryDocument:
-        return LibraryDocument(
-            id=model.id,
-            tenant_id=model.tenant_id,
-            title=model.title,
-            document_type=model.document_type,
-            s3_key=model.s3_key,
-            is_premium=model.is_premium,
-            price=Money(amount=Decimal(model.price_amount), currency="XAF"),
-            faculty=model.faculty,
-            filiere=model.filiere,
-            academic_level=model.academic_level,
-            created_at=model.created_at,
-        )
-
-    @staticmethod
-    def _to_model(doc: LibraryDocument) -> LibraryDocumentModel:
-        return LibraryDocumentModel(
-            id=doc.id,
-            tenant_id=doc.tenant_id,
-            title=doc.title,
-            document_type=doc.document_type,
-            s3_key=doc.s3_key,
-            is_premium=doc.is_premium,
-            price_amount=int(doc.price.amount),
-            faculty=doc.faculty,
-            filiere=doc.filiere,
-            academic_level=doc.academic_level,
-            created_at=doc.created_at,
-        )
-
-    async def save_document(self, doc: LibraryDocument) -> LibraryDocument:
+    async def save_election(self, election: Election) -> Election:
         async with self._session_factory() as session:
-            model = self._to_model(doc)
+            model = _election_entity_to_model(election)
             try:
                 await session.merge(model)
                 await session.commit()
             except Exception:
                 await session.rollback()
                 raise
-        return doc
+        return election
 
-    async def get_document_by_id(self, doc_id: UUID, tenant_id: UUID) -> Optional[LibraryDocument]:
+    async def get_election_by_id(self, election_id: uuid.UUID, tenant_id: uuid.UUID) -> Optional[Election]:
         async with self._session_factory() as session:
-            stmt = select(LibraryDocumentModel).where(
-                LibraryDocumentModel.id == doc_id,
-                LibraryDocumentModel.tenant_id == tenant_id,
+            stmt = select(ElectionModel).where(
+                ElectionModel.id == election_id,
+                ElectionModel.tenant_id == tenant_id,
             )
             result = await session.execute(stmt)
             model = result.scalar_one_or_none()
-            return self._to_entity(model) if model else None
+            return _election_model_to_entity(model) if model else None
 
-    async def list_documents(
-        self,
-        tenant_id: UUID,
-        faculty: Optional[str],
-        level: Optional[str],
-        doc_type: Optional[DocumentType],
-    ) -> List[LibraryDocument]:
+    async def list_elections_by_tenant(
+        self, tenant_id: uuid.UUID, status: Optional[ElectionStatus] = None
+    ) -> List[Election]:
         async with self._session_factory() as session:
-            stmt = select(LibraryDocumentModel).where(
-                LibraryDocumentModel.tenant_id == tenant_id
-            )
-            if faculty:
-                stmt = stmt.where(LibraryDocumentModel.faculty == faculty)
-            if level:
-                stmt = stmt.where(LibraryDocumentModel.academic_level == level)
-            if doc_type:
-                stmt = stmt.where(LibraryDocumentModel.document_type == doc_type)
+            stmt = select(ElectionModel).where(ElectionModel.tenant_id == tenant_id)
+            if status is not None:
+                stmt = stmt.where(ElectionModel.status == status)
             result = await session.execute(stmt)
             models = result.scalars().all()
-            return [self._to_entity(m) for m in models]
+            return [_election_model_to_entity(m) for m in models]
 
 
-class PostgresPurchaseRepository(PurchaseRepositoryPort):
-    """Implémentation PostgreSQL du port PurchaseRepositoryPort."""
+class PostgresVoteRepository(VoteRepositoryPort):
+    """Implémentation PostgreSQL du port VoteRepositoryPort."""
 
     def __init__(self, session_factory: async_sessionmaker[AsyncSession]):
         self._session_factory = session_factory
 
-    @staticmethod
-    def _to_entity(model: PurchaseModel) -> PremiumPurchase:
-        return PremiumPurchase(
-            id=model.id,
-            user_id=model.user_id,
-            tenant_id=model.tenant_id,
-            document_id=model.document_id,
-            price_paid=Money(amount=Decimal(model.price_paid), currency="XAF"),
-            purchased_at=model.purchased_at,
-            is_active=True,  # Le modèle ne stocke pas is_active, on suppose True
-        )
-
-    @staticmethod
-    def _to_model(purchase: PremiumPurchase) -> PurchaseModel:
-        return PurchaseModel(
-            id=purchase.id,
-            tenant_id=purchase.tenant_id,
-            user_id=purchase.user_id,
-            document_id=purchase.document_id,
-            price_paid=int(purchase.price_paid.amount),
-            purchased_at=purchase.purchased_at,
-        )
-
-    async def save_purchase(self, purchase: PremiumPurchase) -> PremiumPurchase:
+    async def has_voted(self, voter_hash: VoterHash, election_id: uuid.UUID) -> bool:
         async with self._session_factory() as session:
-            model = self._to_model(purchase)
+            stmt = select(BallotModel).where(
+                BallotModel.election_id == election_id,
+                BallotModel.voter_hash == voter_hash.value,
+            )
+            result = await session.execute(stmt)
+            return result.scalar_one_or_none() is not None
+
+    async def cast_ballot(self, ballot: Ballot) -> Ballot:
+        async with self._session_factory() as session:
+            model = _ballot_entity_to_model(ballot)
             try:
                 session.add(model)
                 await session.commit()
             except Exception:
                 await session.rollback()
                 raise
-        return purchase
+        return ballot
 
-    async def get_user_purchases(self, user_id: UUID) -> List[PremiumPurchase]:
+    async def get_encrypted_ballots(self, election_id: uuid.UUID) -> List[Ballot]:
         async with self._session_factory() as session:
-            stmt = select(PurchaseModel).where(PurchaseModel.user_id == user_id)
+            stmt = select(BallotModel).where(BallotModel.election_id == election_id)
             result = await session.execute(stmt)
             models = result.scalars().all()
-            return [self._to_entity(m) for m in models]
-
-    async def has_purchased(self, user_id: UUID, document_id: UUID) -> bool:
-        async with self._session_factory() as session:
-            stmt = select(PurchaseModel).where(
-                PurchaseModel.user_id == user_id,
-                PurchaseModel.document_id == document_id,
-            )
-            result = await session.execute(stmt)
-            return result.scalar_one_or_none() is not None
+            return [_ballot_model_to_entity(m) for m in models]
 
 
-class PyPDFWatermarkEngine(WatermarkEnginePort):
-    """Implémentation du filigrane dynamique avec pypdf et reportlab."""
+class RSACryptoEngine(CryptoEnginePort):
+    """Implémentation RSA/ECIES-like du moteur cryptographique."""
 
-    async def apply_dynamic_watermark(self, pdf_bytes: bytes, metadata: WatermarkMetadata) -> bytes:
-        """
-        Applique un filigrane diagonal semi-transparent sur chaque page du PDF.
-        Le texte contient le matricule, l'ID utilisateur, la date et une mention légale.
-        """
-        # Lire le PDF source
-        reader = PdfReader(io.BytesIO(pdf_bytes))
-        num_pages = len(reader.pages)
+    def encrypt_choice(self, choice_data: dict, public_key_pem: str) -> EncryptedVote:
+        public_key = serialization.load_pem_public_key(public_key_pem.encode("utf-8"))
+        plaintext = json.dumps(choice_data).encode("utf-8")
+        ciphertext = public_key.encrypt(
+            plaintext,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None,
+            ),
+        )
+        return EncryptedVote(data=ciphertext)
 
-        # Créer un PDF overlay avec reportlab
-        overlay_buffer = io.BytesIO()
-        c = canvas.Canvas(overlay_buffer, pagesize=A4)
+    def decrypt_ballots(
+        self, encrypted_ballots: List[EncryptedVote], private_key_pem: str
+    ) -> Dict[str, int]:
+        private_key = serialization.load_pem_private_key(private_key_pem.encode("utf-8"), password=None)
+        tally: Dict[str, int] = {}
+        for ballot in encrypted_ballots:
+            try:
+                plaintext = private_key.decrypt(
+                    ballot.data,
+                    padding.OAEP(
+                        mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                        algorithm=hashes.SHA256(),
+                        label=None,
+                    ),
+                )
+                choice_data = json.loads(plaintext.decode("utf-8"))
+                choice_id = choice_data.get("choice_id")
+                if choice_id:
+                    tally[choice_id] = tally.get(choice_id, 0) + 1
+            except Exception:
+                # Ignorer les bulletins invalides ou corrompus
+                continue
+        return tally
 
-        # Couleur rouge semi-transparent
-        red_color = Color(1, 0, 0, alpha=0.3)  # Rouge avec opacité 30%
 
-        # Texte du filigrane
-        watermark_text = (
-            f"Propriété exclusive de {metadata.matricule} - Ne pas diffuser\n"
-            f"Utilisateur: {metadata.user_id} - Date: {metadata.timestamp.isoformat()}\n"
-            f"IP: {metadata.ip_address}"
+class PostgresAuditLedgerRepository(AuditLedgerPort):
+    """Implémentation PostgreSQL du journal d'audit immuable."""
+
+    def __init__(self, session_factory: async_sessionmaker[AsyncSession]):
+        self._session_factory = session_factory
+
+    async def append_entry(
+        self, action: str, metadata: dict, tenant_id: uuid.UUID
+    ) -> AuditLedgerEntry:
+        import hashlib
+        payload = f"{action}|{json.dumps(metadata, sort_keys=True)}|{tenant_id}"
+        entry_hash = hashlib.sha256(payload.encode()).hexdigest()
+
+        entry = AuditLedgerEntry(
+            id=uuid.uuid4(),
+            tenant_id=tenant_id,
+            action=action,
+            metadata=metadata,
+            hash=entry_hash,
+            created_at=datetime.utcnow(),
         )
 
-        # Pour chaque page du PDF original, on dessine le filigrane en diagonale
-        for page_num in range(num_pages):
-            c.setFillColor(red_color)
-            c.setFont("Helvetica", 14)
-            # Rotation pour effet diagonal
-            c.saveState()
-            c.translate(300, 400)  # Position centrale approximative
-            c.rotate(45)
-            # Dessiner le texte centré
-            c.drawCentredString(0, 0, watermark_text)
-            c.restoreState()
-            c.showPage()  # Passer à la page suivante de l'overlay
+        model = AuditLogModel(
+            id=entry.id,
+            tenant_id=entry.tenant_id,
+            action=entry.action,
+            metadata=entry.metadata,
+            hash=entry.hash,
+            created_at=entry.created_at,
+        )
 
-        c.save()
-        overlay_buffer.seek(0)
-
-        # Fusionner l'overlay avec le PDF source
-        overlay_reader = PdfReader(overlay_buffer)
-        writer = PdfWriter()
-
-        for i in range(num_pages):
-            page = reader.pages[i]
-            overlay_page = overlay_reader.pages[i]
-            page.merge_page(overlay_page)
-            writer.add_page(page)
-
-        # Écrire le PDF résultant dans un buffer
-        output_buffer = io.BytesIO()
-        writer.write(output_buffer)
-        output_buffer.seek(0)
-        return output_buffer.getvalue()
+        async with self._session_factory() as session:
+            try:
+                session.add(model)
+                await session.commit()
+            except Exception:
+                await session.rollback()
+                raise
+        return entry
