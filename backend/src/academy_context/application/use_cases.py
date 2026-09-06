@@ -1,172 +1,234 @@
-from dataclasses import dataclass
+import hashlib
+import hmac
 from datetime import datetime
-from decimal import Decimal
-from typing import List, Optional
+from typing import Dict, List, Optional, Protocol
 from uuid import UUID, uuid4
 
-from academy_context.application.dtos import (
-    DocumentUploadDTO,
-    PurchaseRequestDTO,
-    ReaderAccessDTO,
+from democracy_context.application.dtos import (
+    CastVoteDTO,
+    ElectionCreateDTO,
+    ElectionResponseDTO,
+    ElectionResultsDTO,
 )
-from academy_context.domain.entities import LibraryDocument, PremiumPurchase
-from academy_context.domain.ports import (
-    FileStoragePort,
-    LibraryRepositoryPort,
-    PurchaseRepositoryPort,
-    WatermarkEnginePort,
+from democracy_context.domain.entities import (
+    AuditLedgerEntry,
+    Ballot,
+    Election,
+    ElectionStatus,
+    EncryptedVote,
+    VoterHash,
 )
-from academy_context.domain.value_objects import (
-    AccessStatus,
-    DocumentType,
-    WatermarkMetadata,
+from democracy_context.domain.ports import (
+    AuditLedgerPort,
+    CryptoEnginePort,
+    ElectionRepositoryPort,
+    VoteRepositoryPort,
 )
-from shared_kernel.domain.value_objects import Money
+from shared_kernel.config import settings
 
 
-class DocumentNotFoundError(Exception):
+class UserInfoProvider(Protocol):
+    """Fournit les informations académiques nécessaires à la vérification d'éligibilité."""
+
+    def get_user_info(self, user_id: UUID) -> dict:
+        """
+        Retourne un dictionnaire contenant au moins :
+        - academic_status: str
+        - is_certified: bool
+        - level: str
+        """
+        ...
+
+
+class ElectionNotFoundError(Exception):
     pass
 
 
-class AccessDeniedError(Exception):
+class AlreadyVotedError(Exception):
     pass
 
 
-class PaymentError(Exception):
+class NotEligibleError(Exception):
     pass
 
 
-class UploadLibraryDocumentUseCase:
-    """Use case pour l'upload d'un document dans la bibliothèque."""
+class VotingNotOpenError(Exception):
+    pass
 
-    def __init__(self, library_repo: LibraryRepositoryPort, file_storage: FileStoragePort):
-        self._library_repo = library_repo
-        self._file_storage = file_storage
 
-    def execute(
+class TallyNotAllowedError(Exception):
+    pass
+
+
+class CreateElectionUseCase:
+    """Crée une élection et enregistre l'événement dans le registre d'audit."""
+
+    def __init__(
         self,
-        tenant_id: UUID,
-        uploader_id: UUID,
-        dto: DocumentUploadDTO,
-        file_bytes: bytes,
-        original_filename: str,
-        mime_type: str,
-    ) -> LibraryDocument:
-        # Upload du fichier et récupération de la clé S3
-        s3_key = self._file_storage.upload_file(file_bytes, original_filename, mime_type)
+        election_repo: ElectionRepositoryPort,
+        audit_ledger: AuditLedgerPort,
+    ):
+        self._election_repo = election_repo
+        self._audit_ledger = audit_ledger
 
-        # Création de l'entité LibraryDocument
-        doc = LibraryDocument(
+    def execute(self, dto: ElectionCreateDTO, tenant_id: UUID) -> Election:
+        election = Election(
             id=uuid4(),
             tenant_id=tenant_id,
             title=dto.title,
-            document_type=dto.document_type,
-            s3_key=s3_key,
-            is_premium=dto.is_premium,
-            price=Money(amount=Decimal(dto.price_fcfa), currency="XAF"),
-            faculty=dto.faculty,
-            filiere=dto.filiere,
-            academic_level=dto.academic_level,
-            downloads_count=0,
-            created_at=datetime.utcnow(),
+            election_type=dto.election_type,
+            status=ElectionStatus.DRAFT,
+            eligibility_rules=dto.eligibility_rules,
+            voting_start_at=dto.voting_start_at,
+            voting_end_at=dto.voting_end_at,
         )
 
-        return self._library_repo.save_document(doc)
+        saved = self._election_repo.save_election(election)
 
-
-class PurchasePremiumDocumentUseCase:
-    """Use case pour l'achat d'un document premium."""
-
-    def __init__(
-        self,
-        library_repo: LibraryRepositoryPort,
-        purchase_repo: PurchaseRepositoryPort,
-    ):
-        self._library_repo = library_repo
-        self._purchase_repo = purchase_repo
-
-    def execute(
-        self,
-        user_id: UUID,
-        tenant_id: UUID,
-        dto: PurchaseRequestDTO,
-        payment_processor=None,  # dépendance optionnelle pour simuler le paiement
-    ) -> PremiumPurchase:
-        doc = self._library_repo.get_document_by_id(dto.document_id, tenant_id)
-        if not doc:
-            raise DocumentNotFoundError("Document not found")
-
-        if not doc.is_premium:
-            # Le document est gratuit, pas besoin d'achat
-            raise PaymentError("Document is not premium")
-
-        if self._purchase_repo.has_purchased(user_id, dto.document_id):
-            raise PaymentError("User already purchased this document")
-
-        # Simuler ou traiter le paiement (méthode de paiement fournie dans le DTO)
-        # Ici on considère que le paiement est réussi.
-        # Dans une vraie implémentation, on appellerait un service de paiement.
-
-        purchase = PremiumPurchase(
-            id=uuid4(),
-            user_id=user_id,
+        self._audit_ledger.append_entry(
+            action="election.created",
+            metadata={
+                "election_id": str(saved.id),
+                "title": saved.title,
+                "tenant_id": str(tenant_id),
+            },
             tenant_id=tenant_id,
-            document_id=doc.id,
-            price_paid=doc.price,
-            purchased_at=datetime.utcnow(),
-            is_active=True,
         )
 
-        return self._purchase_repo.save_purchase(purchase)
+        return saved
 
 
-class StreamToPineappleReaderUseCase:
-    """Use case pour le streaming sécurisé d'un document avec filigrane dynamique."""
+class CastVoteUseCase:
+    """Use case de vote : anonymisation, éligibilité, unicité, chiffrement et audit."""
 
     def __init__(
         self,
-        library_repo: LibraryRepositoryPort,
-        purchase_repo: PurchaseRepositoryPort,
-        file_storage: FileStoragePort,
-        watermark_engine: WatermarkEnginePort,
+        election_repo: ElectionRepositoryPort,
+        vote_repo: VoteRepositoryPort,
+        crypto_engine: CryptoEnginePort,
+        audit_ledger: AuditLedgerPort,
+        user_info_provider: UserInfoProvider,
     ):
-        self._library_repo = library_repo
-        self._purchase_repo = purchase_repo
-        self._file_storage = file_storage
-        self._watermark_engine = watermark_engine
+        self._election_repo = election_repo
+        self._vote_repo = vote_repo
+        self._crypto_engine = crypto_engine
+        self._audit_ledger = audit_ledger
+        self._user_info_provider = user_info_provider
+
+    def _generate_voter_hash(self, user_id: UUID, election_id: UUID) -> VoterHash:
+        """Génère un hash anonyme de l'électeur en utilisant un pepper système."""
+        pepper = settings.ELECTION_PEPPER_SECRET.encode()
+        message = f"{user_id}:{election_id}".encode()
+        digest = hmac.new(pepper, message, hashlib.sha256).hexdigest()
+        return VoterHash(value=digest)
 
     def execute(
         self,
         user_id: UUID,
         tenant_id: UUID,
-        document_id: UUID,
-        user_matricule: str,
-        user_ip: str,
-    ) -> bytes:
-        doc = self._library_repo.get_document_by_id(document_id, tenant_id)
-        if not doc:
-            raise DocumentNotFoundError("Document not found")
+        dto: CastVoteDTO,
+        public_key_pem: str,
+    ) -> None:
+        election = self._election_repo.get_election_by_id(dto.election_id, tenant_id)
+        if not election:
+            raise ElectionNotFoundError("Election not found")
 
-        # Vérification de l'accès
-        if doc.is_premium:
-            has_purchase = self._purchase_repo.has_purchased(user_id, document_id)
-            if not has_purchase:
-                raise AccessDeniedError("User has not purchased this premium document")
+        if not election.can_vote(datetime.utcnow()):
+            raise VotingNotOpenError("Voting is not currently open")
 
-        # Récupération des bytes du document depuis le stockage
-        file_bytes = self._file_storage.get_file_bytes(doc.s3_key)
+        # Récupération des infos académiques de l'utilisateur
+        user_info = self._user_info_provider.get_user_info(user_id)
 
-        # Construction des métadonnées du filigrane
-        watermark_meta = WatermarkMetadata(
-            matricule=user_matricule,
-            user_id=user_id,
-            timestamp=datetime.utcnow(),
-            ip_address=user_ip,
+        # Vérification de l'éligibilité
+        if not election.is_eligible(
+            user_academic_status=user_info.get("academic_status", ""),
+            is_certified=user_info.get("is_certified", False),
+            user_level=user_info.get("level", ""),
+        ):
+            raise NotEligibleError("User is not eligible for this election")
+
+        # Génération du hash anonyme et vérification d'unicité
+        voter_hash = self._generate_voter_hash(user_id, dto.election_id)
+        if self._vote_repo.has_voted(voter_hash, dto.election_id):
+            raise AlreadyVotedError("User has already voted in this election")
+
+        # Chiffrement du choix
+        choice_data = {"choice_id": dto.choice_id}
+        encrypted = self._crypto_engine.encrypt_choice(choice_data, public_key_pem)
+
+        # Création du bulletin strictement anonyme
+        ballot = Ballot(
+            id=uuid4(),
+            election_id=dto.election_id,
+            tenant_id=tenant_id,
+            voter_hash=voter_hash,
+            encrypted_vote=encrypted,
+            cast_at=datetime.utcnow(),
+        )
+        self._vote_repo.cast_ballot(ballot)
+
+        # Enregistrement dans le registre d'audit
+        self._audit_ledger.append_entry(
+            action="vote.cast",
+            metadata={
+                "election_id": str(dto.election_id),
+                "voter_hash": voter_hash.value,
+                "tenant_id": str(tenant_id),
+            },
+            tenant_id=tenant_id,
         )
 
-        # Application du filigrane dynamique
-        watermarked_pdf = self._watermark_engine.apply_dynamic_watermark(
-            file_bytes, watermark_meta
+
+class TallyResultsUseCase:
+    """Dépouillement des bulletins et publication des résultats après clôture."""
+
+    def __init__(
+        self,
+        election_repo: ElectionRepositoryPort,
+        vote_repo: VoteRepositoryPort,
+        crypto_engine: CryptoEnginePort,
+        audit_ledger: AuditLedgerPort,
+    ):
+        self._election_repo = election_repo
+        self._vote_repo = vote_repo
+        self._crypto_engine = crypto_engine
+        self._audit_ledger = audit_ledger
+
+    def execute(
+        self, election_id: UUID, tenant_id: UUID, private_key_pem: str
+    ) -> ElectionResultsDTO:
+        election = self._election_repo.get_election_by_id(election_id, tenant_id)
+        if not election:
+            raise ElectionNotFoundError("Election not found")
+
+        if election.status != ElectionStatus.VOTING_CLOSED:
+            raise TallyNotAllowedError("Election must be closed before tallying")
+
+        # Récupération des bulletins chiffrés
+        ballots = self._vote_repo.get_encrypted_ballots(election_id)
+        encrypted_ballots = [b.encrypted_vote for b in ballots if b.is_valid]
+
+        # Déchiffrement et comptage
+        tally = self._crypto_engine.decrypt_ballots(encrypted_ballots, private_key_pem)
+
+        # Mise à jour du statut
+        election.status = ElectionStatus.RESULTS_PUBLISHED
+        self._election_repo.save_election(election)
+
+        # Audit de publication
+        self._audit_ledger.append_entry(
+            action="election.results_published",
+            metadata={
+                "election_id": str(election_id),
+                "total_ballots": len(encrypted_ballots),
+                "tenant_id": str(tenant_id),
+            },
+            tenant_id=tenant_id,
         )
 
-        return watermarked_pdf
+        return ElectionResultsDTO(
+            election_id=election_id,
+            total_ballots=len(encrypted_ballots),
+            tally_results=tally,
+            published_at=datetime.utcnow(),
+        )
