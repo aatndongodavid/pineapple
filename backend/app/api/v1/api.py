@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.v1 import health, auth, users, feed, elections, vote, results
+from app.api.v1 import health, auth, users, feed, elections, vote, results, chat
 
 api_router = APIRouter()
 
@@ -11,3 +11,4 @@ api_router.include_router(feed.router, prefix="/feed", tags=["Feed & Publication
 api_router.include_router(elections.router, prefix="/elections", tags=["Démocratie & Élections"])
 api_router.include_router(vote.router, prefix="/vote", tags=["Vote & Audit"])
 api_router.include_router(results.router, prefix="/results", tags=["Vote & Audit"])
+api_router.include_router(chat.router, prefix="/chat", tags=["Messagerie (Temps Réel)"])
