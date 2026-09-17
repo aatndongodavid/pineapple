@@ -5,6 +5,7 @@ from app.models.feed import Post, PostCategory, Comment, Reaction, ReactionType
 from app.models.election import Election, ElectionStatus
 from app.models.ballot import EncryptedBallot
 from app.models.audit import AuditLog
+from app.models.chat import ChatRoom, ChatRoomMember, Message
 
 __all__ = [
     "Base",
@@ -23,4 +24,7 @@ __all__ = [
     "ElectionStatus",
     "EncryptedBallot",
     "AuditLog",
+    "ChatRoom",
+    "ChatRoomMember",
+    "Message",
 ]
