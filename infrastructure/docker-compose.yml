@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: pineapple_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: pineapple_user
+      POSTGRES_PASSWORD: pineapple_password
+      POSTGRES_DB: pineapple_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pineapple_user -d pineapple_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: pineapple_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: pineapple_backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - PROJECT_NAME=Pineapple API
+      - API_V1_STR=/api/v1
+      - ENVIRONMENT=development
+      - DEBUG=True
+      - SECRET_KEY=pineapple_super_secret_key_change_in_production
+      - POSTGRES_SERVER=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=pineapple_user
+      - POSTGRES_PASSWORD=pineapple_password
+      - POSTGRES_DB=pineapple_db
+      - DATABASE_URL=postgresql+asyncpg://pineapple_user:pineapple_password@db:5432/pineapple_db
+      - SYNC_DATABASE_URL=postgresql+psycopg2://pineapple_user:pineapple_password@db:5432/pineapple_db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CORS_ORIGINS=["http://localhost:3000","http://localhost:5173","http://127.0.0.1:5173","http://localhost:8000"]
+    volumes:
+      - ../backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
