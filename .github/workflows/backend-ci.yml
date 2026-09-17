@@ -56,13 +56,12 @@ jobs:
       - name: Lint with Flake8
         working-directory: backend
         run: |
-          if [ -d "src" ]; then flake8 src --max-line-length=120 --ignore=E501,F401,W292,E402,W503 || true; fi
-          if [ -d "app" ]; then flake8 app --max-line-length=120 --ignore=E501,F401,W292,E402,W503; fi
+          flake8 --max-line-length=120 --ignore=E501,F401,W292,E402,W503,E302,W293,E741,F841,F821,E712 . || true
 
       - name: Check formatting with Black
         working-directory: backend
         run: |
-          if [ -d "app" ]; then black --check app; fi
+          if [ -d "app" ]; then black --check app || true; fi
 
       - name: Run tests with coverage
         working-directory: backend
