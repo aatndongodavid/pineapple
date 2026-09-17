@@ -5,7 +5,7 @@ import { motion, HTMLMotionProps } from 'framer-motion';
 import { Loader2, LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-type ButtonVariant = 'primary' | 'secondary' | 'neo' | 'glass';
+type ButtonVariant = 'primary' | 'secondary' | 'neo' | 'glass' | 'ghost' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'children'> {
@@ -23,6 +23,8 @@ const variantClasses: Record<ButtonVariant, string> = {
   secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300 active:bg-gray-400 focus-visible:ring-gray-400',
   neo: 'bg-background-light text-gray-800 shadow-neo-extruded hover:shadow-neo-inset active:shadow-neo-pressed focus-visible:ring-pineapple',
   glass: 'glass-panel text-white hover:bg-white/20 focus-visible:ring-pineapple',
+  ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 active:bg-gray-200 focus-visible:ring-gray-400 dark:text-gray-200 dark:hover:bg-white/10',
+  danger: 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 focus-visible:ring-red-500',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

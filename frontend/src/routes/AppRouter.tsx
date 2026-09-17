@@ -18,13 +18,13 @@ import { SecurityCenterScreen } from '@/features/auth/SecurityCenterScreen';
 import { SettingsScreen } from '@/features/settings/SettingsScreen';
 import { OrganizationsScreen } from '@/features/community/OrganizationsScreen';
 import { RoomsScreen } from '@/features/community/RoomsScreen';
-import { ElectionRoomScreen } from '@/features/democracy/ElectionRoomScreen';
+import { ElectionRoomScreen } from '@/democracy/ElectionRoomScreen';
 import { LibraryScreen } from '@/features/academy/LibraryScreen';
 import { PineappleReaderScreen } from '@/features/academy/PineappleReaderScreen';
 import { MarketplaceScreen } from '@/features/campus_life/MarketplaceScreen';
 import { PineappleRideScreen } from '@/features/campus_life/PineappleRideScreen';
 import { OpportunitiesScreen } from '@/features/opportunities/OpportunitiesScreen';
-import { ElectionCard } from '@/features/democracy/ElectionCard';
+import { ElectionCard } from '@/democracy/ElectionCard';
 
 // Import des écrans admin
 import { AdminDashboardScreen } from '@/features/admin/AdminDashboardScreen';
@@ -43,7 +43,7 @@ const ElectionsListScreen: React.FC = () => {
       id: 'e1',
       title: 'Élection BDE ENSPD 2027',
       electionType: 'BDE',
-      status: 'VOTING_OPEN',
+      status: 'VOTING_OPEN' as const,
       votingStartAt: '2027-03-15T08:00:00Z',
       votingEndAt: '2027-03-15T18:00:00Z',
     },

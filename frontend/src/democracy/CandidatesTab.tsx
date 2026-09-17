@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { User, BadgeCheck } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 
 // ---------- Types ----------
 interface Candidate {
