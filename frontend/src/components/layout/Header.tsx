@@ -11,7 +11,11 @@ const tenants = [
   { id: '3', name: 'ENS' },
 ];
 
-export const Header: React.FC = () => {
+interface HeaderProps {
+  onChatClick?: () => void;
+}
+
+export const Header: React.FC<HeaderProps> = ({ onChatClick }) => {
   const [selectedTenant, setSelectedTenant] = React.useState(tenants[0]);
   const [notifications] = React.useState(3); // à remplacer par un store
 
@@ -43,7 +47,11 @@ export const Header: React.FC = () => {
 
       {/* Notifications + Avatar */}
       <div className="flex items-center gap-4">
-        <button className="relative p-2 rounded-full hover:bg-pineapple/10 transition-colors">
+        <button
+          type="button"
+          onClick={onChatClick}
+          className="relative p-2 rounded-full hover:bg-pineapple/10 transition-colors"
+        >
           <Bell className="h-5 w-5 text-gray-600 dark:text-gray-300" />
           {notifications > 0 && (
             <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">

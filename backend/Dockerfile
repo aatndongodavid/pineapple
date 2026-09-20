@@ -19,7 +19,7 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # Copier les fichiers de dépendances
-COPY requirements.txt .
+COPY backend/requirements.prod.txt requirements.txt
 
 # Installation des dépendances Python dans un environnement virtuel
 RUN python -m venv /opt/venv
@@ -31,6 +31,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 FROM python:3.11-slim
 
 WORKDIR /app
+ENV PYTHONPATH="/app/src"
 
 # Installation des dépendances système légères nécessaires à l'exécution
 RUN apt-get update && \
@@ -41,6 +42,7 @@ RUN apt-get update && \
         libgdk-pixbuf-2.0-0 \
         libffi8 \
         libpq5 \
+        curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copier l'environnement virtuel depuis le builder
@@ -48,7 +50,9 @@ COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Copier le code source
-COPY . .
+COPY backend/ .
+COPY alembic.ini .
+COPY alembic ./alembic
 
 # Exposer le port de l'API
 EXPOSE 8000

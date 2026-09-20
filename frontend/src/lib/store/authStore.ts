@@ -9,15 +9,19 @@ export interface AuthUser {
   firstName?: string;
   lastName?: string;
   matricule?: string;
+  filiere?: string;
+  role?: 'USER' | 'STUDENT' | 'MODERATOR' | 'ADMIN' | string;
 }
 
 interface AuthState {
   token: string | null;
   user: AuthUser | null;
+  tenantId: string | null;
   isAuthenticated: boolean;
   campusStatusDisplay: string | null;
   login: (token: string, user: AuthUser, campusStatusDisplay?: string) => void;
   logout: () => void;
+  clearAuth: () => void;
   updateCampusStatus: (status: string) => void;
 }
 
@@ -26,6 +30,7 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       token: null,
       user: null,
+      tenantId: null,
       isAuthenticated: false,
       campusStatusDisplay: null,
 
@@ -41,6 +46,16 @@ export const useAuthStore = create<AuthState>()(
         set({
           token: null,
           user: null,
+          tenantId: null,
+          isAuthenticated: false,
+          campusStatusDisplay: null,
+        }),
+
+      clearAuth: () =>
+        set({
+          token: null,
+          user: null,
+          tenantId: null,
           isAuthenticated: false,
           campusStatusDisplay: null,
         }),
@@ -53,6 +68,7 @@ export const useAuthStore = create<AuthState>()(
       partialize: (state) => ({
         token: state.token,
         user: state.user,
+        tenantId: state.tenantId,
         isAuthenticated: state.isAuthenticated,
         campusStatusDisplay: state.campusStatusDisplay,
       }),

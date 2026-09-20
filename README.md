@@ -58,8 +58,25 @@ Chaque contexte possède ses couches `domain`, `application`, `infrastructure` e
 git clone https://github.com/aatndongodavid/pineapple.git
 cd pineapple
 ```
+### 2.1 lancer les dockers
 
-### 2. Lancer l'infrastructure
+```bash
+# tout d'abord exécuter cette commande pour construire les images Docker sans cache 
+docker compose build --no-cache
+```
+```bash
+# Puis exécuter la commande suivante pour lancer les conteneurs Docker
+docker compose up -d
+```
+```bash
+# Puis voir les conteneurs en cours d'exécution avec la commande suivante
+docker compose ps
+```
+```bash
+# Pour voir les logs des conteneurs en cours d'exécution avec la commande suivante
+docker compose logs -f
+
+### 2.2 Lancer l'infrastructure
 
 ```bash
 make up
