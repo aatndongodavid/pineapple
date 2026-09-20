@@ -89,7 +89,7 @@ class PostgresTrustSafetyRepository(TrustSafetyRepositoryPort):
             id=model.id,
             tenant_id=model.tenant_id,
             action=model.action,
-            metadata=model.metadata,
+            metadata=model.metadata_,
             hash=model.hash,
             created_at=model.created_at,
         )
@@ -106,7 +106,7 @@ class PostgresTrustSafetyRepository(TrustSafetyRepositoryPort):
             id=entry.id,
             tenant_id=entry.tenant_id,
             action=entry.action,
-            metadata=entry.metadata,
+            metadata_=entry.metadata,
             hash=entry.hash,
             created_at=entry.created_at,
         )

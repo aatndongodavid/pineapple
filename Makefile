@@ -41,6 +41,7 @@ prod-ps: ## Affiche l'état des conteneurs de production
 
 migrate: ## Applique les migrations Alembic dans le conteneur backend
 	$(DOCKER_COMPOSE) exec backend alembic upgrade head
+	$(DOCKER_COMPOSE) exec backend python -m src.scripts.create_tables
 
 seed: ## Injecte les données de démonstration dans le conteneur backend
 	$(DOCKER_COMPOSE) exec backend python -m src.scripts.seed_data

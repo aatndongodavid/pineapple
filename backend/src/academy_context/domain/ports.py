@@ -1,82 +1,51 @@
+import uuid
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional
-from uuid import UUID
 
-from democracy_context.domain.entities import (
-    AuditLedgerEntry,
-    Ballot,
-    Election,
-    ElectionStatus,
-    EncryptedVote,
-    VoterHash,
-)
+from academy_context.domain.entities import LibraryDocument, PremiumPurchase
+from academy_context.domain.value_objects import DocumentType, WatermarkMetadata
 
 
-class ElectionRepositoryPort(ABC):
-    """Port de persistance pour l'agrégat Election."""
-
+class LibraryRepositoryPort(ABC):
     @abstractmethod
-    def save_election(self, election: Election) -> Election:
-        """Sauvegarde une élection (création ou mise à jour)."""
+    async def list_documents(
+        self,
+        tenant_id: uuid.UUID,
+        faculty: str | None = None,
+        level: str | None = None,
+        doc_type: DocumentType | None = None,
+    ) -> list[LibraryDocument]:
         raise NotImplementedError
 
     @abstractmethod
-    def get_election_by_id(self, election_id: UUID, tenant_id: UUID) -> Optional[Election]:
-        """Récupère une élection par son identifiant dans un tenant donné."""
+    async def get_document(self, document_id: uuid.UUID, tenant_id: uuid.UUID) -> LibraryDocument | None:
         raise NotImplementedError
 
     @abstractmethod
-    def list_elections_by_tenant(
-        self, tenant_id: UUID, status: Optional[ElectionStatus] = None
-    ) -> List[Election]:
-        """Liste les élections d'un tenant, avec filtrage optionnel par statut."""
+    async def save_document(self, document: LibraryDocument) -> LibraryDocument:
         raise NotImplementedError
 
 
-class VoteRepositoryPort(ABC):
-    """Port de persistance pour les bulletins de vote."""
-
+class PurchaseRepositoryPort(ABC):
     @abstractmethod
-    def has_voted(self, voter_hash: VoterHash, election_id: UUID) -> bool:
-        """Vérifie si un électeur (haché) a déjà voté pour une élection donnée."""
+    async def save_purchase(self, purchase: PremiumPurchase) -> PremiumPurchase:
         raise NotImplementedError
 
     @abstractmethod
-    def cast_ballot(self, ballot: Ballot) -> Ballot:
-        """Enregistre un bulletin de vote."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def get_encrypted_ballots(self, election_id: UUID) -> List[Ballot]:
-        """Récupère tous les bulletins chiffrés d'une élection."""
+    async def has_purchase(self, user_id: uuid.UUID, document_id: uuid.UUID, tenant_id: uuid.UUID) -> bool:
         raise NotImplementedError
 
 
-class CryptoEnginePort(ABC):
-    """Port pour le moteur cryptographique des votes."""
-
+class FileStoragePort(ABC):
     @abstractmethod
-    def encrypt_choice(self, choice_data: dict, public_key_pem: str) -> EncryptedVote:
-        """Chiffre le choix d'un électeur avec la clé publique fournie."""
+    async def upload_file(self, file_bytes: bytes, filename: str, mime_type: str) -> str:
         raise NotImplementedError
 
     @abstractmethod
-    def decrypt_ballots(
-        self, encrypted_ballots: List[EncryptedVote], private_key_pem: str
-    ) -> Dict[str, int]:
-        """
-        Déchiffre les bulletins et retourne un comptage anonymisé :
-        mapping { "candidate_id": nombre_de_voix }.
-        """
+    async def get_file_bytes(self, file_key: str) -> bytes:
         raise NotImplementedError
 
 
-class AuditLedgerPort(ABC):
-    """Port pour le journal d'audit immuable."""
-
+class WatermarkEnginePort(ABC):
     @abstractmethod
-    def append_entry(
-        self, action: str, metadata: dict, tenant_id: UUID
-    ) -> AuditLedgerEntry:
-        """Ajoute une entrée au registre d'audit."""
+    async def apply_watermark(self, pdf_bytes: bytes, metadata: WatermarkMetadata) -> bytes:
         raise NotImplementedError

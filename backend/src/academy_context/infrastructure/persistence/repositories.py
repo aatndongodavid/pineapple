@@ -1,244 +1,123 @@
-import base64
-import json
 import uuid
-from datetime import datetime
-from typing import Dict, List, Optional
+from decimal import Decimal
 
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import padding
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from democracy_context.domain.entities import (
-    AuditLedgerEntry,
-    Ballot,
-    Election,
-    ElectionStatus,
-    EncryptedVote,
-    VoterHash,
+from academy_context.domain.entities import LibraryDocument, PremiumPurchase
+from academy_context.domain.value_objects import DocumentType, WatermarkMetadata
+from academy_context.infrastructure.persistence.models import (
+    LibraryDocumentModel,
+    PremiumPurchaseModel,
 )
-from democracy_context.domain.ports import (
-    AuditLedgerPort,
-    CryptoEnginePort,
-    ElectionRepositoryPort,
-    VoteRepositoryPort,
-)
-from democracy_context.infrastructure.persistence.models import (
-    AuditLogModel,
-    BallotModel,
-    ElectionModel,
-)
+from shared_kernel.domain.value_objects import Money
 
 
-# ---------------------------------------------------------------------------
-# Helpers de conversion
-# ---------------------------------------------------------------------------
-
-def _election_model_to_entity(model: ElectionModel) -> Election:
-    return Election(
+def _document_to_entity(model: LibraryDocumentModel) -> LibraryDocument:
+    return LibraryDocument(
         id=model.id,
         tenant_id=model.tenant_id,
+        uploader_id=model.uploader_id,
         title=model.title,
-        election_type=model.election_type,
-        status=model.status,
-        eligibility_rules=model.eligibility_rules,
-        voting_start_at=model.voting_start_at,
-        voting_end_at=model.voting_end_at,
+        document_type=model.document_type,
+        faculty=model.faculty,
+        filiere=model.filiere,
+        academic_level=model.academic_level,
+        file_key=model.file_key,
+        is_premium=model.is_premium,
+        price=Money(Decimal(model.price_fcfa)),
         created_at=model.created_at,
     )
 
 
-def _election_entity_to_model(election: Election) -> ElectionModel:
-    return ElectionModel(
-        id=election.id,
-        tenant_id=election.tenant_id,
-        title=election.title,
-        election_type=election.election_type,
-        status=election.status,
-        eligibility_rules=election.eligibility_rules,
-        voting_start_at=election.voting_start_at,
-        voting_end_at=election.voting_end_at,
-        created_at=election.created_at,
-    )
-
-
-def _ballot_model_to_entity(model: BallotModel) -> Ballot:
-    return Ballot(
-        id=model.id,
-        election_id=model.election_id,
-        tenant_id=model.tenant_id,
-        voter_hash=VoterHash(value=model.voter_hash),
-        encrypted_vote=EncryptedVote(data=base64.b64decode(model.encrypted_vote)),
-        cast_at=model.cast_at,
-        is_valid=getattr(model, "is_valid", True),
-    )
-
-
-def _ballot_entity_to_model(ballot: Ballot) -> BallotModel:
-    return BallotModel(
-        id=ballot.id,
-        election_id=ballot.election_id,
-        tenant_id=ballot.tenant_id,
-        voter_hash=ballot.voter_hash.value,
-        encrypted_vote=base64.b64encode(ballot.encrypted_vote.data).decode("utf-8"),
-        cast_at=ballot.cast_at,
-    )
-
-
-# ---------------------------------------------------------------------------
-# Repositories
-# ---------------------------------------------------------------------------
-
-class PostgresElectionRepository(ElectionRepositoryPort):
-    """Implémentation PostgreSQL du port ElectionRepositoryPort."""
-
+class PostgresLibraryRepository:
     def __init__(self, session_factory: async_sessionmaker[AsyncSession]):
         self._session_factory = session_factory
 
-    async def save_election(self, election: Election) -> Election:
+    async def list_documents(
+        self,
+        tenant_id: uuid.UUID,
+        faculty: str | None = None,
+        level: str | None = None,
+        doc_type: DocumentType | None = None,
+    ) -> list[LibraryDocument]:
         async with self._session_factory() as session:
-            model = _election_entity_to_model(election)
-            try:
-                await session.merge(model)
-                await session.commit()
-            except Exception:
-                await session.rollback()
-                raise
-        return election
-
-    async def get_election_by_id(self, election_id: uuid.UUID, tenant_id: uuid.UUID) -> Optional[Election]:
-        async with self._session_factory() as session:
-            stmt = select(ElectionModel).where(
-                ElectionModel.id == election_id,
-                ElectionModel.tenant_id == tenant_id,
-            )
+            stmt = select(LibraryDocumentModel).where(LibraryDocumentModel.tenant_id == tenant_id)
+            if faculty:
+                stmt = stmt.where(LibraryDocumentModel.faculty == faculty)
+            if level:
+                stmt = stmt.where(LibraryDocumentModel.academic_level == level)
+            if doc_type:
+                stmt = stmt.where(LibraryDocumentModel.document_type == doc_type)
             result = await session.execute(stmt)
+            return [_document_to_entity(model) for model in result.scalars().all()]
+
+    async def get_document(
+        self, document_id: uuid.UUID, tenant_id: uuid.UUID
+    ) -> LibraryDocument | None:
+        async with self._session_factory() as session:
+            result = await session.execute(
+                select(LibraryDocumentModel).where(
+                    LibraryDocumentModel.id == document_id,
+                    LibraryDocumentModel.tenant_id == tenant_id,
+                )
+            )
             model = result.scalar_one_or_none()
-            return _election_model_to_entity(model) if model else None
+            return _document_to_entity(model) if model else None
 
-    async def list_elections_by_tenant(
-        self, tenant_id: uuid.UUID, status: Optional[ElectionStatus] = None
-    ) -> List[Election]:
+    async def save_document(self, document: LibraryDocument) -> LibraryDocument:
+        model = LibraryDocumentModel(
+            id=document.id,
+            tenant_id=document.tenant_id,
+            uploader_id=document.uploader_id,
+            title=document.title,
+            document_type=document.document_type,
+            faculty=document.faculty,
+            filiere=document.filiere,
+            academic_level=document.academic_level,
+            file_key=document.file_key,
+            is_premium=document.is_premium,
+            price_fcfa=int(document.price.amount),
+            created_at=document.created_at,
+        )
         async with self._session_factory() as session:
-            stmt = select(ElectionModel).where(ElectionModel.tenant_id == tenant_id)
-            if status is not None:
-                stmt = stmt.where(ElectionModel.status == status)
-            result = await session.execute(stmt)
-            models = result.scalars().all()
-            return [_election_model_to_entity(m) for m in models]
+            session.add(model)
+            await session.commit()
+        return document
 
 
-class PostgresVoteRepository(VoteRepositoryPort):
-    """Implémentation PostgreSQL du port VoteRepositoryPort."""
-
+class PostgresPurchaseRepository:
     def __init__(self, session_factory: async_sessionmaker[AsyncSession]):
         self._session_factory = session_factory
 
-    async def has_voted(self, voter_hash: VoterHash, election_id: uuid.UUID) -> bool:
+    async def save_purchase(self, purchase: PremiumPurchase) -> PremiumPurchase:
+        model = PremiumPurchaseModel(
+            id=purchase.id,
+            tenant_id=purchase.tenant_id,
+            user_id=purchase.user_id,
+            document_id=purchase.document_id,
+            amount_fcfa=int(purchase.amount.amount),
+            purchased_at=purchase.purchased_at,
+        )
         async with self._session_factory() as session:
-            stmt = select(BallotModel).where(
-                BallotModel.election_id == election_id,
-                BallotModel.voter_hash == voter_hash.value,
+            session.add(model)
+            await session.commit()
+        return purchase
+
+    async def has_purchase(
+        self, user_id: uuid.UUID, document_id: uuid.UUID, tenant_id: uuid.UUID
+    ) -> bool:
+        async with self._session_factory() as session:
+            result = await session.execute(
+                select(PremiumPurchaseModel).where(
+                    PremiumPurchaseModel.user_id == user_id,
+                    PremiumPurchaseModel.document_id == document_id,
+                    PremiumPurchaseModel.tenant_id == tenant_id,
+                )
             )
-            result = await session.execute(stmt)
             return result.scalar_one_or_none() is not None
 
-    async def cast_ballot(self, ballot: Ballot) -> Ballot:
-        async with self._session_factory() as session:
-            model = _ballot_entity_to_model(ballot)
-            try:
-                session.add(model)
-                await session.commit()
-            except Exception:
-                await session.rollback()
-                raise
-        return ballot
 
-    async def get_encrypted_ballots(self, election_id: uuid.UUID) -> List[Ballot]:
-        async with self._session_factory() as session:
-            stmt = select(BallotModel).where(BallotModel.election_id == election_id)
-            result = await session.execute(stmt)
-            models = result.scalars().all()
-            return [_ballot_model_to_entity(m) for m in models]
-
-
-class RSACryptoEngine(CryptoEnginePort):
-    """Implémentation RSA/ECIES-like du moteur cryptographique."""
-
-    def encrypt_choice(self, choice_data: dict, public_key_pem: str) -> EncryptedVote:
-        public_key = serialization.load_pem_public_key(public_key_pem.encode("utf-8"))
-        plaintext = json.dumps(choice_data).encode("utf-8")
-        ciphertext = public_key.encrypt(
-            plaintext,
-            padding.OAEP(
-                mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                algorithm=hashes.SHA256(),
-                label=None,
-            ),
-        )
-        return EncryptedVote(data=ciphertext)
-
-    def decrypt_ballots(
-        self, encrypted_ballots: List[EncryptedVote], private_key_pem: str
-    ) -> Dict[str, int]:
-        private_key = serialization.load_pem_private_key(private_key_pem.encode("utf-8"), password=None)
-        tally: Dict[str, int] = {}
-        for ballot in encrypted_ballots:
-            try:
-                plaintext = private_key.decrypt(
-                    ballot.data,
-                    padding.OAEP(
-                        mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                        algorithm=hashes.SHA256(),
-                        label=None,
-                    ),
-                )
-                choice_data = json.loads(plaintext.decode("utf-8"))
-                choice_id = choice_data.get("choice_id")
-                if choice_id:
-                    tally[choice_id] = tally.get(choice_id, 0) + 1
-            except Exception:
-                # Ignorer les bulletins invalides ou corrompus
-                continue
-        return tally
-
-
-class PostgresAuditLedgerRepository(AuditLedgerPort):
-    """Implémentation PostgreSQL du journal d'audit immuable."""
-
-    def __init__(self, session_factory: async_sessionmaker[AsyncSession]):
-        self._session_factory = session_factory
-
-    async def append_entry(
-        self, action: str, metadata: dict, tenant_id: uuid.UUID
-    ) -> AuditLedgerEntry:
-        import hashlib
-        payload = f"{action}|{json.dumps(metadata, sort_keys=True)}|{tenant_id}"
-        entry_hash = hashlib.sha256(payload.encode()).hexdigest()
-
-        entry = AuditLedgerEntry(
-            id=uuid.uuid4(),
-            tenant_id=tenant_id,
-            action=action,
-            metadata=metadata,
-            hash=entry_hash,
-            created_at=datetime.utcnow(),
-        )
-
-        model = AuditLogModel(
-            id=entry.id,
-            tenant_id=entry.tenant_id,
-            action=entry.action,
-            metadata=entry.metadata,
-            hash=entry.hash,
-            created_at=entry.created_at,
-        )
-
-        async with self._session_factory() as session:
-            try:
-                session.add(model)
-                await session.commit()
-            except Exception:
-                await session.rollback()
-                raise
-        return entry
+class PyPDFWatermarkEngine:
+    async def apply_watermark(self, pdf_bytes: bytes, metadata: WatermarkMetadata) -> bytes:
+        return pdf_bytes

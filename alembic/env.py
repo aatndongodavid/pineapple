@@ -55,6 +55,10 @@ def run_migrations_offline() -> None:
 
 def do_run_migrations(connection: Connection) -> None:
     """Exécute les migrations sur une connexion synchrone."""
+    # Le dépôt ne contient pas encore de scripts de révision Alembic.
+    # On crée donc les tables déclarées par les modèles avant l'upgrade.
+    target_metadata.create_all(bind=connection)
+
     context.configure(connection=connection, target_metadata=target_metadata)
 
     with context.begin_transaction():

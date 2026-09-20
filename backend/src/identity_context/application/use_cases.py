@@ -61,11 +61,11 @@ class RegisterUserUseCase:
     def __init__(self, user_repo: UserRepositoryPort):
         self._user_repo = user_repo
 
-    def execute(self, dto: UserRegisterDTO, tenant_id: UUID) -> User:
+    async def execute(self, dto: UserRegisterDTO, tenant_id: UUID) -> User:
         # Vérifier unicité de l'email et du matricule
-        if self._user_repo.get_by_email(dto.email) is not None:
+        if await self._user_repo.get_by_email(dto.email) is not None:
             raise EmailAlreadyExistsError(f"Email {dto.email} already registered.")
-        if self._user_repo.get_by_matricule(dto.matricule, tenant_id) is not None:
+        if await self._user_repo.get_by_matricule(dto.matricule, tenant_id) is not None:
             raise MatriculeAlreadyExistsError(
                 f"Matricule {dto.matricule} already exists for this tenant."
             )
@@ -92,7 +92,7 @@ class RegisterUserUseCase:
         )
 
         # Persister
-        return self._user_repo.save(user)
+        return await self._user_repo.save(user)
 
 
 class AuthenticateUserUseCase:
@@ -101,8 +101,8 @@ class AuthenticateUserUseCase:
     def __init__(self, user_repo: UserRepositoryPort):
         self._user_repo = user_repo
 
-    def execute(self, dto: UserLoginDTO) -> TokenResponseDTO:
-        user = self._user_repo.get_by_email(dto.email)
+    async def execute(self, dto: UserLoginDTO) -> TokenResponseDTO:
+        user = await self._user_repo.get_by_email(dto.email)
         if user is None or not pwd_context.verify(dto.password, user.password_hash):
             raise InvalidCredentialsError("Invalid email or password.")
 

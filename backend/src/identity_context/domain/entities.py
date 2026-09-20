@@ -40,6 +40,7 @@ class User:
     verification_status: VerificationStatus
     academic_status: AcademicStatus
     created_at: datetime = datetime.utcnow()
+    password_hash: str = ""
 
     def resolve_campus_status(self) -> CampusStatusDisplay:
         """Calcule le statut d'affichage public selon la matrice de visibilité."""

@@ -1,49 +1,37 @@
-from datetime import datetime
-from typing import Dict, List, Optional
-from uuid import UUID
+import uuid
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 
-
-class BaseDTO(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+from academy_context.domain.value_objects import AccessStatus, DocumentType
 
 
-class ElectionCreateDTO(BaseDTO):
+class DocumentUploadDTO(BaseModel):
     title: str
-    election_type: str
-    eligibility_rules: Dict
-    voting_start_at: datetime
-    voting_end_at: datetime
+    document_type: DocumentType
+    faculty: str
+    filiere: str
+    academic_level: str
+    is_premium: bool = False
+    price_fcfa: int = 0
 
 
-class MovementCreateDTO(BaseDTO):
-    election_id: UUID
-    name: str
-    slogan: str
-    program_text: str
-    candidate_user_ids: List[UUID]
-
-
-class CastVoteDTO(BaseDTO):
-    election_id: UUID
-    choice_id: str  # peut être un UUID de candidat ou un identifiant de choix
-
-
-class ElectionResponseDTO(BaseDTO):
-    id: UUID
-    tenant_id: UUID
+class DocumentResponseDTO(BaseModel):
+    id: uuid.UUID
+    tenant_id: uuid.UUID
     title: str
-    election_type: str
-    status: str
-    eligibility_rules: Dict
-    voting_start_at: datetime
-    voting_end_at: datetime
-    total_voters_count: int
+    document_type: DocumentType
+    faculty: str
+    filiere: str
+    academic_level: str
+    is_premium: bool
+    price_fcfa: int
+    access_status: AccessStatus
 
 
-class ElectionResultsDTO(BaseDTO):
-    election_id: UUID
-    total_ballots: int
-    tally_results: Dict[str, int]
-    published_at: datetime
+class PurchaseRequestDTO(BaseModel):
+    document_id: uuid.UUID
+
+
+class ReaderAccessDTO(BaseModel):
+    document_id: uuid.UUID
+    access_status: AccessStatus
