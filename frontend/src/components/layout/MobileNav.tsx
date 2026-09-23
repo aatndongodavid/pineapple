@@ -5,13 +5,13 @@ import { Link, useLocation } from 'react-router-dom';
 import { Home, Users, Vote, GraduationCap, Plus, MessageCircle, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useMessagingStore } from '@/lib/store/messagingStore';
 
 const navItems = [
   { to: '/', label: 'Home', icon: Home },
   { to: '/community', label: 'Community', icon: Users },
   { to: '/democracy', label: 'Democracy', icon: Vote },
   { to: '/academy', label: 'Academy', icon: GraduationCap },
-  { to: '/messages', label: 'Messages', icon: MessageCircle },
   { to: '/profile', label: 'Profil', icon: User },
 ];
 
@@ -25,6 +25,8 @@ const creationOptions = [
 export const MobileNav: React.FC = () => {
   const location = useLocation();
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const openChatDrawer = useMessagingStore((state) => state.openChatDrawer);
+  const conversationsCount = useMessagingStore((state) => state.conversations.length);
 
   const handleCreate = (option: string) => {
     // Ici, on pourrait naviguer vers les formulaires de création respectifs
@@ -35,7 +37,7 @@ export const MobileNav: React.FC = () => {
   return (
     <>
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-t border-white/20 dark:border-slate-800 shadow-neo-extruded dark:shadow-neo-dark-extruded">
-        <div className="grid grid-cols-6 h-16">
+        <div className="grid grid-cols-7 h-16">
           {navItems.slice(0, 2).map((item) => (
             <Link
               key={item.to}
@@ -77,6 +79,22 @@ export const MobileNav: React.FC = () => {
               {item.label}
             </Link>
           ))}
+
+          {/* Messages : ouvre le tiroir de discussion plutôt qu'une route dédiée */}
+          <button
+            type="button"
+            onClick={openChatDrawer}
+            disabled={conversationsCount === 0}
+            className={cn(
+              'flex flex-col items-center justify-center gap-1 text-xs',
+              conversationsCount === 0
+                ? 'text-gray-300 dark:text-gray-600'
+                : 'text-gray-500 dark:text-gray-400'
+            )}
+          >
+            <MessageCircle className="h-5 w-5" />
+            Messages
+          </button>
         </div>
       </nav>
 

@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="fr" class="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>Pineapple OS — Plateforme Universitaire Écosystémique</title>
+
+<!-- Polices Google Fonts : Hanken Grotesk, Inter, Geist, Fraunces -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Hanken+Grotesk:wght@500;600;700;800;900&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          brandPrimary: '#002B45',
+          brandDark: '#001626',
+          smartGreen: '#10B981',
+          smartGreenDark: '#047857',
+          accentLime: '#A3E635',
+          accentLimeDark: '#659D0E',
+          techCyan: '#06B6D4',
+          bgLight: '#F4F6F9',
+          bgDark: '#0B1420',
+          surfaceLight: '#FFFFFF',
+          surfaceDark: '#121F30',
+          cardDark: '#18273A',
+          textDark: '#F3F4F6',
+          textLight: '#111827',
+          textSecondaryLight: '#6B7280',
+          textSecondaryDark: '#9CA3AF',
+          borderLight: '#E5E7EB',
+          borderDark: '#22344D',
+          gold: '#D97706',
+        },
+        borderRadius: { card: '1.1rem', button: '0.75rem', pill: '9999px' },
+        fontFamily: {
+          display: ['Hanken Grotesk', 'sans-serif'],
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+          mono: ['Geist', 'monospace'],
+          serif: ['Fraunces', 'serif'],
+        },
+        boxShadow: {
+          glass: '0 10px 30px rgba(0, 22, 38, 0.06)',
+          glassDark: '0 10px 30px rgba(0, 0, 0, 0.35)',
+          modal: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+        }
+      },
+    },
+  }
+</script>
+
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', system-ui, sans-serif; transition: background-color 0.3s ease, color 0.3s ease; }
+  
+  /* Glassmorphism Surface Classes */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+  }
+  .dark .glass-card {
+    background: rgba(24, 39, 58, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .glass-header {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  .dark .glass-header {
+    background: rgba(18, 31, 48, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  /* Micro interactions & Animations */
+  .nav-item { transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+  .nav-item:hover { transform: translateX(3px); }
+  .nav-item.active {
+    background: #ECFDF5;
+    color: #047857;
+    font-weight: 600;
+  }
+  .dark .nav-item.active {
+    background: rgba(16, 185, 129, 0.18);
+    color: #34D399;
+  }
+
+  .card-hover { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+  .card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 32px rgba(0, 22, 38, 0.1);
+  }
+  .dark .card-hover:hover {
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+  }
+
+  @keyframes pulseBadge { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+  .badge-pulse { animation: pulseBadge 2s infinite; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-in { animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+
+  .barfill { transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
+
+  /* Custom Watermark Liseur */
+  .watermark-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0.08;
+    font-family: 'Geist', monospace;
+    font-weight: 700;
+    font-size: 1.25rem;
+    transform: rotate(-22deg);
+    letter-spacing: 0.15em;
+    user-select: none;
+  }
+
+  .modal-backdrop {
+    background: rgba(11, 20, 32, 0.65);
+    backdrop-filter: blur(4px);
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.4); border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(156, 163, 175, 0.7); }
+</style>
+</head>
+
+<body class="bg-bgLight dark:bg-bgDark text-textLight dark:text-textDark min-h-screen flex flex-col selection:bg-smartGreen selection:text-white">
+
+<div id="app" class="min-h-screen flex flex-col">
+
+  <!-- ==================== TOP NAVIGATION HEADER ==================== -->
+  <header class="glass-header border-b border-borderLight dark:border-borderDark sticky top-0 z-40 transition-colors">
+    <div class="max-w-[1600px] mx-auto flex items-center justify-between px-4 lg:px-6 py-2.5 gap-3">
+      
+      <!-- Logo & Mobile Menu Button -->
+      <div class="flex items-center gap-3 flex-shrink-0">
+        <button id="mobileMenuBtn" aria-label="Ouvrir le menu" class="lg:hidden p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-cardDark text-textLight dark:text-textDark transition">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        
+        <div class="flex items-center gap-2.5 cursor-pointer" id="brandLogoHome">
+          <div class="w-9 h-9 bg-gradient-to-br from-brandPrimary to-smartGreen rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+            <span class="text-white font-black text-base">🍍</span>
+          </div>
+          <div class="hidden sm:block">
+            <span class="font-display font-black text-xl tracking-tight text-brandPrimary dark:text-white">Pineapple</span>
+            <span class="text-[10px] font-mono uppercase tracking-widest text-smartGreen dark:text-accentLime block -mt-1 font-bold">Campus OS</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barre de Recherche Globale (Trigger Modal Cmd+K) -->
+      <div class="flex-1 max-w-xl mx-2">
+        <button id="openSearchBtn" class="w-full flex items-center justify-between px-3.5 py-2 bg-gray-100/80 dark:bg-cardDark/80 hover:bg-gray-200/80 dark:hover:bg-cardDark border border-borderLight dark:border-borderDark rounded-xl text-xs text-textSecondaryLight dark:text-textSecondaryDark transition shadow-inner">
+          <div class="flex items-center gap-2.5 truncate">
+            <svg class="text-textSecondaryLight dark:text-textSecondaryDark flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span class="truncate">Rechercher un cours, un club, un trajet, une élection...</span>
+          </div>
+          <span class="hidden md:inline-flex items-center gap-1 font-mono text-[10px] bg-white dark:bg-surfaceDark border border-borderLight dark:border-borderDark px-2 py-0.5 rounded-md shadow-sm font-semibold">⌘K</span>
+        </button>
+      </div>
+
+      <!-- Actions Droite (Sélecteur Université, Notifications, Theme, Profil) -->
+      <div class="flex items-center gap-2 flex-shrink-0">
+        
+        <!-- Sélecteur d'Université Multi-tenant -->
+        <div class="relative hidden md:block" id="uniDropdownContainer">
+          <button id="uniBtn" class="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-cardDark border border-borderLight dark:border-borderDark hover:border-smartGreen rounded-xl text-xs font-semibold shadow-sm transition">
+            <div class="w-5 h-5 bg-smartGreen text-white rounded-full flex items-center justify-center text-[10px] font-bold" id="uniInitial">EN</div>
+            <span class="max-w-[110px] truncate" id="selectedUniText">ENSPD</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div id="uniMenu" class="absolute right-0 top-full mt-2 bg-white dark:bg-surfaceDark border border-borderLight dark:border-borderDark rounded-xl shadow-xl z-50 w-64 py-1.5 hidden fade-in"></div>
+        </div>
+
+        <!-- Mode Sombre / Clair Toggle -->
+        <button id="themeToggleBtn" aria-label="Changer de thème" class="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-cardDark text-textSecondaryLight dark:text-textSecondaryDark transition">
+          <svg id="sunIcon" class="hidden dark:block text-amber-400" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg id="moonIcon" class="block dark:hidden text-slate-700" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+
+        <!-- Notifications Bell -->
+        <button id="notifBell" aria-label="Notifications" class="relative p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-cardDark text-textSecondaryLight dark:text-textSecondaryDark transition">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span id="notifBadge" class="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center badge-pulse">6</span>
+        </button>
+
+        <!-- Profile Menu & Role Switcher -->
+        <div class="relative" id="profileDropdownContainer">
+          <button id="profileBtn" class="flex items-center gap-2 p-1 rounded-xl hover:bg-gray-100 dark:hover:bg-cardDark transition">
+            <div class="relative">
+              <div class="w-8 h-8 bg-gradient-to-tr from-brandPrimary to-smartGreen rounded-full flex items-center justify-center text-white font-bold text-xs shadow-sm">DM</div>
+              <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-smartGreen rounded-full border-2 border-white dark:border-surfaceDark flex items-center justify-center">
+                <svg width="6" height="6" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </div>
+            <svg class="hidden sm:block text-textSecondaryLight dark:text-textSecondaryDark" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          
+          <div id="profileMenu" class="absolute right-0 top-full mt-2 bg-white dark:bg-surfaceDark border border-borderLight dark:border-borderDark rounded-2xl shadow-xl z-50 w-64 py-2 hidden fade-in">
+            <div class="px-4 py-3 border-b border-borderLight dark:border-borderDark mb-1">
+              <p class="text-sm font-bold text-textLight dark:text-textDark">David Meilleur</p>
+              <p class="text-xs text-textSecondaryLight dark:text-textSecondaryDark font-mono">david.m@enspd-udo.cm</p>
+              <div class="mt-2 flex items-center justify-between">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Certifié · L3
+                </span>
+                <span class="text-[10px] font-mono text-textSecondaryLight dark:text-textSecondaryDark" id="currentRoleTag">Étudiant</span>
+              </div>
+            </div>
+
+            <!-- Role Switcher -->
+            <div class="px-4 py-2 border-b border-borderLight dark:border-borderDark">
+              <p class="text-[10px] font-bold font-mono uppercase tracking-wider text-textSecondaryLight dark:text-textSecondaryDark mb-1.5">Vue d'accès (Rôle)</p>
+              <select id="roleSelector" class="w-full bg-bgLight dark:bg-cardDark border border-borderLight dark:border-borderDark rounded-lg text-xs py-1.5 px-2 outline-none font-semibold text-textLight dark:text-textDark focus:border-smartGreen">
+                <option value="student">🎓 Étudiant (Standard)</option>
+                <option value="teacher">👨‍🏫 Enseignant / Recherche</option>
+                <option value="admin">🏢 Admin Établissement</option>
+                <option value="superadmin">👑 Super Admin Global</option>
+              </select>
+            </div>
+
+            <button class="w-full text-left px-4 py-2 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-cardDark transition flex items-center gap-2" data-view="identity">
+              <span>👤</span> Mon profil & Portfolio
+            </button>
+            <button class="w-full text-left px-4 py-2 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-cardDark transition flex items-center gap-2" data-view="academy" data-tab="acquisitions">
+              <span>📘</span> Mes acquisitions & Formations
+            </button>
+            <button class="w-full text-left px-4 py-2 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-cardDark transition flex items-center gap-2" id="openSettingsBtn">
+              <span>⚙️</span> Paramètres compte
+            </button>
+            <div class="border-t border-borderLight dark:border-borderDark my-1"></div>
+            <button class="w-full text-left px-4 py-2 text-xs font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition flex items-center gap-2" id="logoutBtn">
+              <span>🚪</span> Déconnexion
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT AREA WITH SIDEBARS ==================== -->
+  <div class="max-w-[1600px] mx-auto w-full flex flex-1 relative">
+
+    <!-- SIDEBAR DESKTOP -->
+    <aside class="hidden lg:flex w-[250px] flex-shrink-0 flex-col h-[calc(100vh-58px)] sticky top-[58px] border-r border-borderLight dark:border-borderDark bg-white/50 dark:bg-surfaceDark/50 backdrop-blur-md px-3 py-4 space-y-6 overflow-y-auto">
+      
+      <div>
+        <p class="px-3 text-[10px] font-mono font-bold uppercase tracking-widest text-textSecondaryLight dark:text-textSecondaryDark mb-2">Navigation Écosystème</p>
+        <nav class="space-y-1" id="sidebarNav"></nav>
+      </div>
+
+      <!-- Feature Card Widget -->
+      <div class="mt-auto px-1">
+        <div class="glass-card rounded-2xl p-4 border border-smartGreen/30 relative overflow-hidden shadow-sm">
+          <div class="absolute -right-3 -top-3 w-16 h-16 bg-smartGreen/10 rounded-full blur-xl pointer-events-none"></div>
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="text-base">🗳️</span>
+            <span class="font-display font-bold text-xs text-brandPrimary dark:text-white">Pineapple Democracy</span>
+          </div>
+          <p class="text-[11px] text-textSecondaryLight dark:text-textSecondaryDark leading-relaxed">
+            Le scrutin électoral du Bureau Étudiant 2026 est ouvert.
+          </p>
+          <button data-view="democracy" class="quicklink mt-3 w-full py-1.5 bg-smartGreen hover:bg-smartGreenDark text-white text-xs font-bold rounded-lg shadow-sm transition flex items-center justify-center gap-1">
+            Voter maintenant →
+          </button>
+        </div>
+      </div>
+
+      <div class="px-3 pt-2 text-[10px] font-mono text-textSecondaryLight dark:text-textSecondaryDark flex items-center justify-between border-t border-borderLight dark:border-borderDark">
+        <span>Pineapple OS v2.4</span>
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      </div>
+    </aside>
+
+    <!-- MOBILE SIDEBAR OVERLAY -->
+    <div id="mobileSidebarOverlay" class="fixed inset-0 z-50 modal-backdrop hidden lg:hidden">
+      <div class="bg-white dark:bg-surfaceDark w-72 h-full flex flex-col shadow-2xl transition-transform">
+        <div class="flex items-center justify-between p-4 border-b border-borderLight dark:border-borderDark">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-brandPrimary rounded-xl flex items-center justify-center text-white font-bold">🍍</div>
+            <span class="font-display font-bold text-lg">Pineapple OS</span>
+          </div>
+          <button id="closeMobileSidebar" class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-cardDark">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto" id="sidebarNavMobile"></nav>
+      </div>
+    </div>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <main class="flex-1 min-w-0 px-4 lg:px-8 py-6 pb-24 lg:pb-8" id="mainContent"></main>
+
+    <!-- RIGHT SIDEBAR WIDGETS DESKTOP -->
+    <aside class="hidden xl:block w-[310px] flex-shrink-0 px-4 py-6 space-y-5 h-[calc(100vh-58px)] sticky top-[58px] overflow-y-auto border-l border-borderLight dark:border-borderDark" id="rightSidebar"></aside>
+  </div>
+
+  <!-- ==================== MOBILE BOTTOM NAV ==================== -->
+  <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-surfaceDark/90 backdrop-blur-lg border-t border-borderLight dark:border-borderDark z-30">
+    <div class="flex items-center justify-around py-2" id="mobileBottomNav"></div>
+  </nav>
+
+  <!-- ==================== MODALS INTERACTIVES ==================== -->
+
+  <!-- Modal Recherche Globale ⌘K -->
+  <div id="searchModal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-start justify-center pt-16 px-4">
+    <div class="bg-white dark:bg-surfaceDark rounded-2xl w-full max-w-xl shadow-2xl border border-borderLight dark:border-borderDark overflow-hidden fade-in">
+      <div class="p-3 border-b border-borderLight dark:border-borderDark flex items-center gap-3">
+        <svg class="text-smartGreen" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="searchInput" type="text" placeholder="Tapez pour rechercher (cours, amphis, covoiturage...)" class="flex-1 bg-transparent text-sm outline-none font-medium text-textLight dark:text-textDark placeholder-textSecondaryLight dark:placeholder-textSecondaryDark">
+        <button id="closeSearchModal" class="text-xs font-mono font-semibold bg-gray-100 dark:bg-cardDark px-2 py-1 rounded-md">ESC</button>
+      </div>
+      <div class="p-3 max-h-96 overflow-y-auto space-y-2" id="searchResultsContainer">
+        <p class="text-xs text-textSecondaryLight dark:text-textSecondaryDark px-2 py-1 font-mono">Suggestions populaires :</p>
+        <button class="searchSuggestBtn w-full text-left p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-cardDark flex items-center gap-3 transition" data-view="democracy">
+          <span class="text-base">🗳️</span>
+          <div><p class="text-xs font-semibold">Élection Bureau Étudiant 2026</p><p class="text-[10px] text-textSecondaryLight dark:text-textSecondaryDark">Démocratie · Scrutin en cours</p></div>
+        </button>
+        <button class="searchSuggestBtn w-full text-left p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-cardDark flex items-center gap-3 transition" data-view="academy" data-tab="library">
+          <span class="text-base">📘</span>
+          <div><p class="text-xs font-semibold">Corrigé Probabilités L2 2025</p><p class="text-[10px] text-textSecondaryLight dark:text-textSecondaryDark">Academy · Document d'examen</p></div>
+        </button>
+        <button class="searchSuggestBtn w-full text-left p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-cardDark flex items-center gap-3 transition" data-view="services">
+          <span class="text-base">🚗</span>
+          <div><p class="text-xs font-semibold">Trajets Covoiturage Bonamoussadi</p><p class="text-[10px] text-textSecondaryLight dark:text-textSecondaryDark">Services · Pineapple Ride</p></div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Tiroir Notifications -->
+  <div id="notifDrawer" class="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white dark:bg-surfaceDark shadow-2xl border-l border-borderLight dark:border-borderDark hidden flex flex-col fade-in">
+    <div class="p-4 border-b border-borderLight dark:border-borderDark flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-lg">🔔</span>
+        <h3 class="font-display font-bold text-sm">Notifications</h3>
+      </div>
+      <button id="closeNotifDrawer" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-cardDark text-textSecondaryLight dark:text-textSecondaryDark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="p-3 border-b border-borderLight dark:border-borderDark flex items-center justify-between text-xs">
+      <span class="font-mono text-textSecondaryLight dark:text-textSecondaryDark">6 nouvelles alertes</span>
+      <button id="markAllReadBtn" class="text-smartGreen hover:underline font-semibold">Tout marquer comme lu</button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-3 space-y-2" id="notifList">
+      <div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/40 text-xs">
+        <div class="flex items-center justify-between mb-1"><span class="font-bold text-emerald-700 dark:text-emerald-400">🗳️ Démocratie</span><span class="text-[10px] text-textSecondaryLight dark:text-textSecondaryDark">Il y a 10 min</span></div>
+        <p class="text-textLight dark:text-textDark">Le vote pour le Bureau Étudiant ENSPD est ouvert jusqu'à 18h.</p>
+      </div>
+      <div class="p-3 rounded-xl bg-gray-50 dark:bg-cardDark border border-borderLight dark:border-borderDark text-xs">
+        <div class="flex items-center justify-between mb-1"><span class="font-bold text-brandPrimary dark:text-white">🏫 Campus</span><span class="text-[10px] text-textSecondaryLight dark:text-textSecondaryDark">Il y a 1h</span></div>
+        <p class="text-textLight dark:text-textDark">Salle B204 déclarée LIBRE par le délégué de niveau L3.</p>
+      </div>
+      <div class="p-3 rounded-xl bg-gray-50 dark:bg-cardDark border border-borderLight dark:border-borderDark text-xs">
+        <div class="flex items-center justify-between mb-1"><span class="font-bold text-cyan-600 dark:text-cyan-400">🚗 Pineapple Ride</span><span class="text-[10px] text-textSecondaryLight dark:text-textSecondaryDark">Il y a 2h</span></div>
+        <p class="text-textLight dark:text-textDark">Aïcha a confirmé votre réservation pour le trajet Campus → Bonamoussadi.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Covoiturage -->
+  <div id="carpoolModal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-surfaceDark rounded-card w-full max-w-md p-6 shadow-modal border border-borderLight dark:border-borderDark fade-in">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-display font-bold text-lg flex items-center gap-2">🚗 Créer un trajet (Pineapple Ride)</h3>
+        <button id="closeCarpoolModal" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-cardDark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <form id="carpoolForm" class="space-y-3">
+        <div><label class="text-xs font-semibold text-textSecondaryLight dark:text-textSecondaryDark">Lieu de départ</label><select id="fromSelect" class="w-full mt-1 px-3 py-2 bg-bgLight dark:bg-cardDark border border-borderLight dark:border-borderDark rounded-xl text-sm outline-none focus:border-smartGreen font-medium"><option value="">Sélectionner</option><option>Campus ENSPD</option><option>Bonamoussadi</option><option>Akwa</option><option>Bonapriso</option><option>Ndogbong</option></select></div>
+        <div><label class="text-xs font-semibold text-textSecondaryLight dark:text-textSecondaryDark">Destination</label><select id="toSelect" class="w-full mt-1 px-3 py-2 bg-bgLight dark:bg-cardDark border border-borderLight dark:border-borderDark rounded-xl text-sm outline-none focus:border-smartGreen font-medium"><option value="">Sélectionner</option><option>Campus ENSPD</option><option>Bonamoussadi</option><option>Akwa</option><option>Bonapriso</option><option>Ndogbong</option></select></div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-xs font-semibold text-textSecondaryLight dark:text-textSecondaryDark">Date</label><input id="dateInput" type="date" class="w-full mt-1 px-3 py-2 bg-bgLight dark:bg-cardDark border border-borderLight dark:border-borderDark rounded-xl text-sm outline-none focus:border-smartGreen font-medium"></div>
+          <div><label class="text-xs font-semibold text-textSecondaryLight dark:text-textSecondaryDark">Heure</label><input id="timeInput" type="time" class="w-full mt-1 px-3 py-2 bg-bgLight dark:bg-cardDark border border-borderLight dark:border-borderDark rounded-xl text-sm outline-none focus:border-smartGreen font-medium"></div>
+        </div>
+        <div><label class="text-xs font-semibold text-textSecondaryLight dark:text-textSecondaryDark">Places disponibles (max 4)</label><input id="spotsInput" type="number" min="1" max="4" value="3" class="w-full mt-1 px-3 py-2 bg-bgLight dark:bg-cardDark border border-borderLight dark:border-borderDark rounded-xl text-sm outline-none focus:border-smartGreen font-medium"></div>
+        <div><label class="text-xs font-semibold text-textSecondaryLight dark:text-textSecondaryDark">Nom du conducteur</label><input id="driverInput" type="text" placeholder="Ex: David M." class="w-full mt-1 px-3 py-2 bg-bgLight dark:bg-cardDark border border-borderLight dark:border-borderDark rounded-xl text-sm outline-none focus:border-smartGreen font-medium"></div>
+        <p class="text-[11px] text-textSecondaryLight dark:text-textSecondaryDark bg-emerald-50 dark:bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-200 dark:border-emerald-800/40">💡 Pineapple Ride met en relation les étudiants — le règlement s'effectue directement entre vous.</p>
+        <div class="flex gap-2 pt-2">
+          <button type="button" id="cancelModalBtn" class="flex-1 py-2.5 border border-borderLight dark:border-borderDark rounded-xl text-xs font-semibold hover:bg-gray-100 dark:hover:bg-cardDark">Annuler</button>
+          <button type="submit" class="flex-1 py-2.5 bg-smartGreen text-white rounded-xl text-xs font-bold hover:bg-smartGreenDark shadow-sm">Créer le salon</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Achat Document FCFA -->
+  <div id="purchaseModal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-surfaceDark rounded-card w-full max-w-sm p-6 shadow-modal border border-borderLight dark:border-borderDark fade-in text-center" id="purchaseModalContent"></div>
+  </div>
+
+  <!-- Modal Scrutin Vote -->
+  <div id="voteModal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-surfaceDark rounded-card w-full max-w-md p-6 shadow-modal border border-borderLight dark:border-borderDark fade-in" id="voteModalContent"></div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed bottom-20 lg:bottom-6 left-1/2 -translate-x-1/2 z-[60] flex flex-col gap-2 pointer-events-none"></div>
+
+</div>
+
+<!-- ==================== JAVASCRIPT LOGIC & REACTIVE STATE ==================== -->
+<script>
+(function(){
+  // ── 1. État Applicatif Réactif ──────────────────────────────
+  const state = {
+    currentView: 'home',
+    academyTab: 'formations',
+    currentRole: 'student', // student, teacher, admin, superadmin
+    showMobileSidebar: false,
+    showCarpoolModal: false,
+    showPurchaseModal: false,
+    showVoteModal: false,
+    showNotifDrawer: false,
+    showSearchModal: false,
+    notificationCount: 6,
+    selectedUniversity: 'ENSPD',
+    universities: ['ENSPD', 'Université de Douala', 'IUT Douala'],
+    hasVoted: false,
+    purchasedDocs: ['corr-proba-l2'],
+    
+    navSections: [
+      { id:'home', label:'Accueil', icon:'home', domain:'01 — Identity / Feed' },
+      { id:'campus', label:'Campus', icon:'campus', domain:'02 — Campus' },
+      { id:'community', label:'Communauté', icon:'community', domain:'03 — Community' },
+      { id:'democracy', label:'Democracy', icon:'democracy', domain:'04 — Democracy ⭐', badge:'Scrutin' },
+      { id:'academy', label:'Academy', icon:'academy', domain:'05 — Academy' },
+      { id:'opportunities', label:'Opportunités', icon:'opportunities', domain:'06 — Opportunities' },
+      { id:'services', label:'Services', icon:'services', domain:'07 — Campus Life' },
+      { id:'identity', label:'Profil', icon:'profile', domain:'Identity' },
+    ],
+
+    posts: [
+      { id:1, cat:'Vie étudiante', color:'info', author:'Association des Étudiants ENSPD', time:'2h', text:'Rappel : les inscriptions au tournoi sportif inter-filières se clôturent vendredi à 18h. Seulement 4 places restantes par équipe !', certified:true, likes:24, liked:false },
+      { id:2, cat:'Recherche', color:'primaryDark', author:'Dr. Ngassa (Enseignant-Chercheur)', time:'5h', text:'Nouveau projet de recherche IA ouvert : détection précoce des maladies du cacao par vision par ordinateur. Candidatures ouvertes sous l\'onglet Opportunités.', certified:true, likes:42, liked:true },
+      { id:3, cat:'Démocratie', color:'gold', author:'Mouvement Avenir 2026', time:'8h', text:'Notre programme de numérisation complète des démarches académiques est disponible. Venez poser vos questions en commentaire !', certified:false, likes:18, liked:false },
+    ],
+
+    rooms: [
+      { id:1, name:'Amphi A', status:'occupied', updated:'il y a 4 min', capacity:'450 places' },
+      { id:2, name:'Salle B204', status:'free', updated:'il y a 12 min', capacity:'60 places' },
+      { id:3, name:'Salle C102', status:'pending', updated:'à confirmer', capacity:'40 places' },
+      { id:4, name:'Labo IA & Robotique', status:'free', updated:'il y a 2 min', capacity:'25 postes' },
+    ],
+
+    carpoolRides: [
+      { id:1, from:'Campus ENSPD', to:'Bonamoussadi', time:'18:00', spots:3, maxSpots:4, driver:'Aïcha N.' },
+      { id:2, from:'Akwa', to:'Campus ENSPD', time:'07:30', spots:2, maxSpots:4, driver:'Junior T.' },
+    ],
+
+    organizations: [
+      { name:'Club Intelligence Artificielle', type:'Club', members:214, status:'active', desc:'Projets IA appliqués, hackathons et ateliers Python.' },
+      { name:'Association des Étudiants ENSPD', type:'Association', members:1840, status:'active', desc:'Représentation et vie étudiante du campus.' },
+      { name:'Mouvement Avenir 2026', type:'Mouvement', members:96, status:'campaign', desc:'Liste candidate aux élections du Bureau Étudiant 2026.' },
+      { name:'Club Robotique & IoT', type:'Club', members:88, status:'exempt', desc:'Exonération de cotisation accordée pour le semestre 2.' },
+    ],
+
+    elections: [
+      { 
+        id:'bureau-2026', 
+        title:'Bureau Étudiant ENSPD 2026', 
+        type:'Bureau complet', 
+        status:'VOTING_OPEN', 
+        voters:2140, 
+        turnout:1287,
+        candidates:[
+          { id:'a', name:'Mouvement Avenir', pct:48, color:'#10B981' },
+          { id:'b', name:'Mouvement Uni+', pct:34, color:'#06B6D4' },
+          { id:'c', name:'Indécis / Neutre', pct:18, color:'#9CA3AF' },
+        ] 
+      },
+      { id:'delegues-l3', title:'Délégués de niveau — L3 Info', type:'Délégués', status:'CAMPAIGN', voters:340, turnout:0, candidates:[] },
+      { id:'club-ia-2025', title:'Bureau Club IA 2025', type:'Organisation', status:'RESULTS_PUBLISHED', voters:214, turnout:172, candidates:[
+        { id:'a', name:'Liste Innovation', pct:61, color:'#10B981' },
+        { id:'b', name:'Liste Alternative', pct:39, color:'#3B82F6' },
+      ] },
+    ],
+
+    documents: [
+      { id:'sujet-algo-l2', title:'Examen Algorithmique avancée — L2 2025', type:'Sujet libre', price:0, level:'L2' },
+      { id:'corr-algo-l2', title:'Corrigé détaillé — Algorithmique L2 2025', type:'Corrigé Certifié', price:1000, level:'L2' },
+      { id:'corr-proba-l2', title:'Corrigé détaillé — Probabilités L2 2025', type:'Corrigé Certifié', price:1000, level:'L2' },
+      { id:'corr-bdd-l3', title:'Corrigé détaillé — Base de données L3 2026', type:'Corrigé Certifié', price:1500, level:'L3' },
+    ],
+
+    formations: [
+      { title:'Python pour la Data Science', org:'Club IA', price:'5 000 FCFA/mois', format:'🎥 En ligne' },
+      { title:'Prise de parole en public & Leadership', org:'Association des Étudiants', price:'Gratuite', format:'🏫 Présentiel' },
+      { title:'Introduction au Machine Learning', org:'Club IA', price:'8 000 FCFA', format:'🎥+🏫 Hybride' },
+    ],
+
+    projects: [
+      { title:'Détection précoce des maladies du cacao par IA', lab:'Laboratoire Vision & IA', duration:'6 mois', seeking:['2 Data Scientists', '1 étudiant Agronomie'] },
+      { title:'Plateforme de covoiturage intelligent Pineapple Ride', lab:'Dpt. Informatique ENSPD', duration:'3 mois', seeking:['1 Développeur Mobile (Flutter)'] },
+    ],
+  };
+
+  // ── 2. Icônes Vectorielles SVGs ──────────────────────────────
+  const ICONS = {
+    home: '<path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V9.5Z"/>',
+    campus: '<rect x="3" y="4" width="18" height="17" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>',
+    community: '<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M15.5 14.2c2.5.3 4.5 2.3 4.5 5.3"/>',
+    democracy: '<path d="M12 2 3 7v2h18V7L12 2Z"/><path d="M5 11v7M9 11v7M15 11v7M19 11v7"/><path d="M3 21h18"/>',
+    academy: '<path d="M12 3 2 8l10 5 10-5-10-5Z"/><path d="M6 10.5V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-5.5"/>',
+    opportunities: '<circle cx="11" cy="11" r="7"/><path d="M21 21 16.5 16.5"/><path d="M8 11h6M11 8v6"/>',
+    services: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+    profile: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/>',
+  };
+
+  function icon(name, cls) {
+    return `<svg class="${cls||''}" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]||''}</svg>`;
+  }
+
+  // ── 3. Toasts & Helper UI ──────────────────────────────
+  function toast(msg, type='info') {
+    const el = document.createElement('div');
+    el.className = 'bg-brandDark text-white dark:bg-white dark:text-brandDark text-xs font-semibold px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2 fade-in border border-white/20';
+    el.innerHTML = `<span>${type==='success'?'✅':'💡'}</span><span>${msg}</span>`;
+    document.getElementById('toastContainer').appendChild(el);
+    setTimeout(() => {
+      el.style.opacity = '0';
+      el.style.transition = 'opacity .3s ease';
+      setTimeout(() => el.remove(), 300);
+    }, 2800);
+  }
+
+  const STATUS_LABEL = {
+    DRAFT: 'Brouillon', SUBMISSION: 'Soumission', ADMIN_REVIEW: 'Vérification', APPROVED: 'Approuvée',
+    CAMPAIGN: '🗣️ Campagne', VOTING_OPEN: '🟢 Vote ouvert', VOTING_CLOSED: 'Vote clos', COUNTING: 'Dépouillement',
+    RESULTS_PUBLISHED: '📊 Résultats publiés', ARCHIVED: 'Archivée',
+  };
+
+  // ── 4. Renderers de Navigation ──────────────────────────────
+  function navHtml(idPrefix) {
+    return state.navSections.map(s => `
+      <button class="navBtn nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs text-textLight dark:text-textDark text-left font-medium ${state.currentView===s.id?'active':''}" data-view="${s.id}" id="${idPrefix}-${s.id}">
+        <span class="flex-shrink-0">${icon(s.icon)}</span>
+        <span class="flex-1">${s.label}</span>
+        ${s.badge ? `<span class="text-[9px] font-bold font-mono bg-smartGreen text-white px-1.5 py-0.5 rounded-full">${s.badge}</span>` : ''}
+      </button>`).join('');
+  }
+
+  function renderSidebar() {
+    document.getElementById('sidebarNav').innerHTML = navHtml('nav');
+    document.getElementById('sidebarNavMobile').innerHTML = navHtml('navm');
+  }
+
+  function renderMobileBottomNav() {
+    const items = ['home','democracy','academy','community','identity'];
+    document.getElementById('mobileBottomNav').innerHTML = items.map(id => {
+      const s = state.navSections.find(x => x.id === id);
+      return `<button class="bottomNavBtn flex flex-col items-center gap-1 py-1 px-3 text-textSecondaryLight dark:text-textSecondaryDark ${state.currentView===id?'text-smartGreen font-bold':''}" data-view="${id}">
+        ${icon(s.icon)}<span class="text-[10px] font-medium">${s.label}</span></button>`;
+    }).join('');
+  }
+
+  function sectionHeader(eyebrow, title, sub) {
+    return `<div class="mb-6">
+      <p class="text-[10px] font-mono font-bold tracking-widest text-smartGreen dark:text-accentLime uppercase mb-1">${eyebrow}</p>
+      <h2 class="font-display text-2xl lg:text-3xl font-extrabold text-textLight dark:text-textDark tracking-tight">${title}</h2>
+      ${sub ? `<p class="text-xs text-textSecondaryLight dark:text-textSecondaryDark mt-1 max-w-2xl">${sub}</p>` : ''}
+    </div>`;
+  }
+
+  // ── 5. VUES PRINCIPALES ──────────────────────────────
+
+  // VUE 01 : HOME / FEED
+  function renderHome() {
+    return `
+      <div class="max-w-3xl">
+        ${sectionHeader('01 · Identity — Feed Établissement', 'Bonjour David 👋', `Voici l'activité récente de votre campus, ${state.selectedUniversity}.`)}
+
+        <!-- Formulaire de publication réactif -->
+        <div class="glass-card rounded-2xl p-4 mb-6 shadow-glass">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-brandPrimary to-smartGreen rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0">DM</div>
+            <input id="newPostInput" type="text" placeholder="Partager une information ou une question avec votre campus..." class="flex-1 bg-bgLight dark:bg-cardDark border border-borderLight dark:border-borderDark rounded-xl px-4 py-2.5 text-xs outline-none focus:border-smartGreen font-medium text-textLight dark:text-textDark">
+            <button id="publishPostBtn" class="px-4 py-2.5 bg-smartGreen text-white rounded-xl text-xs font-bold hover:bg-smartGreenDark shadow-sm transition flex-shrink-0">Publier</button>
+          </div>
+        </div>
+
+        <!-- Feed des publications -->
+        <div class="space-y-4" id="feedContainer">
+          ${state.posts.map(p => `
+          <article class="glass-card rounded-2xl p-5 card-hover shadow-glass">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-brandPrimary to-smartGreen rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0 shadow-sm">
+                  ${p.author.slice(0,2).toUpperCase()}
+                </div>
+                <div>
+                  <p class="text-xs font-bold text-textLight dark:text-textDark flex items-center gap-1">
+                    ${p.author} ${p.certified ? '<span class="text-smartGreen" title="Compte Certifié">✓</span>' : ''}
+                  </p>
+                  <p class="text-[10px] text-textSecondaryLight dark:text-textSecondaryDark font-mono">Il y a ${p.time} · <span class="text-smartGreen font-semibold">${p.cat}</span></p>
+                </div>
+              </div>
+              <button class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-cardDark text-textSecondaryLight dark:text-textSecondaryDark">•••</button>
+            </div>
+            <p class="text-xs text-textLight dark:text-textDark leading-relaxed font-normal">${p.text}</p>
+            <div class="flex items-center gap-6 mt-4 pt-3 border-t border-borderLight dark:border-borderDark text-xs font-medium text-textSecondaryLight dark:text-textSecondaryDark">
+              <button class="likeBtn flex items-center gap-1.5 hover:text-red-500 transition ${p.liked?'text-red-500 font-bold':''}" data-id="${p.id}">
+                <span>${p.liked?'❤️':'🤍'}</span> <span>${p.likes}</span>
+              </button>
+              <button class="flex items-center gap-1.5 hover:text-smartGreen transition">💬 Commenter</button>
+              <button class="flex items-center gap-1.5 hover:text-smartGreen transition">↗ Partager</button>
+            </div>
+          </article>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  // VUE 02 : CAMPUS & SALLES
+  function renderCampus() {
+    const statusMap = {
+      free: '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold font-mono bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">🟢 Libre</span>',
+      occupied: '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold font-mono bg-red-100 text-red-800 dark:bg-red-950/60 dark:text-red-300">🔴 Occupée</span>',
+      pending: '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold font-mono bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">🟡 À confirmer</span>'
+    };
+
+    return `
+      ${sectionHeader('02 · Campus — Infrastructures & Agenda', 'Gestion du Campus', 'Disponibilité des amphis et salles de cours en temps réel.')}
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Agenda & Événements -->
+        <div class="glass-card rounded-2xl p-5 space-y-4 shadow-glass">
+          <h3 class="font-display font-bold text-sm flex items-center gap-2">📅 Agenda Établissement</h3>
+          <div class="space-y-3">
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-bgLight dark:bg-cardDark border border-borderLight dark:border-borderDark">
+              <div class="w-1.5 h-10 bg-cyan-500 rounded-full"></div>
+              <div><p class="text-xs font-bold">Cérémonie de rentrée & Accueil L1</p><p class="text-[10px] text-textSecondaryLight dark:text-textSecondaryDark font-mono">10/10/2026 — 10h00 · Amphi A</p></div>
+            </div>
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-bgLight dark:bg-cardDark border border-borderLight dark:border-borderDark">
+              <div class="w-1.5 h-10 bg-amber-500 rounded-full"></div>
+              <div><p class="text-xs font-bold">Conférence IA & Recherche appliquée</p><p class="text-[10px] text-textSecondaryLight dark:text-textSecondaryDark font-mono">15/10/2026 — 12h30 · Labo IA</p></div>
+            </div>
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-bgLight dark:bg-cardDark border border-borderLight dark:border-borderDark">
+              <div class="w-1.5 h-10 bg-smartGreen rounded-full"></div>
+              <div><p class="text-xs font-bold">Clôture du scrutin électoral Bureau Étudiant</p><p class="text-[10px] text-textSecondaryLight dark:text-textSecondaryDark font-mono">02/02/2027 — 18h00 · Portail Democracy</p></div>
+            </div>
+          </div>
+          <button class="w-full py-2.5 border border-smartGreen text-smartGreen hover:bg-smartGreen hover:text-white rounded-xl text-xs font-bold transition shadow-sm">+ Ajouter un événement</button>
+        </div>
+
+        <!-- Statut Salles en Temps Réel -->
+        <div class="glass-card rounded-2xl p-5 space-y-4 shadow-glass">
+          <div class="flex items-center justify-between">
+            <h3 class="font-display font-bold text-sm flex items-center gap-2">🏛️ Salles — Statut Temps Réel</h3>
+            <span class="text-[10px] font-mono text-textSecondaryLight dark:text-textSecondaryDark">Mise à jour directe</span>
+          </div>
+          <div class="space-y-3" id="roomsListContainer">
+            ${state.rooms.map(r => `
+              <div class="flex items-center justify-between p-3 rounded-xl border border-borderLight dark:border-borderDark bg-bgLight dark:bg-cardDark">
+                <div>
+                  <p class="font-bold text-xs">${r.name}</p>
+                  <p class="text-[10px] text-textSecondaryLight dark:text-textSecondaryDark font-mono">${r.capacity} · ${r.updated}</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  ${statusMap[r.status]}
+                  <button class="toggleRoomBtn p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-surfaceDark text-xs" data-id="${r.id}" title="Basculer le statut">🔄</button>
+                </div>
+              </div>`).join('')}
+          </div>
+          <p class="text-[10px] text-textSecondaryLight dark:text-textSecondaryDark font-mono">💡 Seul un délégué de niveau certifié peut modifier le statut d'une salle.</p>
+        </div>
+
+      </div>`;
+  }
+
+  // VUE 03 : COMMUNITY
+  function renderCommunity() {
+    const statusBadge = {
+      active: '<span class="px-2 py-0.5 rounded-full text-[9px] font-bold font-mono bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">🟢 Actif</span>',
+      campaign: '<span class="px-2 py-0.5 rounded-full text-[9px] font-bold font-mono bg-cyan-100 text-cyan-800 dark:bg-cyan-950/60 dark:text-cyan-300">🗣️ En campagne</span>',
+      exempt: '<span class="px-2 py-0.5 rounded-full text-[9px] font-bold font-mono bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300"> Exonéré S2</span>'
+    };
+
+    return `
+      ${sectionHeader('03 · Community — Associations & Mouvements', 'Clubs & Vie Associative', 'Toutes les organisations sont soumises à une accréditation institutionnelle.')}
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        ${state.organizations.map(o => `
+          <div class="glass-card rounded-2xl p-5 card-hover shadow-glass flex flex-col justify-between">
+            <div>
+              <div class="flex items-start justify-between mb-3">
+                <div class="w-11 h-11 rounded-xl bg-smartGreen/10 text-smartGreen flex items-center justify-center font-bold text-lg">
+                  ${o.name.charAt(0)}
+                </div>
+                ${statusBadge[o.status]||''}
+              </div>
+              <h3 class="font-display font-bold text-sm text-textLight dark:text-textDark">${o.name}</h3>
+              <p class="text-[10px] font-mono text-textSecondaryLight dark:text-textSecondaryDark mt-0.5">${o.type} · ${o.members} membres inscrits</p>
+              <p class="text-xs text-textSecondaryLight dark:text-textSecondaryDark mt-2 line-clamp-2">${o.desc}</p>
+            </div>
+            <button class="mt-4 w-full py-2 border border-smartGreen text-smartGreen hover:bg-smartGreen hover:text-white rounded-xl text-xs font-bold transition">Rejoindre l'organisation</button>
+          </div>`).join('')}
+
+        <!-- Card de demande d'organisation -->
+        <div class="rounded-2xl border-2 border-dashed border-smartGreen/40 p-5 flex flex-col items-center justify-center text-center bg-smartGreen/5">
+          <span class="text-2xl mb-1">➕</span>
+          <p class="text-xs font-bold text-brandPrimary dark:text-white">Créer une nouvelle organisation</p>
+          <p class="text-[10px] text-textSecondaryLight dark:text-textSecondaryDark mt-1 mb-3">Formulaire soumis à la validation administrative ENSPD.</p>
+          <button id="newOrgBtn" class="px-4 py-2 bg-smartGreen text-white rounded-xl text-xs font-bold hover:bg-smartGreenDark shadow-sm">Déposer une demande</button>
+        </div>
+      </div>`;
+  }
+
+  // VUE 04 : DEMOCRACY ⭐
+  function pollBars(candidates) {
+    return candidates.map(c => `
+      <div class="mb-3">
+        <div class="flex justify-between text-xs font-semibold mb-1">
+          <span class="text-textLight dark:text-textDark">${c.name}</span>
+          <span class="font-mono text-smartGreen font-bold">${c.pct}%</span>
+        </div>
+        <div class="w-full h-3 bg-gray-200 dark:bg-cardDark rounded-full overflow-hidden shadow-inner">
+          <div class="barfill h-full rounded-full" style="width:${c.pct}%; background:${c.color}"></div>
+        </div>
+      </div>`).join('');
+  }
+
+  function renderDemocracy() {
+    const featured = state.elections.find(e => e.id === 'bureau-2026');
+    const cycle = ['DRAFT','SUBMISSION','ADMIN_REVIEW','APPROVED','CAMPAIGN','VOTING_OPEN','VOTING_CLOSED','COUNTING','RESULTS_PUBLISHED','ARCHIVED'];
+    const currentIdx = cycle.indexOf(featured.status);
+
+    return `
+      ${sectionHeader('04 · Democracy ⭐ — Souveraineté du Scrutin', 'Pineapple Democracy', 'Sondages, campagnes et résultats certifiés. Pineapple mesure et analyse ; elle ne recommande aucun candidat.')}
+
+      <!-- Hero Banner Élection -->
+      <div class="bg-gradient-to-r from-brandDark via-brandPrimary to-smartGreenDark rounded-2xl p-6 text-white mb-6 shadow-xl relative overflow-hidden">
+        <div class="relative z-10">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-mono font-bold bg-white/20 text-white backdrop-blur-md">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            ${STATUS_LABEL[featured.status]}
+          </div>
+          <h3 class="font-display text-2xl font-black mt-3 tracking-tight">${featured.title}</h3>
+          <p class="text-xs text-white/80 mt-1 max-w-xl">
+            ${featured.turnout.toLocaleString()} sur ${featured.voters.toLocaleString()} électeurs éligibles ont voté (${Math.round(featured.turnout/featured.voters*100)}% de participation).
+          </p>
+          <div class="flex flex-wrap gap-3 mt-5">
+            <button id="openVoteBtn" class="px-5 py-2.5 bg-white text-brandDark rounded-xl text-xs font-extrabold hover:bg-accentLime transition shadow-lg ${state.hasVoted?'opacity-70 pointer-events-none':''}">
+              ${state.hasVoted ? '✓ Vote enregistré & Verrouillé' : '🗳️ Voter maintenant'}
+            </button>
+            <button class="px-5 py-2.5 bg-white/10 border border-white/30 text-white rounded-xl text-xs font-bold hover:bg-white/20 transition backdrop-blur-md">
+              📄 Consulter les programmes
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Colonne Gauche : Sondage & Campaign Intelligence -->
+        <div class="lg:col-span-2 space-y-6">
+          
+          <div class="glass-card rounded-2xl p-5 shadow-glass">
+            <h3 class="font-display font-bold text-sm mb-1">Sondage Temps Réel — Tendances agrégées</h3>
+            <p class="text-[10px] font-mono text-textSecondaryLight dark:text-textSecondaryDark mb-4">Données anonymisées mises à jour lors des mouvements de campagne.</p>
+            ${pollBars(featured.candidates)}
+          </div>
+
+          <!-- Campaign Intelligence Widget -->
+          <div class="glass-card rounded-2xl p-5 shadow-glass border-l-4 border-l-smartGreen">
+            <h3 class="font-display font-bold text-sm mb-3 flex items-center gap-2">📊 Campaign Intelligence — Mouvement Avenir 2026</h3>
+            <div class="grid grid-cols-3 gap-3 text-center mb-3">
+              <div class="bg-bgLight dark:bg-cardDark rounded-xl py-3 border border-borderLight dark:border-borderDark">
+                <p class="text-lg font-black font-mono text-smartGreen">2 340</p>
+                <p class="text-[9px] font-mono uppercase text-textSecondaryLight dark:text-textSecondaryDark">Portée Média</p>
+              </div>
+              <div class="bg-bgLight dark:bg-cardDark rounded-xl py-3 border border-borderLight dark:border-borderDark">
+                <p class="text-lg font-black font-mono text-cyan-500">612</p>
+                <p class="text-[9px] font-mono uppercase text-textSecondaryLight dark:text-textSecondaryDark">Interactions</p>
+              </div>
+              <div class="bg-bgLight dark:bg-cardDark rounded-xl py-3 border border-borderLight dark:border-borderDark">
+                <p class="text-lg font-black font-mono text-amber-500">26,1%</p>
+                <p class="text-[9px] font-mono uppercase text-textSecondaryLight dark:text-textSecondaryDark">Taux Engagement</p>
+              </div>
+            </div>
+            <p class="text-[10px] text-textSecondaryLight dark:text-textSecondaryDark italic font-mono">Pineapple fournit des métriques neutres pour équilibrer la visibilité des listes candidates.</p>
+          </div>
+
+        </div>
+
+        <!-- Colonne Droite : Cycle Électoral & Sécurité -->
+        <div class="space-y-6">
+          <div class="glass-card rounded-2xl p-5 shadow-glass">
+            <h3 class="font-display font-bold text-sm mb-3">Cycle du Scrutin</h3>
+            <div class="space-y-2.5">
+              ${cycle.map((c, i) => `
+                <div class="flex items-center gap-3">
+                  <div class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold font-mono flex-shrink-0 ${i<=currentIdx?'bg-smartGreen text-white':'bg-gray-200 dark:bg-cardDark text-textSecondaryLight'}">
+                    ${i<=currentIdx?'✓':i+1}
+                  </div>
+                  <span class="text-xs ${i===currentIdx?'font-bold text-smartGreen':'text-textSecondaryLight dark:text-textSecondaryDark'}">
+                    ${STATUS_LABEL[c]||c}
+                  </span>
+                </div>`).join('')}
+            </div>
+          </div>
+
+          <div class="glass-card rounded-2xl p-5 shadow-glass bg-amber-500/5 border border-amber-500/20">
+            <h3 class="font-display font-bold text-xs mb-1 text-amber-600 dark:text-amber-400">🔒 Anonymat & Bulletin Cryptographique</h3>
+            <p class="text-[11px] text-textSecondaryLight dark:text-textSecondaryDark leading-relaxed">
+              Votre bulletin de vote est scellé par une empreinte unique. Aucun identifiant étudiant n'est rattaché à votre choix final.
+            </p>
+          </div>
+        </div>
+
+      </div>`;
+  }
+
+  // Modal Vote Verrouillé
+  function openVoteModal() {
+    const featured = state.elections.find(e => e.id === 'bureau-2026');
+    const content = document.getElementById('voteModalContent');
+    if (state.hasVoted) return;
+
+    content.innerHTML = `
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-display font-bold text-base">🗳️ ${featured.title}</h3>
+        <button id="closeVoteModal" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-cardDark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <p class="text-xs text-textSecondaryLight dark:text-textSecondaryDark mb-4">Sélectionnez une liste candidate. Votre vote sera définitivement verrouillé.</p>
+      
+      <div class="space-y-2.5" id="voteOptions">
+        ${featured.candidates.filter(c => c.name !== 'Indécis / Neutre').map(c => `
+          <button class="voteOptionBtn w-full text-left p-3.5 border-2 border-borderLight dark:border-borderDark rounded-xl hover:border-smartGreen transition flex items-center justify-between" data-id="${c.id}">
+            <span class="text-xs font-bold">${c.name}</span>
+            <span class="w-4 h-4 rounded-full border-2 border-gray-300 dark:border-gray-600 voteRadio"></span>
+          </button>`).join('')}
+      </div>
+
+      <button id="confirmVoteBtn" disabled class="w-full mt-5 py-3 bg-gray-200 dark:bg-cardDark text-gray-400 rounded-xl text-xs font-bold transition">
+        Sélectionnez une liste
+      </button>`;
+
+    document.getElementById('closeVoteModal').addEventListener('click', closeVoteModal);
+    let selected = null;
+
+    content.querySelectorAll('.voteOptionBtn').forEach(btn => btn.addEventListener('click', () => {
+      selected = btn.dataset.id;
+      content.querySelectorAll('.voteOptionBtn').forEach(b => {
+        b.classList.remove('border-smartGreen', 'bg-smartGreen/10');
+        b.querySelector('.voteRadio').classList.remove('bg-smartGreen', 'border-smartGreen');
+      });
+      btn.classList.add('border-smartGreen', 'bg-smartGreen/10');
+      btn.querySelector('.voteRadio').classList.add('bg-smartGreen', 'border-smartGreen');
+
+      const cb = document.getElementById('confirmVoteBtn');
+      cb.disabled = false;
+      cb.textContent = 'Confirmer mon vote (Sceller le bulletin)';
+      cb.classList.remove('bg-gray-200', 'dark:bg-cardDark', 'text-gray-400');
+      cb.classList.add('bg-smartGreen', 'text-white', 'hover:bg-smartGreenDark');
+    }));
+
+    document.getElementById('confirmVoteBtn').addEventListener('click', () => {
+      if (!selected) return;
+      const ballotHash = '0x' + Array.from({length:16}, () => Math.floor(Math.random()*16).toString(16)).join('');
+      
+      content.innerHTML = `
+        <div class="py-6 text-center space-y-3 fade-in">
+          <div class="w-14 h-14 mx-auto bg-emerald-100 dark:bg-emerald-950/60 text-smartGreen rounded-full flex items-center justify-center text-2xl">🔒</div>
+          <h3 class="font-display font-bold text-base">Bulletin Verrouillé & Scellé</h3>
+          <p class="text-xs text-textSecondaryLight dark:text-textSecondaryDark">Votre vote a été anonymisé avec succès.</p>
+          <div class="p-2.5 bg-bgLight dark:bg-cardDark rounded-xl font-mono text-[10px] text-textSecondaryLight dark:text-textSecondaryDark break-all">
+            Hash du bulletin : ${ballotHash}
+          </div>
+        </div>`;
+      
+      state.hasVoted = true;
+      toast('🗳️ Vote confirmé et enregistré dans le registre', 'success');
+      setTimeout(() => { closeVoteModal(); updateUI(); }, 2000);
+    });
+  }
+
+  function closeVoteModal() { state.showVoteModal = false; updateUI(); }
+
+  // VUE 05 : ACADEMY & PINEAPPLE READER
+  function renderAcademy() {
+    const tabs = [ ['formations','Formations & Ateliers'], ['library','Bibliothèque & Corrigés'], ['acquisitions','Mes acquisitions'] ];
+    return `
+      ${sectionHeader('05 · Academy — Excellence Académique', 'Pineapple Academy', 'Bibliothèque numérique, ateliers certifiés et corrigés d\'examens.')}
+      <div class="flex gap-1 mb-6 bg-white dark:bg-cardDark border border-borderLight dark:border-borderDark rounded-full p-1 w-fit">
+        ${tabs.map(([id,label]) => `
+          <button class="academyTabBtn px-4 py-1.5 rounded-full text-xs font-bold transition ${state.academyTab===id?'bg-smartGreen text-white':'text-textSecondaryLight dark:text-textSecondaryDark hover:text-smartGreen'}" data-tab="${id}">
+            ${label}
+          </button>`).join('')}
+      </div>
+      <div id="academyTabContent">${renderAcademyTab()}</div>`;
+  }
+
+  function renderAcademyTab() {
+    if (state.academyTab === 'formations') {
+      return `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        ${state.formations.map(f => `
+          <div class="glass-card rounded-2xl p-5 card-hover shadow-glass flex flex-col justify-between">
+            <div>
+              <div class="h-28 bg-gradient-to-tr from-brandPrimary to-smartGreen/30 rounded-xl mb-3 flex items-center justify-center text-3xl shadow-inner">🎓</div>
+              <h3 class="font-display font-bold text-sm text-textLight dark:text-textDark">${f.title}</h3>
+              <p class="text-[10px] font-mono text-textSecondaryLight dark:text-textSecondaryDark mt-1">${f.org} · ${f.format}</p>
+            </div>
+            <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderLight dark:border-borderDark">
+              <span class="text-xs font-black font-mono text-smartGreen">${f.price}</span>
+              <button class="px-3 py-1.5 bg-smartGreen text-white rounded-xl text-xs font-bold hover:bg-smartGreenDark shadow-sm">S'inscrire</button>
+            </div>
+          </div>`).join('')}
+      </div>`;
+    }
+
+    if (state.academyTab === 'library') {
+      return `<div class="glass-card rounded-2xl shadow-glass overflow-hidden">
+        <div class="px-5 py-3 border-b border-borderLight dark:border-borderDark bg-bgLight/50 dark:bg-cardDark/50">
+          <p class="text-[11px] font-mono text-textSecondaryLight dark:text-textSecondaryDark">Dépôt certifié propre à l'ENSPD — Filigrane de sécurité appliqué à chaque liseur.</p>
+        </div>
+        <div class="divide-y divide-borderLight dark:divide-borderDark">
+          ${state.documents.map(d => {
+            const owned = state.purchasedDocs.includes(d.id);
+            const isFree = d.price === 0;
+            return `<div class="flex items-center justify-between px-5 py-4 hover:bg-gray-50 dark:hover:bg-cardDark/50 transition">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-xl bg-smartGreen/10 text-smartGreen flex items-center justify-center flex-shrink-0 font-bold text-lg">
+                  ${d.type.includes('Corrigé')?'📘':'📄'}
+                </div>
+                <div class="min-w-0">
+                  <p class="text-xs font-bold truncate text-textLight dark:text-textDark">${d.title}</p>
+                  <p class="text-[10px] font-mono text-textSecondaryLight dark:text-textSecondaryDark">${d.level} · ${d.type}</p>
+                </div>
+              </div>
+              ${isFree
+                ? `<button class="px-3.5 py-1.5 border border-smartGreen text-smartGreen rounded-xl text-xs font-bold hover:bg-smartGreen hover:text-white transition">Consulter</button>`
+                : owned
+                  ? `<button class="openReaderBtn px-3.5 py-1.5 bg-smartGreen text-white rounded-xl text-xs font-bold hover:bg-smartGreenDark shadow-sm" data-id="${d.id}">Lire dans Pineapple Reader</button>`
+                  : `<button class="buyDocBtn px-3.5 py-1.5 border border-amber-500 text-amber-500 rounded-xl text-xs font-bold hover:bg-amber-500 hover:text-white transition" data-id="${d.id}">🔒 ${d.price.toLocaleString()} FCFA</button>`
+              }
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }
+
+    // Tab Acquisitions
+    const owned = state.documents.filter(d => state.purchasedDocs.includes(d.id));
+    return `<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      ${owned.map(d => `
+        <div class="glass-card rounded-2xl p-4 shadow-glass flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-12 h-14 bg-gradient-to-br from-brandPrimary to-smartGreen rounded-xl flex items-center justify-center text-white text-xl font-bold flex-shrink-0 shadow-md">📘</div>
+            <div class="min-w-0">
+              <p class="text-xs font-bold truncate text-textLight dark:text-textDark">${d.title}</p>
+              <p class="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">Accès à vie certifié</p>
+            </div>
+          </div>
+          <button class="openReaderBtn px-3.5 py-2 bg-smartGreen text-white rounded-xl text-xs font-bold hover:bg-smartGreenDark shadow-sm flex-shrink-0" data-id="${d.id}">Lire</button>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  function openPurchaseModal(docId) {
+    const doc = state.documents.find(d => d.id === docId);
+    const content = document.getElementById('purchaseModalContent');
+    content.innerHTML = `
+      <div class="w-14 h-14 mx-auto bg-amber-500/10 text-amber-500 rounded-full flex items-center justify-center text-2xl mb-3">🔒</div>
+      <h3 class="font-display font-bold text-sm text-textLight dark:text-textDark">${doc.title}</h3>
+      <p class="text-2xl font-black font-mono text-smartGreen my-3">${doc.price.toLocaleString()} FCFA</p>
+      <p class="text-[11px] text-textSecondaryLight dark:text-textSecondaryDark mb-5">
+        Paiement unique via Mobile Money (MTN / Orange Money). Accès consultable dans le liseur Pineapple Reader avec filigrane nominatif.
+      </p>
+      <div class="flex gap-2">
+        <button id="cancelPurchase" class="flex-1 py-2.5 border border-borderLight dark:border-borderDark rounded-xl text-xs font-semibold">Annuler</button>
+        <button id="confirmPurchase" class="flex-1 py-2.5 bg-smartGreen text-white rounded-xl text-xs font-bold hover:bg-smartGreenDark shadow-sm">Confirmer & Payer</button>
+      </div>`;
+
+    document.getElementById('cancelPurchase').addEventListener('click', closePurchaseModal);
+    document.getElementById('confirmPurchase').addEventListener('click', () => {
+      state.purchasedDocs.push(docId);
+      closePurchaseModal();
+      toast('✅ Achat validé — Document disponible dans vos acquisitions', 'success');
+      updateUI();
+    });
+
+    state.showPurchaseModal = true;
+    updateUI();
+  }
+
+  function closePurchaseModal() { state.showPurchaseModal = false; updateUI(); }
+
+  // Pineapple Reader Sub-View
+  function openReader(docId) {
+    const doc = state.documents.find(d => d.id === docId);
+    const main = document.getElementById('mainContent');
+    
+    main.innerHTML = `
+      <div class="max-w-4xl mx-auto fade-in">
+        <button id="backFromReader" class="text-xs font-bold text-smartGreen hover:underline mb-4 flex items-center gap-1">
+          ← Retour à l'Academy
+        </button>
+
+        <div class="glass-card rounded-2xl shadow-2xl border border-borderLight dark:border-borderDark overflow-hidden">
+          
+          <!-- Reader Toolbar -->
+          <div class="px-6 py-3 border-b border-borderLight dark:border-borderDark flex items-center justify-between bg-bgLight/50 dark:bg-cardDark/50">
+            <div>
+              <h3 class="font-display font-bold text-sm text-textLight dark:text-textDark">${doc.title}</h3>
+              <p class="text-[10px] font-mono text-textSecondaryLight dark:text-textSecondaryDark">ENSPD · ${doc.level} · Filigrane actif</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button class="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-surfaceDark text-xs" title="Zoom avant">🔍 +</button>
+              <button class="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-surfaceDark text-xs" title="Zoom arrière">🔍 -</button>
+              <button class="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-surfaceDark text-xs" title="Favoris">⭐</button>
+            </div>
+          </div>
+
+          <!-- Reader Viewer Box -->
+          <div class="relative bg-gray-100 dark:bg-bgDark min-h-[500px] flex items-center justify-center p-8 overflow-hidden">
+            <div class="watermark-overlay text-gray-400 dark:text-gray-600">
+              DAVID MEILLEUR · MATRICULE 20240147 · COPIE UNIQUE
+            </div>
+            
+            <div class="bg-white dark:bg-surfaceDark shadow-2xl rounded-xl w-full max-w-lg min-h-[420px] p-8 text-xs text-textLight dark:text-textDark leading-relaxed border border-borderLight dark:border-borderDark relative z-10">
+              <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-3 mb-4">
+                <span class="font-bold text-smartGreen font-mono uppercase">Épreuve & Corrigé Officiel</span>
+                <span class="text-[10px] font-mono text-textSecondaryLight">Session 2025/2026</span>
+              </div>
+              <p class="font-bold mb-2 text-sm">Exercice 1 : Modélisation des systèmes dynamiques (8 pts)</p>
+              <p class="text-textSecondaryLight dark:text-textSecondaryDark mb-4">
+                Soit f une fonction continue définie sur l'intervalle [a, b]... Voici la démonstration détaillée étape par étape conformément au barème de l'enseignant.
+              </p>
+              <div class="p-3 bg-bgLight dark:bg-cardDark rounded-xl font-mono text-[11px] border border-borderLight dark:border-borderDark">
+                lim(x->0) [sin(x)/x] = 1 => Solution Q.1 : Convergente.
+              </div>
+            </div>
+          </div>
+
+          <!-- Reader Bottom Nav Bar -->
+          <div class="px-6 py-3 border-t border-borderLight dark:border-borderDark flex items-center justify-between text-xs font-mono">
+            <span class="text-textSecondaryLight dark:text-textSecondaryDark">Page 1 sur 14</span>
+            <div class="flex gap-2">
+              <button class="px-3 py-1 border border-borderLight dark:border-borderDark rounded-lg hover:bg-gray-100 dark:hover:bg-cardDark">‹ Précédent</button>
+              <button class="px-3 py-1 border border-borderLight dark:border-borderDark rounded-lg hover:bg-gray-100 dark:hover:bg-cardDark">Suivant ›</button>
+            </div>
+          </div>
+
+        </div>
+      </div>`;
+
+    document.getElementById('backFromReader').addEventListener('click', () => {
+      state.academyTab = 'acquisitions';
+      state.currentView = 'academy';
+      updateUI();
+    });
+  }
+
+  // VUE 06 : OPPORTUNITIES
+  function renderOpportunities() {
+    return `
+      ${sectionHeader('06 · Opportunities — Recherche & Stages', 'Opportunités', 'Projets académiques applicatifs, offres de recherche et stages.')}
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        ${state.projects.map(p => `
+          <div class="glass-card rounded-2xl p-5 card-hover shadow-glass flex flex-col justify-between">
+            <div>
+              <span class="px-2.5 py-0.5 rounded-full text-[9px] font-bold font-mono bg-cyan-100 text-cyan-800 dark:bg-cyan-950/60 dark:text-cyan-300">
+                Projet de recherche
+              </span>
+              <h3 class="font-display font-bold text-sm text-textLight dark:text-textDark mt-2">${p.title}</h3>
+              <p class="text-[10px] font-mono text-textSecondaryLight dark:text-textSecondaryDark mt-0.5">${p.lab} · Durée : ${p.duration}</p>
+              
+              <div class="mt-3 space-y-1">
+                <p class="text-[11px] font-bold text-textLight dark:text-textDark">Profils recherchés :</p>
+                ${p.seeking.map(s => `
+                  <p class="text-xs text-textSecondaryLight dark:text-textSecondaryDark flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-smartGreen"></span> ${s}
+                  </p>`).join('')}
+              </div>
+            </div>
+
+            <button class="mt-4 w-full py-2 bg-smartGreen text-white rounded-xl text-xs font-bold hover:bg-smartGreenDark shadow-sm">
+              Postuler au projet
+            </button>
+          </div>`).join('')}
+      </div>`;
+  }
+
+  // VUE 07 : SERVICES
+  function renderServices() {
+    return `
+      ${sectionHeader('07 · Services — Marketplace & Covoiturage', 'Services Campus', 'Plateforme d\'entraide, covoiturage étudiant et petites annonces.')}
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Marketplace Widget -->
+        <div class="glass-card rounded-2xl p-5 shadow-glass space-y-3">
+          <h3 class="font-display font-bold text-sm flex items-center gap-2">🛍️ Marketplace Étudiante</h3>
+          <div class="grid grid-cols-2 gap-3">
+            ${[
+              ['🧁 Pâtisserie maison', '2 500 FCFA'],
+              ['🎨 Design & Logo club', '15 000 FCFA'],
+              ['💻 Tutorat Python / C++', '5 000 FCFA/h'],
+              ['📸 Shooting photo événement', '10 000 FCFA']
+            ].map(([title, price]) => `
+              <div class="p-3 bg-bgLight dark:bg-cardDark rounded-xl border border-borderLight dark:border-borderDark">
+                <p class="text-xs font-bold text-textLight dark:text-textDark">${title}</p>
+                <p class="text-xs font-mono font-black text-smartGreen mt-1">${price}</p>
+              </div>`).join('')}
+          </div>
+        </div>
+
+        <!-- Pineapple Ride / Covoiturage -->
+        <div class="glass-card rounded-2xl p-5 shadow-glass space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="font-display font-bold text-sm flex items-center gap-2">🚗 Pineapple Ride</h3>
+            <button id="openCarpoolModalBtn" class="text-xs font-bold text-smartGreen hover:underline">+ Créer un salon</button>
+          </div>
+          <div class="space-y-2">
+            ${state.carpoolRides.map(r => `
+              <div class="flex items-center justify-between p-3 bg-bgLight dark:bg-cardDark rounded-xl border border-borderLight dark:border-borderDark">
+                <div>
+                  <p class="text-xs font-bold">${r.from} → ${r.to}</p>
+                  <p class="text-[10px] font-mono text-textSecondaryLight dark:text-textSecondaryDark">${r.driver} · Dépanne à ${r.time}</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-mono font-bold text-smartGreen">${r.spots}/${r.maxSpots} places</span>
+                  <button class="joinRideBtn px-3 py-1 bg-smartGreen text-white rounded-lg text-xs font-bold hover:bg-smartGreenDark shadow-sm" data-id="${r.id}">Rejoindre</button>
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>
+
+      </div>`;
+  }
+
+  // VUE 08 : IDENTITY / PROFILE
+  function renderIdentity() {
+    return `
+      ${sectionHeader('08 · Identity — Profil & Certification', 'Mon Profil Universitaire', 'Identité certifiée, portfolio et compétences académiques.')}
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="glass-card rounded-2xl p-6 text-center shadow-glass lg:col-span-1">
+          <div class="w-24 h-24 mx-auto bg-gradient-to-tr from-brandPrimary via-smartGreen to-accentLime rounded-full flex items-center justify-center text-white font-extrabold text-3xl mb-3 shadow-xl">
+            DM
+          </div>
+          <h3 class="font-display font-bold text-lg text-textLight dark:text-textDark">David Meilleur</h3>
+          <p class="text-xs text-textSecondaryLight dark:text-textSecondaryDark font-mono">ENSPD · Data Science & IA · Niveau L3</p>
+          
+          <div class="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-mono bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Statut Certifié ACTIVE
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 mt-6 text-left">
+            <div class="bg-bgLight dark:bg-cardDark p-3 rounded-xl border border-borderLight dark:border-borderDark">
+              <p class="text-[9px] font-mono uppercase text-textSecondaryLight">Matricule</p>
+              <p class="text-xs font-bold font-mono mt-0.5">20240147</p>
+            </div>
+            <div class="bg-bgLight dark:bg-cardDark p-3 rounded-xl border border-borderLight dark:border-borderDark">
+              <p class="text-[9px] font-mono uppercase text-textSecondaryLight">Niveau</p>
+              <p class="text-xs font-bold font-mono mt-0.5">Licence 3</p>
+            </div>
+          </div>
+
+          <button class="w-full mt-5 py-2.5 border border-smartGreen text-smartGreen hover:bg-smartGreen hover:text-white rounded-xl text-xs font-bold transition">
+            📄 Exporter mon CV Certifié
+          </button>
+        </div>
+
+        <div class="lg:col-span-2 space-y-4">
+          <div class="glass-card rounded-2xl p-5 shadow-glass">
+            <h3 class="font-display font-bold text-sm mb-3">Portfolio & Projets Récents</h3>
+            <div class="space-y-2">
+              <div class="p-3 border border-borderLight dark:border-borderDark rounded-xl bg-bgLight dark:bg-cardDark flex justify-between items-center">
+                <div><p class="text-xs font-bold">🍍 Pineapple OS — Plateforme Universitaire</p><p class="text-[10px] text-textSecondaryLight font-mono">Projet de développement SaaS Campus</p></div>
+                <span class="text-[10px] font-mono text-smartGreen font-bold">2026</span>
+              </div>
+              <div class="p-3 border border-borderLight dark:border-borderDark rounded-xl bg-bgLight dark:bg-cardDark flex justify-between items-center">
+                <div><p class="text-xs font-bold">Fondateur — Club Intelligence Artificielle ENSPD</p><p class="text-[10px] text-textSecondaryLight font-mono">Engagement associatif certifié</p></div>
+                <span class="text-[10px] font-mono text-smartGreen font-bold">2025</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>`;
+  }
+
+  // VUES ADMINISTRATION (ADMIN / SUPERADMIN ROLE)
+  function renderAdminOverview() {
+    return `
+      ${sectionHeader('Administration Établissement', 'Tableau de Bord Admin ENSPD', 'Vue réservée aux administrateurs de l\'établissement.')}
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="glass-card p-4 rounded-2xl shadow-glass">
+          <p class="text-[10px] font-mono text-textSecondaryLight uppercase">Étudiants Inscrits</p>
+          <p class="text-2xl font-black font-mono text-smartGreen mt-1">2 140</p>
+        </div>
+        <div class="glass-card p-4 rounded-2xl shadow-glass">
+          <p class="text-[10px] font-mono text-textSecondaryLight uppercase">Demandes Clubs</p>
+          <p class="text-2xl font-black font-mono text-amber-500 mt-1">3 en attente</p>
+        </div>
+        <div class="glass-card p-4 rounded-2xl shadow-glass">
+          <p class="text-[10px] font-mono text-textSecondaryLight uppercase">Taux Participation Vote</p>
+          <p class="text-2xl font-black font-mono text-cyan-500 mt-1">60.1%</p>
+        </div>
+      </div>`;
+  }
+
+  // ── 6. Right Sidebar Renderer ──────────────────────────────
+  function renderRightSidebar() {
+    const el = document.getElementById('rightSidebar');
+    if (!el) return;
+
+    el.innerHTML = `
+      <!-- Widget Vote -->
+      <div class="glass-card rounded-2xl p-4 shadow-glass">
+        <h4 class="text-[10px] font-mono font-bold uppercase tracking-wider text-textSecondaryLight dark:text-textSecondaryDark mb-2">Scrutin Actif</h4>
+        <p class="text-xs font-bold text-textLight dark:text-textDark">Bureau Étudiant ENSPD 2026</p>
+        <div class="mt-3">
+          ${pollBars(state.elections[0].candidates.slice(0, 2))}
+        </div>
+        <button data-view="democracy" class="quicklink w-full mt-2 py-1.5 bg-smartGreen/10 text-smartGreen hover:bg-smartGreen hover:text-white rounded-lg text-xs font-bold transition text-center">
+          Participer au vote →
+        </button>
+      </div>
+
+      <!-- Widget Salles Libres -->
+      <div class="glass-card rounded-2xl p-4 shadow-glass">
+        <h4 class="text-[10px] font-mono font-bold uppercase tracking-wider text-textSecondaryLight dark:text-textSecondaryDark mb-2">Salles Libres Actuellement</h4>
+        <div class="space-y-1.5">
+          ${state.rooms.filter(r=>r.status==='free').map(r => `
+            <div class="flex items-center justify-between text-xs py-1">
+              <span class="font-semibold text-textLight dark:text-textDark">${r.name}</span>
+              <span class="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">🟢 Libre</span>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  // ── 7. Router & Event Binding ──────────────────────────────
+  const RENDERERS = {
+    home: renderHome,
+    campus: renderCampus,
+    community: renderCommunity,
+    democracy: renderDemocracy,
+    academy: renderAcademy,
+    opportunities: renderOpportunities,
+    services: renderServices,
+    identity: renderIdentity,
+    admin: renderAdminOverview
+  };
+
+  function renderMainContent() {
+    const mainEl = document.getElementById('mainContent');
+    const renderer = RENDERERS[state.currentView] || renderHome;
+    mainEl.innerHTML = `<div class="fade-in">${renderer()}</div>`;
+  }
+
+  function updateUI() {
+    renderSidebar();
+    renderMainContent();
+    renderRightSidebar();
+    renderMobileBottomNav();
+
+    document.getElementById('mobileSidebarOverlay').classList.toggle('hidden', !state.showMobileSidebar);
+    document.getElementById('carpoolModal').classList.toggle('hidden', !state.showCarpoolModal);
+    document.getElementById('purchaseModal').classList.toggle('hidden', !state.showPurchaseModal);
+    document.getElementById('voteModal').classList.toggle('hidden', !state.showVoteModal);
+    document.getElementById('notifDrawer').classList.toggle('hidden', !state.showNotifDrawer);
+    document.getElementById('searchModal').classList.toggle('hidden', !state.showSearchModal);
+
+    bindDynamicEvents();
+  }
+
+  function bindDynamicEvents() {
+    // Nav Items
+    document.querySelectorAll('.navBtn, .bottomNavBtn, .quicklink, .searchSuggestBtn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.dataset.view) state.currentView = btn.dataset.view;
+        if (btn.dataset.tab) state.academyTab = btn.dataset.tab;
+        state.showMobileSidebar = false;
+        state.showSearchModal = false;
+        updateUI();
+      });
+    });
+
+    // Academy Tabs
+    document.querySelectorAll('.academyTabBtn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.academyTab = btn.dataset.tab;
+        updateUI();
+      });
+    });
+
+    // Document & Reader Actions
+    document.querySelectorAll('.buyDocBtn').forEach(btn => btn.addEventListener('click', () => openPurchaseModal(btn.dataset.id)));
+    document.querySelectorAll('.openReaderBtn').forEach(btn => btn.addEventListener('click', () => openReader(btn.dataset.id)));
+
+    // Vote Button
+    const voteBtn = document.getElementById('openVoteBtn');
+    if (voteBtn) voteBtn.addEventListener('click', () => { state.showVoteModal = true; updateUI(); openVoteModal(); });
+
+    // Likes Feed
+    document.querySelectorAll('.likeBtn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = state.posts.find(x => x.id == btn.dataset.id);
+        if (p) {
+          p.liked = !p.liked;
+          p.likes += p.liked ? 1 : -1;
+          updateUI();
+        }
+      });
+    });
+
+    // Room Status Toggle
+    document.querySelectorAll('.toggleRoomBtn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const r = state.rooms.find(x => x.id == btn.dataset.id);
+        if (r) {
+          r.status = r.status === 'free' ? 'occupied' : 'free';
+          r.updated = 'À l\'instant';
+          toast(`Statut de ${r.name} mis à jour`, 'success');
+          updateUI();
+        }
+      });
+    });
+
+    // Covoiturage Join
+    document.querySelectorAll('.joinRideBtn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const ride = state.carpoolRides.find(r => r.id == btn.dataset.id);
+        if (ride && ride.spots > 0) {
+          ride.spots--;
+          toast('🚗 Réservation confirmée sur Pineapple Ride !', 'success');
+          updateUI();
+        }
+      });
+    });
+
+    // New Post Form
+    const pubBtn = document.getElementById('publishPostBtn');
+    if (pubBtn) {
+      pubBtn.addEventListener('click', () => {
+        const input = document.getElementById('newPostInput');
+        if (input && input.value.trim()) {
+          state.posts.unshift({
+            id: Date.now(),
+            cat: 'Vie étudiante',
+            author: 'David Meilleur (Vous)',
+            time: 'À l\'instant',
+            text: input.value.trim(),
+            certified: true,
+            likes: 0,
+            liked: false
+          });
+          toast('Post publié sur le feed du campus !', 'success');
+          updateUI();
+        }
+      });
+    }
+
+    const openCarpool = document.getElementById('openCarpoolModalBtn');
+    if (openCarpool) openCarpool.addEventListener('click', () => { state.showCarpoolModal = true; updateUI(); });
+  }
+
+  // ── 8. Event Listeners Statiques ──────────────────────────────
+  function setupStaticEvents() {
+    // Mode Sombre / Clair Toggle
+    const themeBtn = document.getElementById('themeToggleBtn');
+    themeBtn.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('pineapple_theme', isDark ? 'dark' : 'light');
+    });
+
+    // Restaurer le thème enregistré
+    if (localStorage.getItem('pineapple_theme') === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
+
+    // Role Selector (Student, Teacher, Admin, Super Admin)
+    const roleSel = document.getElementById('roleSelector');
+    roleSel.addEventListener('change', (e) => {
+      state.currentRole = e.target.value;
+      document.getElementById('currentRoleTag').textContent = e.target.options[e.target.selectedIndex].text.split(' ')[1];
+      if (state.currentRole === 'admin' || state.currentRole === 'superadmin') {
+        state.currentView = 'admin';
+      } else {
+        state.currentView = 'home';
+      }
+      toast(`Mode de vue changé : ${e.target.options[e.target.selectedIndex].text}`, 'info');
+      updateUI();
+    });
+
+    // Search Modal ⌘K
+    document.getElementById('openSearchBtn').addEventListener('click', () => { state.showSearchModal = true; updateUI(); });
+    document.getElementById('closeSearchModal').addEventListener('click', () => { state.showSearchModal = false; updateUI(); });
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        state.showSearchModal = !state.showSearchModal;
+        updateUI();
+      }
+    });
+
+    // Notifications Drawer
+    document.getElementById('notifBell').addEventListener('click', () => {
+      state.showNotifDrawer = true;
+      state.notificationCount = 0;
+      document.getElementById('notifBadge').classList.add('hidden');
+      updateUI();
+    });
+    document.getElementById('closeNotifDrawer').addEventListener('click', () => { state.showNotifDrawer = false; updateUI(); });
+
+    // Mobile Sidebar
+    document.getElementById('mobileMenuBtn').addEventListener('click', () => { state.showMobileSidebar = true; updateUI(); });
+    document.getElementById('closeMobileSidebar').addEventListener('click', () => { state.showMobileSidebar = false; updateUI(); });
+
+    // Dropdown Université
+    const uniBtn = document.getElementById('uniBtn'), uniMenu = document.getElementById('uniMenu');
+    uniBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      uniMenu.classList.toggle('hidden');
+      uniMenu.innerHTML = state.universities.map(u => `
+        <button class="w-full text-left px-4 py-2.5 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-cardDark transition flex items-center gap-2 ${u===state.selectedUniversity?'text-smartGreen font-bold':''}">
+          <span class="w-5 h-5 bg-smartGreen text-white rounded-full flex items-center justify-center text-[10px] font-bold">${u.slice(0,2).toUpperCase()}</span> ${u}
+        </button>`).join('');
+
+      uniMenu.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+        state.selectedUniversity = b.textContent.trim();
+        document.getElementById('selectedUniText').textContent = state.selectedUniversity;
+        document.getElementById('uniInitial').textContent = state.selectedUniversity.slice(0,2).toUpperCase();
+        uniMenu.classList.add('hidden');
+        toast(`Écosystème changé : ${state.selectedUniversity}`, 'info');
+      }));
+    });
+    document.addEventListener('click', () => uniMenu.classList.add('hidden'));
+
+    // Profile Menu Dropdown
+    document.getElementById('profileBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('profileMenu').classList.toggle('hidden');
+    });
+    document.addEventListener('click', () => document.getElementById('profileMenu').classList.add('hidden'));
+
+    // Formulaire Covoiturage
+    document.getElementById('closeCarpoolModal').addEventListener('click', () => { state.showCarpoolModal = false; updateUI(); });
+    document.getElementById('cancelModalBtn').addEventListener('click', () => { state.showCarpoolModal = false; updateUI(); });
+    document.getElementById('carpoolForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const from = document.getElementById('fromSelect').value;
+      const to = document.getElementById('toSelect').value;
+      const time = document.getElementById('timeInput').value;
+      const spots = parseInt(document.getElementById('spotsInput').value);
+      const driver = document.getElementById('driverInput').value.trim();
+
+      if (!from || !to || !time || !spots || !driver) return alert('Veuillez remplir tous les champs.');
+      state.carpoolRides.push({ id: Date.now(), from, to, time, spots, maxSpots: spots, driver });
+      state.showCarpoolModal = false;
+      toast('🚗 Salon de covoiturage créé avec succès !', 'success');
+      updateUI();
+    });
+  }
+
+  // Initialisation
+  updateUI();
+  setupStaticEvents();
+})();
+</script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 // frontend/src/routes/AppRouter.tsx
 
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { ProtectedRoute } from './ProtectedRoute';
@@ -95,18 +95,24 @@ export const AppRouter: React.FC = () => {
           <Route path="/security" element={<SecurityCenterScreen />} />
           <Route path="/settings" element={<SettingsScreen />} />
 
+          {/* Community : redirection d'index vers le premier onglet réel */}
+          <Route path="/community" element={<Navigate to="/community/organizations" replace />} />
           <Route path="/community/organizations" element={<OrganizationsScreen />} />
           <Route path="/community/rooms" element={<RoomsScreen />} />
 
           <Route path="/democracy" element={<ElectionsListScreen />} />
           <Route path="/democracy/:id" element={<ElectionRoomScreen />} />
 
+          {/* Academy : redirection d'index vers la bibliothèque */}
+          <Route path="/academy" element={<Navigate to="/academy/library" replace />} />
           <Route path="/academy/library" element={<LibraryScreen />} />
           <Route
             path="/academy/reader/:id"
             element={<PineappleReaderScreen documentId=":id" onClose={() => window.history.back()} />}
           />
 
+          {/* Campus Life : redirection d'index vers le marketplace */}
+          <Route path="/campus-life" element={<Navigate to="/campus-life/marketplace" replace />} />
           <Route path="/campus-life/marketplace" element={<MarketplaceScreen />} />
           <Route path="/campus-life/ride" element={<PineappleRideScreen />} />
 
