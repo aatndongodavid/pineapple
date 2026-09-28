@@ -42,8 +42,18 @@ from shared_kernel.infrastructure.database import AsyncSessionLocal
 from shared_kernel.infrastructure.tenant_middleware import get_current_tenant_id
 
 
+from identity_context.domain.value_objects import VerificationStatus
+from identity_context.infrastructure.persistence.repositories import PostgresUserRepository
+
+
 async def get_session_factory() -> async_sessionmaker[AsyncSession]:
     return AsyncSessionLocal
+
+
+async def get_user_repo(
+    session_factory: async_sessionmaker[AsyncSession] = Depends(get_session_factory),
+) -> PostgresUserRepository:
+    return PostgresUserRepository(session_factory)
 
 
 async def get_election_repo(
@@ -72,6 +82,24 @@ async def get_admin_user(
     admin: dict = Depends(require_role("ADMIN")),
 ) -> dict:
     return admin
+
+
+class RealDemocracyUserInfoProvider:
+    def __init__(self, user_repo: PostgresUserRepository, tenant_id: uuid.UUID):
+        self._user_repo = user_repo
+        self._tenant_id = tenant_id
+
+    async def get_user_info(self, user_id: uuid.UUID) -> dict:
+        user = await self._user_repo.get_by_id(user_id, self._tenant_id)
+        if not user:
+            return {}
+        return {
+            "academic_status": user.academic_status.value if hasattr(user.academic_status, "value") else str(user.academic_status),
+            "is_certified": user.verification_status == VerificationStatus.VERIFIED,
+            "faculty": user.faculty,
+            "filiere": user.filiere,
+            "academic_year": user.academic_year,
+        }
 
 
 # ---------------------------------------------------------------------------
@@ -145,32 +173,22 @@ async def cast_vote(
     vote_repo: PostgresVoteRepository = Depends(get_vote_repo),
     crypto_engine: RSACryptoEngine = Depends(get_crypto_engine),
     audit_repo: PostgresAuditLedgerRepository = Depends(get_audit_repo),
+    user_repo: PostgresUserRepository = Depends(get_user_repo),
 ):
     """
     Exprime un vote pour une élection donnée.
     Vérifie l'éligibilité, l'unicité et chiffre le bulletin avant enregistrement.
     """
-    # Le use case requiert un UserInfoProvider ; pour la démonstration on fournit un provider simple.
-    class UserInfoProvider:
-        def get_user_info(self, user_id: uuid.UUID) -> dict:
-            # TODO: Appel au service Identity pour obtenir les infos académiques.
-            # Pour l'exemple, on suppose que l'utilisateur est éligible.
-            return {
-                "academic_status": "student",
-                "is_certified": True,
-                "level": "L3",
-            }
+    provider = RealDemocracyUserInfoProvider(user_repo, tenant_id)
 
     use_case = CastVoteUseCase(
         election_repo=election_repo,
         vote_repo=vote_repo,
         crypto_engine=crypto_engine,
         audit_ledger=audit_repo,
-        user_info_provider=UserInfoProvider(),
+        user_info_provider=provider,
     )
 
-    # Clé publique à récupérer depuis la configuration ou un service de clés.
-    # Pour le prototype, on met une clé factice (à remplacer).
     PUBLIC_KEY_PEM = "-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----"
 
     try:
@@ -212,7 +230,6 @@ async def tally_election(
         audit_ledger=audit_repo,
     )
 
-    # Clé privée à récupérer depuis un stockage sécurisé (jamais en clair dans le code).
     PRIVATE_KEY_PEM = "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
 
     try:
@@ -235,9 +252,9 @@ async def get_election_audit(
     """
     Consulte le registre immuable de l'élection (réservé aux administrateurs).
     """
-    # TODO: Implémenter une méthode de listing des entrées d'audit filtrées par élection.
-    # Pour le moment, on renvoie un message indiquant que la fonctionnalité est en cours.
+    entries = await audit_repo.list_entries_by_election(election_id, tenant_id)
     return {
-        "message": "Audit log query not yet implemented",
         "election_id": str(election_id),
+        "total_entries": len(entries),
+        "entries": entries,
     }

@@ -82,10 +82,15 @@ class CreateMarketplaceListingUseCase:
 
 
 class CreateRideShareUseCase:
-    """Création d'une offre de covoiturage Pineapple Ride."""
+    """Création d'une offre de covoiturage Pineapple Ride (réservée aux étudiants certifiés actifs)."""
 
-    def __init__(self, ride_repo: RideRepositoryPort):
+    def __init__(
+        self,
+        ride_repo: RideRepositoryPort,
+        user_status_provider: Optional[UserStatusProvider] = None,
+    ):
         self._ride_repo = ride_repo
+        self._user_status_provider = user_status_provider
 
     async def execute(
         self,
@@ -93,6 +98,10 @@ class CreateRideShareUseCase:
         tenant_id: UUID,
         dto: RideCreateDTO,
     ) -> RideShare:
+        if self._user_status_provider:
+            if not await self._user_status_provider.is_certified_active(driver_id):
+                raise UserNotEligibleError("Seuls les étudiants certifiés actifs peuvent créer un trajet de covoiturage.")
+
         ride = RideShare(
             id=uuid4(),
             tenant_id=tenant_id,

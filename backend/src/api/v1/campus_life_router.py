@@ -59,13 +59,29 @@ async def get_messaging_repo(
     return PostgresMessagingRepository(session_factory)
 
 
-class SimpleUserStatusProvider:
+from identity_context.domain.value_objects import AccountStatus, VerificationStatus
+from identity_context.infrastructure.persistence.repositories import PostgresUserRepository
+
+
+async def get_user_repo(
+    session_factory: async_sessionmaker[AsyncSession] = Depends(get_session_factory),
+) -> PostgresUserRepository:
+    return PostgresUserRepository(session_factory)
+
+
+class RealUserStatusProvider:
+    def __init__(self, user_repo: PostgresUserRepository, tenant_id: uuid.UUID):
+        self._user_repo = user_repo
+        self._tenant_id = tenant_id
+
     async def is_certified_active(self, user_id: uuid.UUID) -> bool:
-        return True
-
-
-async def get_user_status_provider() -> SimpleUserStatusProvider:
-    return SimpleUserStatusProvider()
+        user = await self._user_repo.get_by_id(user_id, self._tenant_id)
+        if not user:
+            return False
+        return (
+            user.verification_status == VerificationStatus.VERIFIED
+            and user.account_status == AccountStatus.ACTIVE
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -107,12 +123,13 @@ async def create_listing(
     current_user: dict = Depends(get_current_user),
     tenant_id: uuid.UUID = Depends(get_current_tenant_id),
     marketplace_repo: PostgresMarketplaceRepository = Depends(get_marketplace_repo),
-    user_status_provider: SimpleUserStatusProvider = Depends(get_user_status_provider),
+    user_repo: PostgresUserRepository = Depends(get_user_repo),
 ):
     """
     Publier une annonce (réservé aux étudiants certifiés actifs).
     """
-    use_case = CreateMarketplaceListingUseCase(marketplace_repo, user_status_provider)
+    provider = RealUserStatusProvider(user_repo, tenant_id)
+    use_case = CreateMarketplaceListingUseCase(marketplace_repo, provider)
     try:
         listing = await use_case.execute(
             seller_id=current_user["user_id"],
@@ -169,16 +186,22 @@ async def create_ride(
     current_user: dict = Depends(get_current_user),
     tenant_id: uuid.UUID = Depends(get_current_tenant_id),
     ride_repo: PostgresRideRepository = Depends(get_ride_repo),
+    user_repo: PostgresUserRepository = Depends(get_user_repo),
 ):
     """
-    Proposer un trajet de covoiturage.
+    Proposer un trajet de covoiturage (réservé aux étudiants certifiés actifs).
     """
-    use_case = CreateRideShareUseCase(ride_repo)
-    ride = await use_case.execute(
-        driver_id=current_user["user_id"],
-        tenant_id=tenant_id,
-        dto=dto,
-    )
+    provider = RealUserStatusProvider(user_repo, tenant_id)
+    use_case = CreateRideShareUseCase(ride_repo, provider)
+    try:
+        ride = await use_case.execute(
+            driver_id=current_user["user_id"],
+            tenant_id=tenant_id,
+            dto=dto,
+        )
+    except UserNotEligibleError as e:
+        raise HTTPException(status_code=403, detail=str(e))
+
     return RideResponseDTO(
         id=ride.id,
         tenant_id=ride.tenant_id,

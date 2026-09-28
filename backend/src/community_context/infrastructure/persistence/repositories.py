@@ -92,29 +92,44 @@ class PostgresPostRepository(PostRepositoryPort):
         user_id: UUID,
         limit: int = 20,
         offset: int = 0,
+        faculty: Optional[str] = None,
+        filiere: Optional[str] = None,
+        academic_year: Optional[str] = None,
     ) -> List[Post]:
         async with self._session_factory() as session:
             stmt = select(PostModel).where(PostModel.tenant_id == tenant_id)
 
             # Filtrage selon l'onglet demandé
             if tab == "mon_etablissement":
-                # Publications organiques locales (scope LOCAL)
                 stmt = stmt.where(PostModel.scope == AudienceScope.LOCAL)
             elif tab == "pour_toi":
-                # Pour l'instant, on retourne toutes les publications locales non sponsorisées
                 stmt = stmt.where(PostModel.is_sponsored == False)
             elif tab == "communautes":
-                # Publications provenant d'organisations
                 stmt = stmt.where(PostModel.organization_id.isnot(None))
             elif tab == "marketplace":
-                # Le fil marketplace n'est pas géré ici ; retourner vide
                 return []
-            # Les autres onglets (academy, opportunities) ne sont pas gérés ici
 
             stmt = stmt.order_by(PostModel.created_at.desc()).limit(limit).offset(offset)
             result = await session.execute(stmt)
-            models = result.scalars().all()
-            return [self._to_entity(m) for m in models]
+            models = list(result.scalars().all())
+            posts = [self._to_entity(m) for m in models]
+
+            # Insertion des posts sponsorisés
+            if tab in ("pour_toi", "mon_etablissement"):
+                sponsored_stmt = select(PostModel).where(
+                    PostModel.tenant_id == tenant_id,
+                    PostModel.is_sponsored == True,
+                ).limit(3)
+                s_result = await session.execute(sponsored_stmt)
+                sponsored_models = list(s_result.scalars().all())
+                if sponsored_models:
+                    s_entity = self._to_entity(sponsored_models[0])
+                    if len(posts) >= 2:
+                        posts.insert(2, s_entity)
+                    else:
+                        posts.append(s_entity)
+
+            return posts
 
 
 class PostgresOrganizationRepository(OrganizationRepositoryPort):
