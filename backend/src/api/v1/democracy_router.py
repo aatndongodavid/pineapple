@@ -37,13 +37,9 @@ from democracy_context.infrastructure.persistence.repositories import (
     RSACryptoEngine,
 )
 from shared_kernel.config import settings
+from shared_kernel.infrastructure.auth import get_current_user, require_role
 from shared_kernel.infrastructure.database import AsyncSessionLocal
 from shared_kernel.infrastructure.tenant_middleware import get_current_tenant_id
-
-# ---------------------------------------------------------------------------
-# Sécurité & dépendances transverses
-# ---------------------------------------------------------------------------
-security = HTTPBearer()
 
 
 async def get_session_factory() -> async_sessionmaker[AsyncSession]:
@@ -72,39 +68,10 @@ async def get_audit_repo(
     return PostgresAuditLedgerRepository(session_factory)
 
 
-async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
-) -> dict:
-    """Retourne l'utilisateur courant à partir du JWT (simplifié : id + tenant)."""
-    token = credentials.credentials
-    try:
-        payload = jwt.decode(
-            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
-        )
-        user_id = uuid.UUID(payload.get("sub"))
-        token_tenant = uuid.UUID(payload.get("tenant_id"))
-        if token_tenant != tenant_id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token tenant mismatch",
-            )
-        return {"user_id": user_id, "tenant_id": tenant_id}
-    except (JWTError, KeyError, ValueError):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication token",
-        )
-
-
-# NOTE: Pour les opérations admin, il faudrait un rôle vérifié.
-# On suppose qu'une dépendance get_admin_user vérifie le rôle admin.
-# Ici, on se contente d'authentifier l'utilisateur et on documente la nécessité du contrôle RBAC.
 async def get_admin_user(
-    current_user: dict = Depends(get_current_user),
+    admin: dict = Depends(require_role("ADMIN")),
 ) -> dict:
-    # TODO: Implémenter la vérification du rôle admin (cf. A.15 RBAC)
-    return current_user
+    return admin
 
 
 # ---------------------------------------------------------------------------

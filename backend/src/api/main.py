@@ -14,6 +14,7 @@ from api.v1.campus_life_router import router as campus_life_router
 from api.v1.opportunities_router import router as opportunities_router
 from api.v1.monetization_router import router as monetization_router
 from api.v1.trust_safety_router import router as trust_safety_router
+from api.v1.platform_admin_router import router as platform_admin_router
 
 # Métadonnées de l'application
 APP_DESCRIPTION = """
@@ -82,6 +83,7 @@ app.include_router(campus_life_router, prefix="/api/v1")
 app.include_router(opportunities_router, prefix="/api/v1")
 app.include_router(monetization_router, prefix="/api/v1")
 app.include_router(trust_safety_router, prefix="/api/v1")
+app.include_router(platform_admin_router, prefix="/api/v1")
 
 # Optionnel : point d'entrée racine
 @app.get("/", include_in_schema=False)

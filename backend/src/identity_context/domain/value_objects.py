@@ -25,6 +25,14 @@ class AcademicStatus(str, Enum):
     ALUMNI = "ALUMNI"
 
 
+class UserRole(str, Enum):
+    STUDENT = "STUDENT"
+    TEACHER = "TEACHER"
+    MODERATOR = "MODERATOR"
+    ADMIN = "ADMIN"
+
+
+
 class DocumentType(str, Enum):
     CARTE_ETUDIANT = "CARTE_ETUDIANT"
     QUITTANCE = "QUITTANCE"

@@ -11,7 +11,8 @@ from starlette.responses import Response
 tenant_id_ctx: ContextVar[uuid.UUID | None] = ContextVar("tenant_id", default=None)
 
 # Routes publiques qui ne nécessitent pas le header X-Tenant-ID
-PUBLIC_PATHS = {"/health", "/docs", "/openapi.json", "/redoc"}
+PUBLIC_PATHS = {"/health", "/metrics", "/docs", "/openapi.json", "/redoc", "/"}
+PUBLIC_PREFIXES = ("/api/v1/platform", "/platform")
 
 
 def get_current_tenant_id() -> uuid.UUID:
@@ -39,8 +40,8 @@ class TenantMiddleware(BaseHTTPMiddleware):
     ) -> Response:
         path = request.url.path
 
-        # Autoriser les routes publiques sans header
-        if path in PUBLIC_PATHS:
+        # Autoriser les routes publiques et platform admin sans header tenant
+        if path in PUBLIC_PATHS or any(path.startswith(prefix) for prefix in PUBLIC_PREFIXES):
             return await call_next(request)
 
         tenant_header = request.headers.get("X-Tenant-ID")

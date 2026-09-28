@@ -23,10 +23,9 @@ from trust_safety_context.infrastructure.persistence.repositories import (
     PostgresTrustSafetyRepository,
 )
 from shared_kernel.config import settings
+from shared_kernel.infrastructure.auth import get_current_user, require_role
 from shared_kernel.infrastructure.database import AsyncSessionLocal
 from shared_kernel.infrastructure.tenant_middleware import get_current_tenant_id
-
-security = HTTPBearer()
 
 
 async def get_session_factory() -> async_sessionmaker[AsyncSession]:
@@ -39,37 +38,10 @@ async def get_trust_safety_repo(
     return PostgresTrustSafetyRepository(session_factory)
 
 
-async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
-) -> dict:
-    token = credentials.credentials
-    try:
-        payload = jwt.decode(
-            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
-        )
-        user_id = uuid.UUID(payload.get("sub"))
-        token_tenant = uuid.UUID(payload.get("tenant_id"))
-        if token_tenant != tenant_id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token tenant mismatch",
-            )
-        return {"user_id": user_id, "tenant_id": tenant_id}
-    except (JWTError, KeyError, ValueError):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication token",
-        )
-
-
 async def get_moderator_user(
-    current_user: dict = Depends(get_current_user),
+    moderator: dict = Depends(require_role("MODERATOR", "ADMIN")),
 ) -> dict:
-    # TODO: Vérifier le rôle modérateur/admin à partir du JWT ou d'un service RBAC.
-    # Pour l'instant, on accepte tout utilisateur authentifié en tant que modérateur.
-    # Dans une vraie implémentation, on lèverait une 403 si l'utilisateur n'a pas le rôle.
-    return current_user
+    return moderator
 
 
 router = APIRouter(prefix="/trust-safety", tags=["Trust & Safety"])

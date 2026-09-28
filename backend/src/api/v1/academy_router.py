@@ -34,14 +34,15 @@ from academy_context.infrastructure.persistence.repositories import (
     PostgresPurchaseRepository,
     PyPDFWatermarkEngine,
 )
+from identity_context.infrastructure.persistence.repositories import PostgresUserRepository
 from shared_kernel.config import settings
+from shared_kernel.infrastructure.auth import get_current_user, require_role
 from shared_kernel.infrastructure.database import AsyncSessionLocal
 from shared_kernel.infrastructure.tenant_middleware import get_current_tenant_id
 
 # ---------------------------------------------------------------------------
 # Sécurité & dépendances transverses
 # ---------------------------------------------------------------------------
-security = HTTPBearer()
 
 
 class InMemoryFileStorage(FileStoragePort):
@@ -74,6 +75,12 @@ async def get_purchase_repo(
     return PostgresPurchaseRepository(session_factory)
 
 
+async def get_user_repo(
+    session_factory: async_sessionmaker[AsyncSession] = Depends(get_session_factory),
+) -> PostgresUserRepository:
+    return PostgresUserRepository(session_factory)
+
+
 async def get_file_storage() -> FileStoragePort:
     # En production, remplacer par S3FileStorage
     return InMemoryFileStorage()
@@ -83,38 +90,21 @@ async def get_watermark_engine() -> WatermarkEnginePort:
     return PyPDFWatermarkEngine()
 
 
-async def get_current_user(
+async def get_user_reader_context(
     request: Request,
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    current_user: dict = Depends(get_current_user),
+    user_repo: PostgresUserRepository = Depends(get_user_repo),
 ) -> dict:
-    """Retourne l'utilisateur courant (id, tenant_id, matricule) à partir du JWT."""
-    token = credentials.credentials
-    try:
-        payload = jwt.decode(
-            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
-        )
-        user_id = uuid.UUID(payload.get("sub"))
-        token_tenant = uuid.UUID(payload.get("tenant_id"))
-        if token_tenant != tenant_id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token tenant mismatch",
-            )
-        # TODO: Récupérer le matricule depuis une source fiable (ex: UserRepository)
-        # Pour l'instant on met une valeur par défaut.
-        matricule = "UNKNOWN"
-        return {
-            "user_id": user_id,
-            "tenant_id": tenant_id,
-            "matricule": matricule,
-            "ip_address": request.client.host if request.client else "0.0.0.0",
-        }
-    except (JWTError, KeyError, ValueError):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication token",
-        )
+    """Récupère le profil réel de l'utilisateur (dont son matricule) pour le filigrane Pineapple Reader."""
+    user = await user_repo.get_by_id(current_user["user_id"], current_user["tenant_id"])
+    matricule = user.matricule if user and user.matricule else "NON_MATRICULE"
+    return {
+        "user_id": current_user["user_id"],
+        "tenant_id": current_user["tenant_id"],
+        "role": current_user["role"],
+        "matricule": matricule,
+        "ip_address": request.client.host if request and request.client else "0.0.0.0",
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -162,15 +152,14 @@ async def upload_document(
     is_premium: bool = Form(False),
     price_fcfa: int = Form(0),
     file: UploadFile = File(...),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(require_role("ADMIN", "TEACHER")),
     tenant_id: uuid.UUID = Depends(get_current_tenant_id),
     library_repo: PostgresLibraryRepository = Depends(get_library_repo),
     file_storage: FileStoragePort = Depends(get_file_storage),
 ):
     """
-    Proposer un document (Admin / Enseignant).
+    Proposer un document (Réservé aux Admins et Enseignants).
     """
-    # TODO: Vérifier le rôle admin/enseignant
     dto = DocumentUploadDTO(
         title=title,
         document_type=document_type,
@@ -238,7 +227,7 @@ async def purchase_premium(
 async def stream_document(
     document_id: uuid.UUID,
     request: Request,
-    current_user: dict = Depends(get_current_user),
+    user_ctx: dict = Depends(get_user_reader_context),
     tenant_id: uuid.UUID = Depends(get_current_tenant_id),
     library_repo: PostgresLibraryRepository = Depends(get_library_repo),
     purchase_repo: PostgresPurchaseRepository = Depends(get_purchase_repo),
@@ -256,11 +245,11 @@ async def stream_document(
     )
     try:
         pdf_bytes = await use_case.execute(
-            user_id=current_user["user_id"],
+            user_id=user_ctx["user_id"],
             tenant_id=tenant_id,
             document_id=document_id,
-            user_matricule=current_user["matricule"],
-            user_ip=current_user["ip_address"],
+            user_matricule=user_ctx["matricule"],
+            user_ip=user_ctx["ip_address"],
         )
     except DocumentNotFoundError:
         raise HTTPException(status_code=404, detail="Document not found")

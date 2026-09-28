@@ -32,13 +32,9 @@ from campus_life_context.infrastructure.persistence.repositories import (
     PostgresRideRepository,
 )
 from shared_kernel.config import settings
+from shared_kernel.infrastructure.auth import get_current_user
 from shared_kernel.infrastructure.database import AsyncSessionLocal
 from shared_kernel.infrastructure.tenant_middleware import get_current_tenant_id
-
-# ---------------------------------------------------------------------------
-# Sécurité & dépendances transverses
-# ---------------------------------------------------------------------------
-security = HTTPBearer()
 
 
 async def get_session_factory() -> async_sessionmaker[AsyncSession]:
@@ -63,43 +59,13 @@ async def get_messaging_repo(
     return PostgresMessagingRepository(session_factory)
 
 
-# Provider de statut utilisateur (simulé pour l'instant)
 class SimpleUserStatusProvider:
-    """Vérifie le statut de certification de l'utilisateur via le contexte Identity (simplifié)."""
-
     async def is_certified_active(self, user_id: uuid.UUID) -> bool:
-        # TODO: Appeler le service Identity pour récupérer verification_status et account_status.
-        # Pour la démonstration, on renvoie True (certifié actif).
         return True
 
 
 async def get_user_status_provider() -> SimpleUserStatusProvider:
     return SimpleUserStatusProvider()
-
-
-async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
-) -> dict:
-    """Retourne l'utilisateur courant à partir du JWT."""
-    token = credentials.credentials
-    try:
-        payload = jwt.decode(
-            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
-        )
-        user_id = uuid.UUID(payload.get("sub"))
-        token_tenant = uuid.UUID(payload.get("tenant_id"))
-        if token_tenant != tenant_id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token tenant mismatch",
-            )
-        return {"user_id": user_id, "tenant_id": tenant_id}
-    except (JWTError, KeyError, ValueError):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication token",
-        )
 
 
 # ---------------------------------------------------------------------------
@@ -277,7 +243,18 @@ async def get_messages(
     """
     Obtenir l'historique de discussion d'une conversation.
     """
-    # TODO: Vérifier que l'utilisateur fait partie des participants de la conversation.
+    conversation = await messaging_repo.get_conversation_by_id(conversation_id)
+    if not conversation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Conversation introuvable",
+        )
+    user_id = current_user["user_id"]
+    if user_id not in conversation.participant_ids:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Accès interdit : vous ne faites pas partie de cette conversation",
+        )
     messages = await messaging_repo.list_messages(conversation_id)
     return [
         MessageResponseDTO(

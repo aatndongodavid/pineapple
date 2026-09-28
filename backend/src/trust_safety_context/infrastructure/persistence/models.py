@@ -3,9 +3,11 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, ForeignKey, String, Text, func
+from sqlalchemy import DateTime, Enum, ForeignKey, JSON, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
+
+JSONBType = JSON().with_variant(JSONB, "postgresql")
 
 from trust_safety_context.domain.value_objects import ReportReason, ReportStatus
 from shared_kernel.infrastructure.database import Base
@@ -38,7 +40,7 @@ class AuditLogEntryModel(Base):
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     tenant_id: Mapped[uuid.UUID] = mapped_column(index=True, nullable=False)
     action: Mapped[str] = mapped_column(String(200), nullable=False)
-    metadata_: Mapped[dict] = mapped_column("metadata", JSONB, nullable=False, default=dict)
+    metadata_: Mapped[dict] = mapped_column("metadata", JSONBType, nullable=False, default=dict)
     hash: Mapped[str] = mapped_column(String(255), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False

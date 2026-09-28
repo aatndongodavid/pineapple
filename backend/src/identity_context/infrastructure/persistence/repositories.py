@@ -9,6 +9,7 @@ from identity_context.domain.ports import CertificationRepositoryPort, UserRepos
 from identity_context.domain.value_objects import (
     AccountStatus,
     AcademicStatus,
+    UserRole,
     VerificationStatus,
 )
 from identity_context.infrastructure.persistence.models import (
@@ -40,6 +41,7 @@ class PostgresUserRepository(UserRepositoryPort):
             account_status=user.account_status,
             verification_status=user.verification_status,
             academic_status=user.academic_status,
+            role=user.role,
             created_at=user.created_at,
         )
 
@@ -59,6 +61,7 @@ class PostgresUserRepository(UserRepositoryPort):
             account_status=model.account_status,
             verification_status=model.verification_status,
             academic_status=model.academic_status,
+            role=model.role if hasattr(model, "role") and model.role else UserRole.STUDENT,
             created_at=model.created_at,
         )
         # Ajouter password_hash si l'entité le possède

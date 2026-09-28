@@ -78,3 +78,8 @@ class MessagingRepositoryPort(ABC):
     def list_messages(self, conversation_id: UUID, limit: int = 50) -> List[Message]:
         """Liste les messages d'une conversation (du plus récent au plus ancien)."""
         raise NotImplementedError
+
+    @abstractmethod
+    def get_conversation_by_id(self, conversation_id: UUID) -> Optional[Conversation]:
+        """Récupère une conversation par son ID."""
+        raise NotImplementedError

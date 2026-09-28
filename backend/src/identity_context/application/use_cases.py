@@ -87,8 +87,9 @@ class RegisterUserUseCase:
             account_status=AccountStatus.ACTIVE,
             verification_status=VerificationStatus.UNVERIFIED,
             academic_status=AcademicStatus.STUDENT,
+            role=dto.role,
             created_at=datetime.utcnow(),
-            password_hash=hashed_password,  # à ajouter à l'entité User
+            password_hash=hashed_password,
         )
 
         # Persister
@@ -115,6 +116,7 @@ class AuthenticateUserUseCase:
         payload = {
             "sub": str(user.id),
             "tenant_id": str(user.tenant_id),
+            "role": user.role.value if hasattr(user.role, "value") else str(user.role),
             "exp": expiration,
         }
         access_token = jwt.encode(
@@ -128,6 +130,7 @@ class AuthenticateUserUseCase:
             token_type="bearer",
             user_id=user.id,
             tenant_id=user.tenant_id,
+            role=user.role,
         )
 
 
@@ -189,13 +192,9 @@ class ReviewCertificationUseCase:
         self._user_repo = user_repo
         self._cert_repo = cert_repo
 
-    def execute(self, admin_id: UUID, tenant_id: UUID, dto: CertificationReviewDTO) -> None:
+    async def execute(self, admin_id: UUID, tenant_id: UUID, dto: CertificationReviewDTO) -> None:
         # Vérifier que le document existe et appartient au tenant
-        documents = self._cert_repo.get_by_user_id(dto.document_id)  # attention : get_by_user_id prend user_id, pas doc id
-        # Il faut une méthode pour récupérer par document_id, à adapter.
-        # On suppose qu'on a une méthode get_by_id dans CertificationRepositoryPort (non spécifiée)
-        # On va simuler en cherchant dans les pending documents.
-        pending_docs = self._cert_repo.get_pending_documents(tenant_id)
+        pending_docs = await self._cert_repo.get_pending_documents(tenant_id)
         doc = next((d for d in pending_docs if d.id == dto.document_id), None)
         if doc is None:
             raise CertificationDocumentNotFoundError("Document not found or not pending.")
@@ -204,23 +203,23 @@ class ReviewCertificationUseCase:
             doc.status = VerificationStatus.VERIFIED
             doc.rejection_reason = None
             # Mettre à jour l'utilisateur
-            user = self._user_repo.get_by_id(doc.user_id, tenant_id)
+            user = await self._user_repo.get_by_id(doc.user_id, tenant_id)
             if user:
                 user.verification_status = VerificationStatus.VERIFIED
-                self._user_repo.save(user)
+                await self._user_repo.save(user)
         else:
             if not dto.rejection_reason:
                 raise RejectionReasonRequiredError("Rejection reason is required when rejecting.")
             doc.status = VerificationStatus.REJECTED
             doc.rejection_reason = dto.rejection_reason
             # Mettre à jour l'utilisateur
-            user = self._user_repo.get_by_id(doc.user_id, tenant_id)
+            user = await self._user_repo.get_by_id(doc.user_id, tenant_id)
             if user:
                 user.verification_status = VerificationStatus.REJECTED
-                self._user_repo.save(user)
+                await self._user_repo.save(user)
 
         # Sauvegarder le document mis à jour
-        self._cert_repo.save_document(doc)
+        await self._cert_repo.save_document(doc)
 
 
 class ResetAnnualCertificationsUseCase:

@@ -8,6 +8,7 @@ from identity_context.domain.value_objects import (
     AcademicStatus,
     CampusStatusDisplay,
     DocumentType,
+    UserRole,
     VerificationStatus,
 )
 
@@ -39,6 +40,7 @@ class User:
     account_status: AccountStatus
     verification_status: VerificationStatus
     academic_status: AcademicStatus
+    role: UserRole = UserRole.STUDENT
     created_at: datetime = datetime.utcnow()
     password_hash: str = ""
 

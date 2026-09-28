@@ -304,3 +304,10 @@ class PostgresMessagingRepository(MessagingRepositoryPort):
             result = await session.execute(stmt)
             models = result.scalars().all()
             return [self._to_message_entity(m) for m in models]
+
+    async def get_conversation_by_id(self, conversation_id: UUID) -> Optional[Conversation]:
+        async with self._session_factory() as session:
+            stmt = select(ConversationModel).where(ConversationModel.id == conversation_id)
+            result = await session.execute(stmt)
+            model = result.scalar_one_or_none()
+            return self._to_conversation_entity(model) if model else None

@@ -38,25 +38,15 @@ from identity_context.infrastructure.persistence.repositories import (
     PostgresUserRepository,
 )
 from shared_kernel.config import settings
+from shared_kernel.infrastructure.auth import get_current_user, require_role
 from shared_kernel.infrastructure.database import AsyncSessionLocal
 from shared_kernel.infrastructure.tenant_middleware import get_current_tenant_id
 
-# ---------------------------------------------------------------------------
-# Sécurité & dépendances transverses
-# ---------------------------------------------------------------------------
-security = HTTPBearer()
 
-
-# NOTE: L'entité User doit contenir un champ `password_hash: str` pour stocker
-#       le mot de passe haché. Ce champ est utilisé par le repository et les use cases.
-#       Pensez à l'ajouter dans la définition de l'agrégat User.
-
-# Dépendance pour obtenir la session factory (utilisée par les repositories)
 async def get_session_factory() -> async_sessionmaker[AsyncSession]:
     return AsyncSessionLocal
 
 
-# Dépendances pour les repositories
 async def get_user_repo(
     session_factory: async_sessionmaker[AsyncSession] = Depends(get_session_factory),
 ) -> PostgresUserRepository:
@@ -69,54 +59,16 @@ async def get_cert_repo(
     return PostgresCertificationRepository(session_factory)
 
 
-# Dépendance pour le stockage de fichiers (à implémenter selon l'infra, ex: S3)
 class DummyFileStorage(FileStoragePort):
-    """Implémentation de démonstration - à remplacer par S3 en production."""
-
-    async def upload_file(self, file_bytes: bytes, filename: str, mime_type: str) -> str:
-        # Simule le téléversement et retourne une clé factice
-        return f"dummy/{uuid.uuid4()}-{filename}"
+    def upload_file(self, file_bytes: bytes, original_filename: str, mime_type: str) -> str:
+        return f"dummy_key_{uuid.uuid4().hex}"
 
     async def generate_presigned_url(self, file_key: str, expires_in: int = 3600) -> str:
         return f"https://example.com/{file_key}"
 
 
 async def get_file_storage() -> FileStoragePort:
-    # En production, utiliser S3FileStorage avec la config AWS
     return DummyFileStorage()
-
-
-# Dépendance pour obtenir l'utilisateur courant à partir du JWT
-async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
-    user_repo: PostgresUserRepository = Depends(get_user_repo),
-) -> User:
-    token = credentials.credentials
-    try:
-        payload = jwt.decode(
-            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
-        )
-        user_id = uuid.UUID(payload.get("sub"))
-        token_tenant = uuid.UUID(payload.get("tenant_id"))
-        if token_tenant != tenant_id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token tenant mismatch",
-            )
-    except (JWTError, KeyError, ValueError):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication token",
-        )
-
-    user = await user_repo.get_by_id(user_id, tenant_id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found",
-        )
-    return user
 
 
 # ---------------------------------------------------------------------------
@@ -183,24 +135,34 @@ async def login(
 
 
 @router.get("/me", response_model=UserResponseDTO)
-async def get_me(current_user: User = Depends(get_current_user)):
+async def get_me(
+    current_user: dict = Depends(get_current_user),
+    user_repo: PostgresUserRepository = Depends(get_user_repo),
+):
     """
-    Retourne le profil de l'utilisateur connecté avec son statut campus.
+    Retourne le profil de l'utilisateur connecté avec son statut campus et son rôle.
     """
+    user = await user_repo.get_by_id(current_user["user_id"], current_user["tenant_id"])
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Utilisateur non trouvé",
+        )
     return UserResponseDTO(
-        id=current_user.id,
-        tenant_id=current_user.tenant_id,
-        email=current_user.email,
-        first_name=current_user.first_name,
-        last_name=current_user.last_name,
-        matricule=current_user.matricule,
-        faculty=current_user.faculty,
-        filiere=current_user.filiere,
-        academic_year=current_user.academic_year,
-        account_status=current_user.account_status,
-        verification_status=current_user.verification_status,
-        academic_status=current_user.academic_status,
-        campus_status_display=current_user.resolve_campus_status().value,
+        id=user.id,
+        tenant_id=user.tenant_id,
+        email=user.email,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        matricule=user.matricule,
+        faculty=user.faculty,
+        filiere=user.filiere,
+        academic_year=user.academic_year,
+        account_status=user.account_status,
+        verification_status=user.verification_status,
+        academic_status=user.academic_status,
+        role=user.role,
+        campus_status_display=user.resolve_campus_status().value,
     )
 
 
@@ -208,7 +170,7 @@ async def get_me(current_user: User = Depends(get_current_user)):
 async def submit_certification(
     document_type: DocumentType = Form(...),
     file: UploadFile = File(...),
-    current_user: User = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     tenant_id: uuid.UUID = Depends(get_current_tenant_id),
     user_repo: PostgresUserRepository = Depends(get_user_repo),
     cert_repo: PostgresCertificationRepository = Depends(get_cert_repo),
@@ -222,15 +184,15 @@ async def submit_certification(
     use_case = SubmitCertificationUseCase(user_repo, cert_repo, file_storage)
     try:
         doc = await use_case.execute(
-            user_id=current_user.id,
+            user_id=current_user["user_id"],
             tenant_id=tenant_id,
             dto=CertificationSubmitDTO(
                 document_type=document_type,
-                file_base64_or_name=file.filename,
+                file_base64_or_name=file.filename or "document",
             ),
             file_bytes=file_bytes,
-            original_filename=file.filename,
-            mime_type=file.content_type,
+            original_filename=file.filename or "document",
+            mime_type=file.content_type or "application/octet-stream",
         )
     except IdentityDomainError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -241,20 +203,18 @@ async def submit_certification(
 @router.post("/certification/review", status_code=status.HTTP_200_OK)
 async def review_certification(
     review: CertificationReviewDTO,
-    current_user: User = Depends(get_current_user),  # Doit être un administrateur
+    admin: dict = Depends(require_role("ADMIN")),
     tenant_id: uuid.UUID = Depends(get_current_tenant_id),
     user_repo: PostgresUserRepository = Depends(get_user_repo),
     cert_repo: PostgresCertificationRepository = Depends(get_cert_repo),
 ):
     """
-    Validation ou rejet d'un document de certification (réservé aux admins).
-    La vérification du rôle admin doit être implémentée selon le RBAC (A.15).
+    Validation ou rejet d'un document de certification (réservé aux administrateurs).
     """
-    # TODO: Ajouter une vérification de rôle admin (ex: via un champ is_admin ou une table de rôles)
     use_case = ReviewCertificationUseCase(user_repo, cert_repo)
     try:
         await use_case.execute(
-            admin_id=current_user.id,
+            admin_id=admin["user_id"],
             tenant_id=tenant_id,
             dto=review,
         )

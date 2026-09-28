@@ -32,6 +32,7 @@ import { IdentityVerificationScreen } from '@/features/admin/IdentityVerificatio
 import { DemocracyControlScreen } from '@/features/admin/DemocracyControlScreen';
 import { TrustSafetyScreen } from '@/features/admin/TrustSafetyScreen';
 import { MonetizationScreen } from '@/features/admin/MonetizationScreen';
+import { SuperAdminDashboardScreen } from '@/features/admin/SuperAdminDashboardScreen';
 
 // ---------------------------------------------------------------
 // Petit écran temporaire pour la liste des élections (ou import réel)
@@ -130,6 +131,9 @@ export const AppRouter: React.FC = () => {
           <Route path="/admin/monetization" element={<MonetizationScreen />} />
         </Route>
       </Route>
+
+      {/* Route Super Admin Transverse (Gemula) */}
+      <Route path="/super-admin" element={<SuperAdminDashboardScreen />} />
 
       {/* Fallback 404 */}
       <Route path="*" element={<NotFoundScreen />} />

@@ -3,9 +3,11 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Integer, String, func
+from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Integer, JSON, String, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
+
+JSONBType = JSON().with_variant(JSONB, "postgresql")
 
 from monetization_context.domain.value_objects import (
     CampusLicenseTier,
@@ -20,7 +22,7 @@ class SponsorshipModel(Base):
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     tenant_id: Mapped[uuid.UUID] = mapped_column(index=True, nullable=False)
     organization_id: Mapped[uuid.UUID] = mapped_column(nullable=False)
-    target_tenant_ids: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
+    target_tenant_ids: Mapped[list] = mapped_column(JSONBType, nullable=False, default=list)
     budget_amount: Mapped[int] = mapped_column(Integer, nullable=False)
     status: Mapped[SponsorshipStatus] = mapped_column(
         Enum(SponsorshipStatus, name="sponsorship_status_enum"),

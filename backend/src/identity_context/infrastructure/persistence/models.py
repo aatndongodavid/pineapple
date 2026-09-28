@@ -8,6 +8,7 @@ from identity_context.domain.value_objects import (
     AccountStatus,
     AcademicStatus,
     DocumentType,
+    UserRole,
     VerificationStatus,
 )
 from shared_kernel.infrastructure.database import Base
@@ -39,6 +40,11 @@ class UserModel(Base):
         Enum(AcademicStatus, name="academic_status_enum"),
         nullable=False,
         default=AcademicStatus.STUDENT,
+    )
+    role: Mapped[UserRole] = mapped_column(
+        Enum(UserRole, name="user_role_enum"),
+        nullable=False,
+        default=UserRole.STUDENT,
     )
 
     created_at: Mapped[datetime] = mapped_column(
