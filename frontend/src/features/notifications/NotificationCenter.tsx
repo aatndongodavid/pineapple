@@ -141,6 +141,14 @@ export const NotificationCenter: React.FC = () => {
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-slate-800">
               <h3 className="font-semibold text-gray-800 dark:text-white">Notifications</h3>
               <div className="flex items-center gap-2">
+                {typeof window !== 'undefined' && 'Notification' in window && Notification.permission !== 'granted' && (
+                  <button
+                    onClick={() => Notification.requestPermission()}
+                    className="text-xs text-amber-500 hover:underline"
+                  >
+                    Activer Push
+                  </button>
+                )}
                 <button
                   onClick={markAllAsRead}
                   className="text-xs text-pineapple hover:underline flex items-center gap-1"
