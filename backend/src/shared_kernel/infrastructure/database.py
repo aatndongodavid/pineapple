@@ -5,12 +5,12 @@ from sqlalchemy.orm import DeclarativeBase
 
 from shared_kernel.config import settings
 
-# Configuration du moteur asynchrone avec pool de connexions
 engine = create_async_engine(
     settings.DATABASE_URL,
-    pool_size=20,
-    max_overflow=10,
+    pool_size=50,
+    max_overflow=50,
     pool_pre_ping=True,
+    pool_recycle=1800,
 )
 
 # Fabrique de sessions asynchrones

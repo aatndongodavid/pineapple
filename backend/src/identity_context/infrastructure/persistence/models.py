@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, ForeignKey, String, Text, func
+from sqlalchemy import DateTime, Enum, ForeignKey, Index, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from identity_context.domain.value_objects import (
@@ -16,6 +16,10 @@ from shared_kernel.infrastructure.database import Base
 
 class UserModel(Base):
     __tablename__ = "users"
+    __table_args__ = (
+        Index("idx_user_tenant_email", "tenant_id", "email"),
+        Index("idx_user_tenant_role", "tenant_id", "role"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     tenant_id: Mapped[uuid.UUID] = mapped_column(index=True, nullable=False)
