@@ -1,0 +1,27 @@
+{
+  "ClusterName": "pineapple-production-cluster",
+  "ServiceName": "pineapple-backend-service",
+  "MinCapacity": 2,
+  "MaxCapacity": 20,
+  "TargetTrackingScalingPolicies": [
+    {
+      "PolicyName": "pineapple-cpu-high-autoscale",
+      "TargetValue": 70.0,
+      "PredefinedMetricSpecification": {
+        "PredefinedMetricType": "ECSServiceAverageCPUUtilization"
+      },
+      "ScaleOutCooldown": 60,
+      "ScaleInCooldown": 300
+    },
+    {
+      "PolicyName": "pineapple-alb-requests-autoscale",
+      "TargetValue": 1000.0,
+      "PredefinedMetricSpecification": {
+        "PredefinedMetricType": "ALBRequestCountPerTarget",
+        "ResourceLabel": "app/pineapple-alb/50dc6c495c0c9188/targetgroup/pineapple-backend-tg/738f1c67e829944f"
+      },
+      "ScaleOutCooldown": 30,
+      "ScaleInCooldown": 180
+    }
+  ]
+}

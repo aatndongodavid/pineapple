@@ -98,9 +98,9 @@ export const LoginScreen: React.FC = () => {
         transition={{ duration: 0.4, ease: 'easeOut' }}
         className="w-full max-w-md"
       >
-        <Card variant="neo-extruded" className="p-8">
+        <Card variant="default" className="p-8">
           <div className="flex flex-col items-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-pineapple flex items-center justify-center mb-4 shadow-neo-extruded dark:shadow-neo-dark-extruded">
+            <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mb-4 shadow-card dark:shadow-card">
               <Building2 className="h-8 w-8 text-white" />
             </div>
             <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
@@ -120,7 +120,7 @@ export const LoginScreen: React.FC = () => {
               <select
                 value={tenantCode}
                 onChange={(e) => setTenantCode(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 {TENANTS.map((t) => (
                   <option key={t.id} value={t.code}>
@@ -141,7 +141,7 @@ export const LoginScreen: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="vous@exemple.cm"
-                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
 
@@ -156,7 +156,7 @@ export const LoginScreen: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
 
@@ -181,7 +181,7 @@ export const LoginScreen: React.FC = () => {
               Pas encore de compte ?{' '}
               <Link
                 to="/register"
-                className="text-pineapple hover:underline font-medium"
+                className="text-primary hover:underline font-medium"
               >
                 Créer un compte
               </Link>

@@ -84,7 +84,7 @@ export const OpportunitiesScreen: React.FC = () => {
         className="flex items-center justify-between"
       >
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Opportunités</h1>
-        <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-pineapple text-white shadow-neo-extruded dark:shadow-neo-dark-extruded hover:shadow-neo-pressed dark:hover:shadow-neo-dark-pressed transition-shadow">
+        <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white shadow-card dark:shadow-card hover:shadow-sm dark:hover:shadow-sm transition-shadow">
           <Plus className="h-5 w-5" />
           <span className="text-sm font-medium">Proposer une opportunité</span>
         </button>
@@ -98,7 +98,7 @@ export const OpportunitiesScreen: React.FC = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Rechercher une opportunité..."
-          className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+          className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>
 
@@ -111,8 +111,8 @@ export const OpportunitiesScreen: React.FC = () => {
             className={cn(
               'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all',
               activeTab === tab.id
-                ? 'bg-pineapple text-white shadow-neo-pressed dark:shadow-neo-dark-pressed'
-                : 'bg-background-light dark:bg-slate-800 text-gray-600 dark:text-gray-300 shadow-neo-extruded dark:shadow-neo-dark-extruded'
+                ? 'bg-primary text-white shadow-sm dark:shadow-sm'
+                : 'bg-background-light dark:bg-slate-800 text-gray-600 dark:text-gray-300 shadow-card dark:shadow-card'
             )}
           >
             {tab.label}

@@ -2,9 +2,8 @@
 
 import React from 'react';
 import { Bell, ChevronDown, UserCircle } from 'lucide-react';
-import { Badge } from '@/components/ui/Badge';
+import { LogoMark } from '@/components/ui/LogoMark';
 
-// Simulons un sélecteur de tenant avec un simple dropdown
 const tenants = [
   { id: '1', name: 'ENSPD' },
   { id: '2', name: 'UDo' },
@@ -17,26 +16,30 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onChatClick }) => {
   const [selectedTenant, setSelectedTenant] = React.useState(tenants[0]);
-  const [notifications] = React.useState(3); // à remplacer par un store
+  const [notifications] = React.useState(3);
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between px-4 md:px-6 py-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-white/20 dark:border-slate-800 shadow-sm">
-      {/* Sélecteur d'établissement */}
-      <div className="flex items-center gap-2">
-        <span className="hidden sm:inline text-sm text-gray-500 dark:text-gray-400">
+    <header className="sticky top-0 z-40 flex items-center justify-between px-4 md:px-6 py-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 shadow-sm">
+      {/* Sélecteur d'établissement & Brand logo */}
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:hidden">
+          <LogoMark size={28} />
+          <span className="font-bold text-lg text-primary tracking-tight">Pineapple</span>
+        </div>
+        <span className="hidden sm:inline text-sm text-stone-500 dark:text-stone-400">
           Établissement :
         </span>
         <div className="relative group">
-          <button className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-background-light dark:bg-slate-800 text-gray-700 dark:text-gray-200 text-sm font-medium">
+          <button className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-stone-100 dark:bg-slate-800 text-stone-700 dark:text-stone-200 text-sm font-medium border border-stone-200 dark:border-stone-700">
             {selectedTenant.name}
             <ChevronDown className="h-4 w-4" />
           </button>
-          <div className="absolute hidden group-hover:block top-full mt-1 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-neo-extruded dark:shadow-neo-dark-extruded border border-white/20 dark:border-slate-800 p-1">
+          <div className="absolute hidden group-hover:block top-full mt-1 w-48 bg-white dark:bg-slate-900 rounded-xl shadow-card border border-stone-200 dark:border-stone-800 p-1">
             {tenants.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setSelectedTenant(t)}
-                className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-pineapple/10"
+                className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-primary/10 text-stone-700 dark:text-stone-200"
               >
                 {t.name}
               </button>
@@ -50,18 +53,19 @@ export const Header: React.FC<HeaderProps> = ({ onChatClick }) => {
         <button
           type="button"
           onClick={onChatClick}
-          className="relative p-2 rounded-full hover:bg-pineapple/10 transition-colors"
+          aria-label="Voir les notifications"
+          className="relative p-2 rounded-full hover:bg-primary/10 transition-colors"
         >
-          <Bell className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+          <Bell className="h-5 w-5 text-stone-600 dark:text-stone-300" />
           {notifications > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+            <span className="absolute -top-0.5 -right-0.5 bg-danger text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-bold">
               {notifications}
             </span>
           )}
         </button>
-        <button className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-full bg-pineapple/20 flex items-center justify-center">
-            <UserCircle className="h-6 w-6 text-pineapple" />
+        <button type="button" aria-label="Profil utilisateur" className="flex items-center gap-2">
+          <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center">
+            <UserCircle className="h-6 w-6 text-primary" />
           </div>
         </button>
       </div>

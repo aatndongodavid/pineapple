@@ -63,8 +63,8 @@ export const ProfileScreen: React.FC = () => {
       >
         <Card variant="glass" className="p-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-pineapple/20 flex items-center justify-center shadow-neo-extruded dark:shadow-neo-dark-extruded">
-              <User className="h-8 w-8 text-pineapple" />
+            <div className="w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center shadow-card dark:shadow-card">
+              <User className="h-8 w-8 text-primary" />
             </div>
             <div className="flex-1">
               <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
@@ -82,14 +82,14 @@ export const ProfileScreen: React.FC = () => {
           {/* Informations académiques */}
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex items-center gap-3 p-3 rounded-xl bg-background-light dark:bg-slate-800">
-              <Building className="h-5 w-5 text-pineapple" />
+              <Building className="h-5 w-5 text-primary" />
               <div>
                 <span className="text-xs text-gray-500 dark:text-gray-400">Établissement</span>
                 <p className="font-medium text-gray-800 dark:text-white">{campusName || 'ENSPD'}</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-3 rounded-xl bg-background-light dark:bg-slate-800">
-              <GraduationCap className="h-5 w-5 text-pineapple" />
+              <GraduationCap className="h-5 w-5 text-primary" />
               <div>
                 <span className="text-xs text-gray-500 dark:text-gray-400">Filière</span>
                 <p className="font-medium text-gray-800 dark:text-white">
@@ -98,7 +98,7 @@ export const ProfileScreen: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center gap-3 p-3 rounded-xl bg-background-light dark:bg-slate-800">
-              <IdCard className="h-5 w-5 text-pineapple" />
+              <IdCard className="h-5 w-5 text-primary" />
               <div>
                 <span className="text-xs text-gray-500 dark:text-gray-400">Matricule</span>
                 <p className="font-medium text-gray-800 dark:text-white">{user?.matricule || 'N/A'}</p>
@@ -130,14 +130,14 @@ export const ProfileScreen: React.FC = () => {
         className="space-y-3"
       >
         <Card variant="flat" className="p-4">
-          <button className="w-full flex items-center gap-3 py-2 hover:bg-pineapple/5 rounded-lg transition-colors">
-            <ShieldCheck className="h-5 w-5 text-pineapple" />
+          <button className="w-full flex items-center gap-3 py-2 hover:bg-primary/5 rounded-lg transition-colors">
+            <ShieldCheck className="h-5 w-5 text-primary" />
             <span className="flex-1 text-left text-gray-700 dark:text-gray-200">Security Center</span>
             <ChevronRight className="h-5 w-5 text-gray-400" />
           </button>
           <div className="border-t border-gray-200 dark:border-slate-700 my-2" />
-          <button className="w-full flex items-center gap-3 py-2 hover:bg-pineapple/5 rounded-lg transition-colors">
-            <BookOpen className="h-5 w-5 text-pineapple" />
+          <button className="w-full flex items-center gap-3 py-2 hover:bg-primary/5 rounded-lg transition-colors">
+            <BookOpen className="h-5 w-5 text-primary" />
             <span className="flex-1 text-left text-gray-700 dark:text-gray-200">Ma bibliothèque</span>
             <ChevronRight className="h-5 w-5 text-gray-400" />
           </button>

@@ -27,10 +27,12 @@ class UserModel(Base):
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     first_name: Mapped[str] = mapped_column(String(100), nullable=False)
     last_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    matricule: Mapped[str] = mapped_column(String(50), nullable=False)
-    faculty: Mapped[str] = mapped_column(String(150), nullable=False)
-    filiere: Mapped[str] = mapped_column(String(150), nullable=False)
-    academic_year: Mapped[str] = mapped_column(String(20), nullable=False)
+    matricule: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    faculty: Mapped[str | None] = mapped_column(String(150), nullable=True)
+    filiere: Mapped[str | None] = mapped_column(String(150), nullable=True)
+    academic_year: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    phone_number: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    sms_consent: Mapped[bool] = mapped_column(default=False, nullable=False)
 
     account_status: Mapped[AccountStatus] = mapped_column(
         Enum(AccountStatus, name="account_status_enum"), nullable=False, default=AccountStatus.ACTIVE
@@ -79,3 +81,17 @@ class CertificationDocumentModel(Base):
     submitted_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
+
+
+class LegalAcceptanceModel(Base):
+    __tablename__ = "legal_acceptances"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True, nullable=False
+    )
+    document_type: Mapped[str] = mapped_column(String(50), nullable=False)
+    version: Mapped[str] = mapped_column(String(20), nullable=False)
+    accepted_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )

@@ -59,7 +59,7 @@ async def get_room_repo(
     return PostgresRoomRepository(session_factory)
 
 
-from shared_kernel.infrastructure.auth import get_current_user
+from shared_kernel.infrastructure.auth import get_current_user, require_role
 
 
 # ---------------------------------------------------------------------------
@@ -115,8 +115,17 @@ async def create_post(
     post_repo: PostgresPostRepository = Depends(get_post_repo),
 ):
     """
-    Créer une publication sur le fil.
+    Créer une publication sur le fil avec filtrage de modération préventive.
     """
+    from trust_safety_context.domain.content_moderation import ContentModerationService
+
+    is_flagged, reason = ContentModerationService.inspect_text(dto.content)
+    if is_flagged:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Publication mise en attente de modération préventive : {reason}",
+        )
+
     use_case = CreatePostUseCase(post_repo)
     try:
         post = await use_case.execute(
@@ -196,6 +205,31 @@ async def create_organization(
     }
 
 
+@router.patch("/organizations/{organization_id}/verify", response_model=dict)
+async def verify_organization(
+    organization_id: uuid.UUID,
+    is_verified: bool = Query(True),
+    admin: dict = Depends(require_role("ADMIN")),
+    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    org_repo: PostgresOrganizationRepository = Depends(get_org_repo),
+):
+    """
+    Valider ou rejeter un club/mouvement étudiant (réservé aux administrateurs).
+    """
+    org = await org_repo.get_by_id(organization_id, tenant_id)
+    if not org:
+        raise HTTPException(status_code=404, detail="Organization not found")
+    
+    org.is_verified = is_verified
+    await org_repo.save(org)
+    
+    return {
+        "message": f"Organization {'verified' if is_verified else 'unverified'} successfully",
+        "id": str(org.id),
+        "is_verified": org.is_verified,
+    }
+
+
 @router.get("/rooms", response_model=List[dict])
 async def list_rooms(
     tenant_id: uuid.UUID = Depends(get_current_tenant_id),
@@ -228,6 +262,9 @@ async def declare_room(
 ):
     """
     Déclarer l'occupation ou la libération d'une salle.
+    
+    Portée d'accès (Option A) : Accessible à tout utilisateur authentifié disposant
+    d'un statut actif ('ACTIVE').
     """
     use_case = DeclareRoomStatusUseCase(room_repo)
     try:

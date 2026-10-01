@@ -13,7 +13,13 @@ from community_context.domain.value_objects import (
 
 @dataclass
 class Room:
-    """Entité représentant une salle déclarée libre par un délégué."""
+    """
+    Entité représentant une salle déclarée libre sur le campus.
+    
+    Décision de modélisation (Option A - Accès communautaire ouvert) :
+    Tout étudiant authentifié avec un compte actif ('ACTIVE') peut déclarer le statut
+    d'une salle pour encourager l'entraide en temps réel sans imposer un rôle dédié.
+    """
     id: UUID
     tenant_id: UUID
     name: str

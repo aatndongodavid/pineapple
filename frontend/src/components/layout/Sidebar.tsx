@@ -12,6 +12,7 @@ import {
   User,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { LogoMark } from '@/components/ui/LogoMark';
 
 const navItems = [
   { to: '/', label: 'Home', icon: Home },
@@ -25,19 +26,17 @@ const navItems = [
 
 export const Sidebar: React.FC = () => {
   return (
-    <aside className="hidden md:flex flex-col w-64 h-screen bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-r border-white/20 dark:border-slate-800 shadow-xl">
+    <aside className="hidden md:flex flex-col w-64 h-screen bg-white/90 dark:bg-stone-900/90 backdrop-blur-md border-r border-stone-200 dark:border-stone-800 shadow-sm">
       {/* Logo */}
-      <div className="flex items-center gap-3 p-6">
-        <div className="w-10 h-10 rounded-xl bg-pineapple flex items-center justify-center text-white font-bold text-xl">
-          P
-        </div>
-        <span className="text-lg font-semibold text-gray-800 dark:text-white">
+      <div className="flex items-center gap-3 p-6 border-b border-stone-100 dark:border-stone-800">
+        <LogoMark size={36} />
+        <span className="text-xl font-bold tracking-tight text-stone-900 dark:text-white">
           Pineapple
         </span>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 space-y-1">
+      <nav className="flex-1 px-3 py-4 space-y-1">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
@@ -45,9 +44,9 @@ export const Sidebar: React.FC = () => {
             className={({ isActive }) =>
               cn(
                 'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all',
-                'text-gray-600 dark:text-gray-400 hover:bg-pineapple/10 hover:text-pineapple',
+                'text-stone-600 dark:text-stone-400 hover:bg-primary-light/10 hover:text-primary',
                 isActive
-                  ? 'bg-pineapple/15 text-pineapple shadow-neo-inset dark:shadow-neo-dark-inset'
+                  ? 'bg-primary/10 text-primary font-semibold border-r-2 border-primary'
                   : ''
               )
             }
@@ -59,7 +58,9 @@ export const Sidebar: React.FC = () => {
       </nav>
 
       {/* Version */}
-      <div className="p-4 text-xs text-gray-400">Pineapple OS v3.0.0</div>
+      <div className="p-4 text-xs text-stone-400 dark:text-stone-500 border-t border-stone-100 dark:border-stone-800">
+        Pineapple OS v3.0.0
+      </div>
     </aside>
   );
-};
+};

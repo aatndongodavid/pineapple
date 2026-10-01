@@ -8,10 +8,13 @@ import { useWebSocket } from '@/lib/websocket/client';
 import apiClient from '@/lib/api/client';
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
 
+import i18n from '@/i18n';
+
 /**
  * Hook d'initialisation global de l'application.
  * Il est appelé une seule fois au montage de App.tsx.
  * Responsabilités :
+ * - Initialiser l'internationalisation (langue persistée).
  * - Vérifier le token JWT et recharger le profil utilisateur.
  * - Initialiser la connexion WebSocket (écoute des notifications).
  * - Déclencher la synchronisation des actions hors‑ligne si le réseau est disponible.
@@ -22,11 +25,8 @@ export function useInitializeApp(): boolean {
   const { token, login, logout } = useAuthStore();
   const { tenantId } = useTenantStore();
 
-  // Initialisation du WebSocket global (le hook vérifie lui‑même la présence du token)
-  // On écoute les messages de type notification via un callback vide ou un store dédié.
   useWebSocket({
     onMessage: (message) => {
-      // Ici on pourrait dispatcher vers un notificationStore
       console.log('[WebSocket] Message reçu :', message);
     },
   });
@@ -35,6 +35,11 @@ export function useInitializeApp(): boolean {
     let isMounted = true;
 
     async function initialize() {
+      // Synchronisation de la langue au démarrage
+      const savedLang = localStorage.getItem('pineapple_language') || 'fr';
+      if (i18n.language !== savedLang) {
+        await i18n.changeLanguage(savedLang);
+      }
       // Si un token existe, on tente de recharger le profil utilisateur.
       if (token && tenantId) {
         try {

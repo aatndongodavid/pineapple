@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './App';
 import './index.css';
+import './i18n';
 import { registerSW } from 'virtual:pwa-register';
 
 // Enregistrement du Service Worker pour la PWA

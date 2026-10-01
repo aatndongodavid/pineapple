@@ -42,6 +42,17 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
     }
   }, [isOpen]);
 
+  // Escape key handler pour fermer le tiroir au clavier
+  useEffect(() => {
+    const handleKeyDownEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDownEsc);
+    return () => window.removeEventListener('keydown', handleKeyDownEsc);
+  }, [isOpen, onClose]);
+
   const handleSend = () => {
     const content = inputValue.trim();
     if (!content) return;
@@ -78,6 +89,9 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
         >
           {/* Tiroir / Modale */}
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Discussion avec ${contactName}`}
             initial={{ y: '100%', opacity: 0.5 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: '100%', opacity: 0 }}
@@ -85,7 +99,7 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
             className={cn(
               'w-full md:w-[420px] h-[85vh] md:h-[80vh] md:mr-4 md:mb-4',
               'bg-white dark:bg-slate-900 rounded-t-3xl md:rounded-3xl',
-              'shadow-neo-extruded dark:shadow-neo-dark-extruded flex flex-col overflow-hidden'
+              'shadow-card dark:shadow-card flex flex-col overflow-hidden'
             )}
             onClick={(e) => e.stopPropagation()}
           >
@@ -104,7 +118,7 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
               </div>
               <button
                 onClick={onClose}
-                className="p-1 rounded-full hover:bg-pineapple/10"
+                className="p-1 rounded-full hover:bg-primary/10"
                 aria-label="Fermer"
               >
                 <X className="h-5 w-5 text-gray-500" />
@@ -126,7 +140,7 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
 
             {/* Zone de saisie */}
             <div className="flex items-center gap-2 p-3 border-t border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-              <button className="p-2 rounded-full hover:bg-pineapple/10 text-gray-500">
+              <button className="p-2 rounded-full hover:bg-primary/10 text-gray-500">
                 <Paperclip className="h-5 w-5" />
               </button>
               <input
@@ -136,13 +150,13 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Écrivez un message..."
-                className="flex-1 px-4 py-2 rounded-xl bg-background-light dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-pineapple"
+                className="flex-1 px-4 py-2 rounded-xl bg-background-light dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <button
                 onClick={handleSend}
                 disabled={!inputValue.trim()}
                 className={cn(
-                  'p-2 rounded-full bg-pineapple text-white disabled:opacity-50',
+                  'p-2 rounded-full bg-primary text-white disabled:opacity-50',
                   'hover:bg-emerald-600 transition-colors'
                 )}
                 aria-label="Envoyer"

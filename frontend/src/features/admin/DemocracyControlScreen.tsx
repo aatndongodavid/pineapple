@@ -143,7 +143,7 @@ export const DemocracyControlScreen: React.FC = () => {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-            <Vote className="h-7 w-7 text-pineapple" />
+            <Vote className="h-7 w-7 text-primary" />
             Democracy Control
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">Gestion des élections et des mouvements</p>
@@ -166,7 +166,7 @@ export const DemocracyControlScreen: React.FC = () => {
       {/* Liste des élections */}
       <div className="space-y-4">
         {elections.map((election) => (
-          <Card key={election.id} variant="neo-extruded" className="p-5">
+          <Card key={election.id} variant="default" className="p-5">
             <div className="flex items-start justify-between mb-3">
               <div>
                 <h3 className="font-semibold text-gray-800 dark:text-white">{election.title}</h3>
@@ -230,7 +230,7 @@ export const DemocracyControlScreen: React.FC = () => {
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
-              className="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-lg shadow-neo-extruded dark:shadow-neo-dark-extruded"
+              className="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-lg shadow-card dark:shadow-card"
               onClick={(e) => e.stopPropagation()}
             >
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Créer une élection</h3>
@@ -241,7 +241,7 @@ export const DemocracyControlScreen: React.FC = () => {
                     type="text"
                     value={newElection.title}
                     onChange={(e) => setNewElection({ ...newElection, title: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-pineapple"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
@@ -249,7 +249,7 @@ export const DemocracyControlScreen: React.FC = () => {
                   <select
                     value={newElection.type}
                     onChange={(e) => setNewElection({ ...newElection, type: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-pineapple"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value="BDE">BDE</option>
                     <option value="Délégué">Délégué</option>
@@ -263,7 +263,7 @@ export const DemocracyControlScreen: React.FC = () => {
                       type="datetime-local"
                       value={newElection.startDate}
                       onChange={(e) => setNewElection({ ...newElection, startDate: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-pineapple"
+                      className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                   </div>
                   <div>
@@ -272,7 +272,7 @@ export const DemocracyControlScreen: React.FC = () => {
                       type="datetime-local"
                       value={newElection.endDate}
                       onChange={(e) => setNewElection({ ...newElection, endDate: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-pineapple"
+                      className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                   </div>
                 </div>
@@ -282,7 +282,7 @@ export const DemocracyControlScreen: React.FC = () => {
                     value={newElection.filieres.join(', ')}
                     onChange={(e) => setNewElection({ ...newElection, filieres: e.target.value.split(',').map(s => s.trim()) })}
                     rows={3}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-pineapple"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               </div>

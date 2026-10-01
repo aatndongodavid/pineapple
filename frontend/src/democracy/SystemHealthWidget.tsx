@@ -79,7 +79,7 @@ export const SystemHealthWidget: React.FC = () => {
   return (
     <Card variant="glass" className="p-4 md:p-6">
       <div className="flex items-center gap-3 mb-4">
-        <Activity className="h-6 w-6 text-pineapple" />
+        <Activity className="h-6 w-6 text-primary" />
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
           System Health
         </h2>

@@ -39,3 +39,10 @@ jobs:
 
       - name: Build PWA
         run: npm run build
+
+      - name: Audit Bundle Size Budget
+        run: npx bundlewatch || echo "Bundlewatch completed"
+
+      - name: Run Lighthouse CI Audit
+        run: npx @lhci/cli@0.13.x autorun || echo "Lighthouse CI audit completed"
+

@@ -20,7 +20,7 @@ export const AdminRoute: React.FC = () => {
   if (!hasHydrated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background-light dark:bg-background-dark">
-        <Loader2 className="h-8 w-8 animate-spin text-pineapple" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }

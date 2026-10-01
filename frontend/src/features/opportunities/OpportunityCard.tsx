@@ -46,7 +46,7 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({
       whileHover={{ y: -4 }}
       transition={{ duration: 0.2 }}
     >
-      <Card variant="neo-extruded" className="p-5 flex flex-col h-full">
+      <Card variant="default" className="p-5 flex flex-col h-full">
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-gray-800 dark:text-white truncate">
@@ -73,7 +73,7 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({
           {opportunity.required_skills.map((skill) => (
             <span
               key={skill}
-              className="px-2 py-1 text-xs rounded-full bg-pineapple/10 text-pineapple"
+              className="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary"
             >
               {skill}
             </span>

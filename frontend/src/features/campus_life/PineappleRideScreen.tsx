@@ -81,7 +81,7 @@ export const PineappleRideScreen: React.FC = () => {
             placeholder="Départ"
             value={departureQuery}
             onChange={(e) => setDepartureQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+            className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
         <div className="relative">
@@ -91,7 +91,7 @@ export const PineappleRideScreen: React.FC = () => {
             placeholder="Destination"
             value={destinationQuery}
             onChange={(e) => setDestinationQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+            className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
         <div className="relative">
@@ -103,7 +103,7 @@ export const PineappleRideScreen: React.FC = () => {
             onChange={(e) => setTimeQuery(e.target.value)}
             min={0}
             max={23}
-            className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+            className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
       </div>

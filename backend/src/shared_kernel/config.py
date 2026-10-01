@@ -22,8 +22,11 @@ class Settings(BaseSettings):
 
     # --- Sécurité / Authentification ---
     JWT_SECRET_KEY: str
+    JWT_SECRET_KEY_PREVIOUS: str | None = None
     JWT_ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    MFA_ISSUER: str = "Pineapple OS"
 
     # --- Sécurité électorale ---
     ELECTION_PEPPER_SECRET: str

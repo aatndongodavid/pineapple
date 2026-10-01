@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="36" height="36" fill="none">
+  <!-- Crown Leaves -->
+  <path d="M 18 10 C 16 5 11 2 7 2 C 9 6 12 9 16 11 Z" fill="#15803D" />
+  <path d="M 18 10 C 20 5 25 2 29 2 C 27 6 24 9 20 11 Z" fill="#16A34A" />
+  <path d="M 18 10 C 14 6 10 3 4 4 C 8 7 12 9 17 11 Z" fill="#15803D" opacity="0.9" />
+  <path d="M 18 10 C 22 6 26 3 32 4 C 28 7 24 9 19 11 Z" fill="#16A34A" />
+  <path d="M 18 10 C 18 3 18 0 18 0 C 18 3 18 7 18 10 Z" stroke="#16A34A" stroke-width="2" stroke-linecap="round" />
+
+  <!-- Pineapple Body -->
+  <path d="M 18 10 L 29 21 L 18 32 L 7 21 Z" fill="#F97316" />
+  <!-- Light Facet -->
+  <path d="M 18 10 L 29 21 L 18 21 Z" fill="#FDBA74" opacity="0.8" />
+
+  <!-- Facet Grid -->
+  <line x1="12" y1="15" x2="24" y2="27" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1" />
+  <line x1="24" y1="15" x2="12" y2="27" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1" />
+</svg>

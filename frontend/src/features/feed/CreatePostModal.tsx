@@ -154,7 +154,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.95, y: 20 }}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-neo-extruded dark:shadow-neo-dark-extruded overflow-hidden"
+            className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-card dark:shadow-card overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* En-tête */}
@@ -162,7 +162,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
               <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
                 Créer une publication
               </h2>
-              <button onClick={onClose} className="p-1 rounded-full hover:bg-pineapple/10">
+              <button onClick={onClose} className="p-1 rounded-full hover:bg-primary/10">
                 <X className="h-5 w-5 text-gray-500" />
               </button>
             </div>
@@ -176,7 +176,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                 onChange={handleContentChange}
                 placeholder="Quoi de neuf sur le campus ?"
                 rows={3}
-                className="w-full px-4 py-3 rounded-xl bg-background-light dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple resize-none"
+                className="w-full px-4 py-3 rounded-xl bg-background-light dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                 style={{ minHeight: '80px' }}
               />
 
@@ -243,7 +243,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                     className={cn(
                       'flex items-center gap-2 p-3 rounded-xl border-2 transition-colors',
                       scope === 'LOCAL'
-                        ? 'border-pineapple bg-pineapple/10 text-pineapple'
+                        ? 'border-primary bg-primary/10 text-primary'
                         : 'border-transparent bg-background-light dark:bg-slate-800 text-gray-600 dark:text-gray-300'
                     )}
                   >
@@ -256,7 +256,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                     className={cn(
                       'flex items-center gap-2 p-3 rounded-xl border-2 transition-colors',
                       scope === 'EXTENDED'
-                        ? 'border-pineapple bg-pineapple/10 text-pineapple'
+                        ? 'border-primary bg-primary/10 text-primary'
                         : 'border-transparent bg-background-light dark:bg-slate-800 text-gray-600 dark:text-gray-300'
                     )}
                   >
@@ -278,7 +278,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                     className={cn(
                       'flex items-center gap-2 px-4 py-2 rounded-xl border-2 transition-colors',
                       postAs === 'profile'
-                        ? 'border-pineapple bg-pineapple/10 text-pineapple'
+                        ? 'border-primary bg-primary/10 text-primary'
                         : 'border-transparent bg-background-light dark:bg-slate-800 text-gray-600 dark:text-gray-300'
                     )}
                   >
@@ -291,7 +291,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                     className={cn(
                       'flex items-center gap-2 px-4 py-2 rounded-xl border-2 transition-colors',
                       postAs === 'organization'
-                        ? 'border-pineapple bg-pineapple/10 text-pineapple'
+                        ? 'border-primary bg-primary/10 text-primary'
                         : 'border-transparent bg-background-light dark:bg-slate-800 text-gray-600 dark:text-gray-300'
                     )}
                   >
@@ -304,7 +304,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                   <select
                     value={selectedOrgId || ''}
                     onChange={(e) => setSelectedOrgId(e.target.value)}
-                    className="mt-2 w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+                    className="mt-2 w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value="" disabled>
                       Choisir une organisation

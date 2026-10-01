@@ -63,12 +63,12 @@ export const CampaignTab: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-            <Card variant="neo-extruded" className="p-6">
+            <Card variant="default" className="p-6">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                   {campaign.name}
                 </h3>
-                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-pineapple/10 text-pineapple">
+                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary">
                   <TrendingUp className="h-4 w-4" />
                   <span className="text-sm font-medium">
                     Engagement : {campaign.engagementScore}

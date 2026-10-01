@@ -156,15 +156,15 @@ export const PostCard: React.FC<PostCardProps> = ({ post, className }) => {
   return (
     <div
       className={cn(
-        'p-5 rounded-2xl bg-white dark:bg-slate-800 shadow-neo-extruded dark:shadow-neo-dark-extruded transition-shadow',
-        'hover:shadow-neo-pressed dark:hover:shadow-neo-dark-pressed',
+        'p-5 rounded-2xl bg-white dark:bg-slate-800 shadow-card dark:shadow-card transition-shadow',
+        'hover:shadow-sm dark:hover:shadow-sm',
         className
       )}
     >
       {/* En-tête */}
       <div className="flex items-start gap-3">
         {/* Avatar */}
-        <div className="w-11 h-11 rounded-full bg-pineapple/20 flex items-center justify-center text-pineapple font-bold shrink-0">
+        <div className="w-11 h-11 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold shrink-0">
           {post.author.avatarUrl ? (
             <img src={post.author.avatarUrl} alt={post.author.name} className="w-full h-full rounded-full object-cover" />
           ) : (
@@ -214,7 +214,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, className }) => {
         {shouldTruncate && (
           <button
             onClick={handleToggleText}
-            className="mt-1 text-sm text-pineapple font-medium flex items-center gap-1"
+            className="mt-1 text-sm text-primary font-medium flex items-center gap-1"
           >
             {showAllText ? (
               <>
@@ -257,13 +257,13 @@ export const PostCard: React.FC<PostCardProps> = ({ post, className }) => {
           </motion.button>
 
           {/* Commentaire */}
-          <button className="flex items-center gap-1 text-sm text-gray-500 hover:text-pineapple transition-colors">
+          <button className="flex items-center gap-1 text-sm text-gray-500 hover:text-primary transition-colors">
             <MessageCircle className="w-5 h-5" />
             <span>{/* nombre de commentaires si dispo */}</span>
           </button>
 
           {/* Partager */}
-          <button className="flex items-center gap-1 text-sm text-gray-500 hover:text-pineapple transition-colors">
+          <button className="flex items-center gap-1 text-sm text-gray-500 hover:text-primary transition-colors">
             <Share2 className="w-5 h-5" />
           </button>
         </div>

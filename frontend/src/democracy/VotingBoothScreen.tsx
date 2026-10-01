@@ -106,7 +106,7 @@ export const VotingBoothScreen: React.FC = () => {
   if (!IS_ELIGIBLE) {
     return (
       <div className="max-w-2xl mx-auto p-6">
-        <Card variant="neo-inset" className="p-8 text-center">
+        <Card variant="outline" className="p-8 text-center">
           <AlertTriangle className="h-16 w-16 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-gray-800 dark:text-white">Accès refusé</h2>
           <p className="text-gray-600 dark:text-gray-300 mt-2">
@@ -125,8 +125,8 @@ export const VotingBoothScreen: React.FC = () => {
       <Card variant="glass" className="p-6 md:p-8">
         {/* En-tête avec verrou */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-xl bg-pineapple/20 flex items-center justify-center">
-            <Lock className="h-6 w-6 text-pineapple" />
+          <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
+            <Lock className="h-6 w-6 text-primary" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Isoloir numérique</h1>
@@ -139,16 +139,16 @@ export const VotingBoothScreen: React.FC = () => {
           {['Sélection', 'Confirmation', 'Chiffrement', 'Reçu'].map((label, index) => (
             <React.Fragment key={label}>
               {index > 0 && (
-                <div className={cn('h-1 flex-1 mx-1 rounded', index <= step ? 'bg-pineapple' : 'bg-gray-300 dark:bg-slate-700')} />
+                <div className={cn('h-1 flex-1 mx-1 rounded', index <= step ? 'bg-primary' : 'bg-gray-300 dark:bg-slate-700')} />
               )}
               <div className="flex flex-col items-center">
                 <div
                   className={cn(
                     'w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium',
                     index < step
-                      ? 'bg-pineapple text-white'
+                      ? 'bg-primary text-white'
                       : index === step
-                        ? 'bg-pineapple/20 text-pineapple border-2 border-pineapple'
+                        ? 'bg-primary/20 text-primary border-2 border-primary'
                         : 'bg-gray-200 dark:bg-slate-700 text-gray-500'
                   )}
                 >
@@ -177,7 +177,7 @@ export const VotingBoothScreen: React.FC = () => {
                     <button
                       key={movement.id}
                       onClick={() => handleSelectMovement(movement)}
-                      className="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent hover:border-pineapple transition-all text-left"
+                      className="w-full p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent hover:border-primary transition-all text-left"
                     >
                       <h3 className="font-medium text-gray-800 dark:text-white">{movement.name}</h3>
                       <p className="text-sm text-gray-500">Candidats : {movement.candidates.map(c => c.name).join(', ')}</p>
@@ -221,7 +221,7 @@ export const VotingBoothScreen: React.FC = () => {
               <div className="text-center">
                 {isEncrypting ? (
                   <>
-                    <Loader2 className="h-16 w-16 text-pineapple animate-spin mx-auto mb-4" />
+                    <Loader2 className="h-16 w-16 text-primary animate-spin mx-auto mb-4" />
                     <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
                       Chiffrement asymétrique en cours...
                     </h2>
@@ -229,7 +229,7 @@ export const VotingBoothScreen: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <ShieldCheck className="h-16 w-16 text-pineapple mx-auto mb-4" />
+                    <ShieldCheck className="h-16 w-16 text-primary mx-auto mb-4" />
                     <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
                       Prêt à déposer
                     </h2>
@@ -258,7 +258,7 @@ export const VotingBoothScreen: React.FC = () => {
                 <p className="text-sm text-gray-500 mb-4">Votre participation a été prise en compte.</p>
                 <div className="p-4 rounded-2xl bg-background-light dark:bg-slate-800 inline-block">
                   <span className="text-sm text-gray-500">Reçu de vote :</span>
-                  <p className="font-mono text-lg font-bold text-pineapple">{voterHash}</p>
+                  <p className="font-mono text-lg font-bold text-primary">{voterHash}</p>
                 </div>
                 <div className="mt-6">
                   <Button variant="secondary" onClick={handleStartOver}>

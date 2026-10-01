@@ -69,7 +69,7 @@ function truncateHash(hash: string, chars = 16): string {
 // ---------- Composant ----------
 export const AuditLedgerTab: React.FC = () => {
   return (
-    <Card variant="neo-extruded" className="p-4 md:p-6 overflow-x-auto">
+    <Card variant="default" className="p-4 md:p-6 overflow-x-auto">
       <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
         Election Audit Ledger
       </h2>
@@ -86,7 +86,7 @@ export const AuditLedgerTab: React.FC = () => {
             <tr
               key={entry.id}
               className={cn(
-                'border-b border-gray-200 dark:border-slate-800 hover:bg-pineapple/5 transition-colors'
+                'border-b border-gray-200 dark:border-slate-800 hover:bg-primary/5 transition-colors'
               )}
             >
               <td className="px-4 py-3 text-gray-700 dark:text-gray-300 font-mono text-xs">

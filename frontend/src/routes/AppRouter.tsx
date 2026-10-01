@@ -10,6 +10,7 @@ import { AdminRoute } from './AdminRoute';
 // Écrans publics (chargés immédiatement)
 import { LoginScreen } from '@/features/auth/LoginScreen';
 import { RegisterScreen } from '@/features/auth/RegisterScreen';
+const LegalScreen = lazy(() => import('@/features/legal/LegalScreen').then(m => ({ default: m.LegalScreen })));
 
 // Écrans protégés et administration en Code Splitting (React.lazy)
 const FeedScreen = lazy(() => import('@/features/feed/FeedScreen').then(m => ({ default: m.FeedScreen })));
@@ -97,6 +98,8 @@ export const AppRouter: React.FC = () => {
         {/* Routes publiques */}
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/register" element={<RegisterScreen />} />
+        <Route path="/legal" element={<LegalScreen />} />
+        <Route path="/legal/:docType" element={<LegalScreen />} />
 
         {/* Routes protégées avec layout principal */}
         <Route element={<ProtectedRoute />}>

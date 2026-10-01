@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, WebSocket
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -207,7 +207,39 @@ async def cast_vote(
     except AlreadyVotedError:
         raise HTTPException(status_code=409, detail="User has already voted")
 
+    # Diffusion en temps réel du décompte des votes via Pub/Sub (Vélocité Z2)
+    from shared_kernel.infrastructure.websocket_pubsub import ws_manager
+    asyncio.create_task(
+        ws_manager.broadcast_to_local(
+            conversation_id=f"election_tally_{dto.election_id}",
+            message_data={
+                "type": "NEW_VOTE_CAST",
+                "election_id": str(dto.election_id),
+                "timestamp": str(datetime.now(timezone.utc)),
+            }
+        )
+    )
+
     return {"message": "Vote cast successfully"}
+
+
+@router.websocket("/ws/live-tally/{election_id}")
+async def live_tally_websocket(
+    websocket: WebSocket,
+    election_id: uuid.UUID,
+):
+    """
+    Canal WebSocket temps réel pour la diffusion dynamique du décompte des voix (Vélocité Z2).
+    """
+    from shared_kernel.infrastructure.websocket_pubsub import ws_manager
+    channel_id = f"election_tally_{election_id}"
+    await ws_manager.connect(channel_id, websocket)
+    try:
+        while True:
+            # Maintenir la connexion active
+            await websocket.receive_text()
+    except Exception:
+        ws_manager.disconnect(channel_id, websocket)
 
 
 @router.post("/elections/{election_id}/tally", response_model=ElectionResultsDTO)

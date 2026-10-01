@@ -1,0 +1,86 @@
+{
+  "common": {
+    "appName": "Pineapple",
+    "home": "Accueil",
+    "community": "Communauté",
+    "democracy": "Démocratie",
+    "academy": "Académie",
+    "profile": "Profil",
+    "messages": "Messages",
+    "settings": "Paramètres",
+    "logout": "Déconnexion",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "loading": "Chargement...",
+    "search": "Rechercher...",
+    "error": "Erreur",
+    "success": "Succès",
+    "create": "Créer",
+    "delete": "Supprimer",
+    "edit": "Éditer",
+    "messagesDisabledReason": "Aucune conversation active pour le moment"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "darkMode": "Mode Sombre",
+    "darkModeDesc": "Activer le thème sombre",
+    "pushNotifications": "Notifications Push",
+    "pushNotificationsDesc": "Recevoir les alertes de vote et de certification",
+    "interfaceLanguage": "Langue de l'interface",
+    "chooseLanguage": "Choisir la langue d'affichage",
+    "dataSaver": "Économie de données",
+    "dataSaverDesc": "Ne pas charger les images du feed automatiquement",
+    "connectedDevices": "Gérer les appareils connectés",
+    "phoneNumber": "Numéro de téléphone",
+    "smsConsent": "Consentement notifications SMS",
+    "smsConsentDesc": "Recevoir les alertes SMS critiques (vote, certification, sécurité)"
+  },
+  "nav": {
+    "home": "Accueil",
+    "community": "Communauté",
+    "democracy": "Démocratie",
+    "academy": "Académie",
+    "profile": "Profil",
+    "messages": "Messages",
+    "admin": "Administration",
+    "superAdmin": "Super Admin"
+  },
+  "feed": {
+    "title": "Fil d'actualité campus",
+    "createPost": "Partager une actualité ou poser une question...",
+    "publish": "Publier",
+    "like": "J'aime",
+    "comment": "Commenter",
+    "share": "Partager",
+    "pendingReview": "En attente de modération préventive",
+    "noPosts": "Aucune publication pour le moment."
+  },
+  "login": {
+    "title": "Connexion à Pineapple",
+    "emailLabel": "Adresse Email Universitaire",
+    "passwordLabel": "Mot de passe",
+    "submit": "Se connecter",
+    "noAccount": "Pas encore de compte ? S'inscrire",
+    "cguNotice": "En vous connectant, vous acceptez nos "
+  },
+  "legal": {
+    "cgu": "Conditions Générales d'Utilisation",
+    "privacy": "Politique de Confidentialité",
+    "legalNotice": "Mentions Légales",
+    "acceptPrompt": "Veuillez accepter la dernière version des documents légaux pour continuer.",
+    "acceptButton": "J'accepte les conditions",
+    "placeholderDisclaimer": "Contenu juridique à valider par un juriste certifié."
+  },
+  "bulkImport": {
+    "title": "Import en masse d'étudiants (CSV)",
+    "subtitle": "Onboarding de promotion par fichier CSV d'établissement",
+    "uploadButton": "Importer le fichier CSV",
+    "dragDropText": "Glissez-déposez le fichier CSV ici ou cliquez pour parcourir",
+    "processing": "Traitement de l'import en cours...",
+    "reportTitle": "Rapport d'importation",
+    "processedCount": "Lignes traitées",
+    "successCount": "Réussites",
+    "errorCount": "Erreurs",
+    "tempPasswordNotice": "Les comptes sont créés vérifiés (VERIFIED) avec un mot de passe temporaire unique."
+  }
+}

@@ -13,7 +13,7 @@ export const App: React.FC = () => {
   if (!isInitialized) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background-light dark:bg-background-dark">
-        <div className="animate-spin h-8 w-8 border-4 border-pineapple border-t-transparent rounded-full" />
+        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
       </div>
     );
   }
