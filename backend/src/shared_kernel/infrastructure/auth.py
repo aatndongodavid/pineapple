@@ -115,7 +115,7 @@ async def require_platform_admin(
 ) -> Dict[str, Any]:
     """
     Dépendance de sécurité pour le rôle Super Administrateur de la plateforme (Gemula).
-    Le token doit avoir scope="platform".
+    Le token doit avoir scope="platform" et ne doit pas être révoqué.
     """
     if not credentials:
         raise HTTPException(
@@ -135,10 +135,27 @@ async def require_platform_admin(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Accès réservé aux super-administrateurs de la plateforme",
             )
+        token_jti = payload.get("jti", token[:16])
+        user_id_str = payload.get("sub")
+        token_iat = payload.get("iat")
+
+        is_revoked = await token_blacklist.is_token_revoked(
+            token_jti=token_jti,
+            user_id=user_id_str,
+            token_issued_at=token_iat,
+        )
+        if is_revoked:
+            security_logger.log_token_revoked(token_jti=token_jti, user_id=user_id_str, reason="Attempted use of revoked platform admin token")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Ce token ou cette session super-admin a été révoqué(e).",
+            )
+
         return {
             "admin_id": uuid.UUID(payload["sub"]),
             "email": payload.get("email"),
             "scope": "platform",
+            "jti": token_jti,
             "raw_payload": payload,
         }
     except (JWTError, ValueError, KeyError):

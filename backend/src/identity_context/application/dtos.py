@@ -32,6 +32,7 @@ class UserRegisterDTO(BaseDTO):
 class UserLoginDTO(BaseDTO):
     email: EmailStr
     password: str
+    totp_code: Optional[str] = None
 
 
 class TokenResponseDTO(BaseDTO):

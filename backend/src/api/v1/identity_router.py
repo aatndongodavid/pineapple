@@ -122,6 +122,7 @@ async def login(
 ):
     """
     Authentification et émission du JWT.
+    Exige la vérification du second facteur TOTP (MFA) pour les rôles privilégiés.
     """
     use_case = AuthenticateUserUseCase(user_repo)
     try:
@@ -131,6 +132,25 @@ async def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
         )
+
+    # AA1: Vérification du MFA TOTP pour les rôles d'administration
+    user = await user_repo.get_by_email(dto.email)
+    if user and (user.role.value in ["ADMIN", "PLATFORM_ADMIN"] or getattr(user, "totp_secret", None)):
+        totp_secret = getattr(user, "totp_secret", None)
+        if totp_secret:
+            if not dto.totp_code:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Code TOTP (MFA) requis pour ce compte d'administration",
+                )
+            from shared_kernel.infrastructure.mfa import verify_totp_code
+            if not verify_totp_code(secret=totp_secret, code=dto.totp_code):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Code TOTP (MFA) invalide ou expiré",
+                )
+
+    return token_dto
 
 @router.post("/revoke-token")
 async def revoke_token(

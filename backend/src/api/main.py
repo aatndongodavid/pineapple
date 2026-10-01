@@ -25,6 +25,15 @@ API backend officielle de Pineapple 3.0.
 Connecter. Collaborer. Grandir.
 """
 
+from contextlib import asynccontextmanager
+from shared_kernel.infrastructure.scheduler import start_scheduler, stop_scheduler
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    start_scheduler()
+    yield
+    stop_scheduler()
+
 app = FastAPI(
     title="Pineapple OS API",
     description=APP_DESCRIPTION,
@@ -32,6 +41,7 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
+    lifespan=lifespan,
 )
 
 from starlette.middleware.base import BaseHTTPMiddleware

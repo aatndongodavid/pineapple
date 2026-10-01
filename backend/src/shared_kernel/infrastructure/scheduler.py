@@ -77,3 +77,40 @@ async def run_alumni_archival_job():
             await session.rollback()
             logger.error(f"Erreur lors de l'archivage automatique des alumni: {e}")
             return 0
+
+
+_scheduler = None
+
+
+def start_scheduler():
+    """
+    Initialise et démarre le planificateur APScheduler.
+    Planifie le job quotidien d'archivage des Alumni (tous les jours à 02h00).
+    """
+    global _scheduler
+    try:
+        from apscheduler.schedulers.asyncio import AsyncIOScheduler
+        _scheduler = AsyncIOScheduler()
+        _scheduler.add_job(
+            run_alumni_archival_job,
+            trigger="cron",
+            hour=2,
+            minute=0,
+            id="alumni_archival_job",
+            replace_existing=True,
+        )
+        _scheduler.start()
+        logger.info("APScheduler démarré avec succès. Tâche d'archivage alumni planifiée (02h00).")
+    except Exception as e:
+        logger.warning(f"Avertissement : APScheduler non démarré ({e}).")
+
+
+def stop_scheduler():
+    """
+    Arrête proprement le planificateur APScheduler à la fermeture de l'application.
+    """
+    global _scheduler
+    if _scheduler and getattr(_scheduler, "running", False):
+        _scheduler.shutdown(wait=False)
+        logger.info("APScheduler arrêté avec succès.")
+
