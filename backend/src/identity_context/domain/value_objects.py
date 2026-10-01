@@ -23,6 +23,15 @@ class AcademicStatus(str, Enum):
     STUDENT = "STUDENT"
     TEACHER = "TEACHER"
     ALUMNI = "ALUMNI"
+    ENTERPRISE = "ENTERPRISE"
+
+
+class UserRole(str, Enum):
+    STUDENT = "STUDENT"
+    TEACHER = "TEACHER"
+    MODERATOR = "MODERATOR"
+    ADMIN = "ADMIN"
+    ENTERPRISE = "ENTERPRISE"
 
 
 class DocumentType(str, Enum):
@@ -30,6 +39,7 @@ class DocumentType(str, Enum):
     QUITTANCE = "QUITTANCE"
     DIPLOME = "DIPLOME"
     ACTE_NAISSANCE = "ACTE_NAISSANCE"
+    ENTERPRISE_REGISTRATION = "ENTERPRISE_REGISTRATION"
 
 
 class CampusStatusDisplay(str, Enum):
@@ -39,6 +49,7 @@ class CampusStatusDisplay(str, Enum):
     ARCHIVED = "Archivé"
     ALUMNI = "Alumni"
     VERIFIED_TEACHER = "Enseignant vérifié"
+    ENTERPRISE = "Compte Entreprise"
 
 
 @dataclass(frozen=True)

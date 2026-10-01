@@ -1,6 +1,6 @@
 // frontend/src/components/ui/Button.tsx
 
-import React, { forwardRef, ButtonHTMLAttributes } from 'react';
+import React, { forwardRef } from 'react';
 import { motion, HTMLMotionProps } from 'framer-motion';
 import { Loader2, LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -19,12 +19,12 @@ export interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'children'>
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-pineapple text-white hover:bg-emerald-600 active:bg-emerald-700 focus-visible:ring-emerald-500',
-  secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300 active:bg-gray-400 focus-visible:ring-gray-400',
-  neo: 'bg-background-light text-gray-800 shadow-neo-extruded hover:shadow-neo-inset active:shadow-neo-pressed focus-visible:ring-pineapple',
-  glass: 'glass-panel text-white hover:bg-white/20 focus-visible:ring-pineapple',
-  ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 active:bg-gray-200 focus-visible:ring-gray-400 dark:text-gray-200 dark:hover:bg-white/10',
-  danger: 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 focus-visible:ring-red-500',
+  primary: 'bg-primary text-white hover:bg-primary-dark active:bg-orange-800 focus-visible:ring-primary',
+  secondary: 'bg-secondary text-white hover:bg-secondary-dark active:bg-emerald-800 focus-visible:ring-secondary',
+  neo: 'bg-white dark:bg-slate-800 text-stone-800 dark:text-stone-100 border border-stone-200 dark:border-stone-700 shadow-card hover:bg-stone-50 dark:hover:bg-slate-700 focus-visible:ring-primary',
+  glass: 'glass-panel text-white hover:bg-white/20 focus-visible:ring-primary',
+  ghost: 'bg-transparent text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-white/10 focus-visible:ring-stone-400',
+  danger: 'bg-danger text-white hover:bg-red-700 active:bg-red-800 focus-visible:ring-danger',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

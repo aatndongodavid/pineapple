@@ -1,0 +1,86 @@
+{
+  "common": {
+    "appName": "Pineapple",
+    "home": "Home",
+    "community": "Community",
+    "democracy": "Democracy",
+    "academy": "Academy",
+    "profile": "Profile",
+    "messages": "Messages",
+    "settings": "Settings",
+    "logout": "Log out",
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "search": "Search...",
+    "error": "Error",
+    "success": "Success",
+    "create": "Create",
+    "delete": "Delete",
+    "edit": "Edit",
+    "messagesDisabledReason": "No active conversations currently"
+  },
+  "settings": {
+    "title": "Settings",
+    "darkMode": "Dark Mode",
+    "darkModeDesc": "Enable dark theme",
+    "pushNotifications": "Push Notifications",
+    "pushNotificationsDesc": "Receive voting and certification alerts",
+    "interfaceLanguage": "Interface Language",
+    "chooseLanguage": "Select display language",
+    "dataSaver": "Data Saver",
+    "dataSaverDesc": "Do not load feed images automatically",
+    "connectedDevices": "Manage connected devices",
+    "phoneNumber": "Phone number",
+    "smsConsent": "SMS Notifications Consent",
+    "smsConsentDesc": "Receive critical SMS alerts (voting, certification, security)"
+  },
+  "nav": {
+    "home": "Home",
+    "community": "Community",
+    "democracy": "Democracy",
+    "academy": "Academy",
+    "profile": "Profile",
+    "messages": "Messages",
+    "admin": "Administration",
+    "superAdmin": "Super Admin"
+  },
+  "feed": {
+    "title": "Campus Feed",
+    "createPost": "Share campus news or ask a question...",
+    "publish": "Publish",
+    "like": "Like",
+    "comment": "Comment",
+    "share": "Share",
+    "pendingReview": "Pending preventive moderation review",
+    "noPosts": "No posts available yet."
+  },
+  "login": {
+    "title": "Sign in to Pineapple",
+    "emailLabel": "University Email Address",
+    "passwordLabel": "Password",
+    "submit": "Sign in",
+    "noAccount": "Don't have an account? Sign up",
+    "cguNotice": "By signing in, you accept our "
+  },
+  "legal": {
+    "cgu": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "legalNotice": "Legal Notice",
+    "acceptPrompt": "Please accept the latest version of legal documents to continue.",
+    "acceptButton": "I accept terms",
+    "placeholderDisclaimer": "Legal content pending validation by certified legal counsel."
+  },
+  "bulkImport": {
+    "title": "Student Bulk Import (CSV)",
+    "subtitle": "Institutional student list onboarding via CSV file",
+    "uploadButton": "Upload CSV File",
+    "dragDropText": "Drag and drop your CSV file here or click to browse",
+    "processing": "Processing bulk import...",
+    "reportTitle": "Import Report",
+    "processedCount": "Processed Lines",
+    "successCount": "Successes",
+    "errorCount": "Errors",
+    "tempPasswordNotice": "Accounts are created as verified (VERIFIED) with a unique temporary password."
+  }
+}

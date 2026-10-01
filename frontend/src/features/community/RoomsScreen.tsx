@@ -96,15 +96,15 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, now, onDeclare }) => {
   const remaining = room.expires_at ? formatRemainingTime(room.expires_at, now) : null;
 
   return (
-    <Card variant="neo-extruded" className="p-4 flex flex-col">
+    <Card variant="default" className="p-4 flex flex-col">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2">
-          <DoorOpen className="h-5 w-5 text-pineapple" />
+          <DoorOpen className="h-5 w-5 text-primary" />
           <h3 className="font-semibold text-gray-800 dark:text-white">{room.name}</h3>
         </div>
         <button
           onClick={() => onDeclare(room.id)}
-          className="p-1 rounded-full hover:bg-pineapple/10"
+          className="p-1 rounded-full hover:bg-primary/10"
           aria-label="Déclarer le statut"
         >
           <MoreVertical className="h-5 w-5 text-gray-500" />
@@ -116,7 +116,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, now, onDeclare }) => {
       </div>
 
       <div className="mt-4 flex items-center justify-between">
-        <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-white dark:bg-slate-800 shadow-neo-inset dark:shadow-neo-dark-inset">
+        <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-white dark:bg-slate-800 border border-stone-200 dark:border-stone-800 dark:border border-stone-800">
           <span className={cn('w-2.5 h-2.5 rounded-full', statusInfo.color)} />
           {statusInfo.label}
         </span>
@@ -179,7 +179,7 @@ export const RoomsScreen: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2"
       >
-        <MapPin className="h-7 w-7 text-pineapple" />
+        <MapPin className="h-7 w-7 text-primary" />
         Salles de classe
       </motion.h1>
 
@@ -204,14 +204,14 @@ export const RoomsScreen: React.FC = () => {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 100, opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="absolute bottom-0 left-0 right-0 md:bottom-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 w-full max-w-md mx-auto bg-white dark:bg-slate-900 rounded-t-3xl md:rounded-2xl shadow-neo-extruded dark:shadow-neo-dark-extruded p-6"
+              className="absolute bottom-0 left-0 right-0 md:bottom-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 w-full max-w-md mx-auto bg-white dark:bg-slate-900 rounded-t-3xl md:rounded-2xl shadow-card dark:shadow-card p-6"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                   Déclarer le statut
                 </h3>
-                <button onClick={closeDeclare} className="p-1 rounded-full hover:bg-pineapple/10">
+                <button onClick={closeDeclare} className="p-1 rounded-full hover:bg-primary/10">
                   <X className="h-5 w-5 text-gray-500" />
                 </button>
               </div>

@@ -1,0 +1,15 @@
+{
+  "files": [
+    {
+      "path": "./dist/assets/index-*.js",
+      "maxSize": "500kB"
+    },
+    {
+      "path": "./dist/assets/*.js",
+      "maxSize": "50kB"
+    }
+  ],
+  "ci": {
+    "trackBranches": ["main", "master", "develop"]
+  }
+}

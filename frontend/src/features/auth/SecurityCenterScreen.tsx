@@ -125,7 +125,7 @@ export const SecurityCenterScreen: React.FC = () => {
     <div className="max-w-3xl mx-auto p-4 md:p-6 space-y-6 pb-24 md:pb-6">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-          <ShieldCheck className="h-7 w-7 text-pineapple" />
+          <ShieldCheck className="h-7 w-7 text-primary" />
           Security Center
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -144,11 +144,11 @@ export const SecurityCenterScreen: React.FC = () => {
                 className="flex items-center justify-between p-3 rounded-xl bg-background-light dark:bg-slate-800"
               >
                 <div className="flex items-center gap-3">
-                  <session.icon className="h-6 w-6 text-pineapple" />
+                  <session.icon className="h-6 w-6 text-primary" />
                   <div>
                     <p className="font-medium text-gray-800 dark:text-white">
                       {session.device} <span className="text-xs text-gray-500">({session.browser})</span>
-                      {session.isCurrent && <span className="ml-2 text-xs text-pineapple">Session actuelle</span>}
+                      {session.isCurrent && <span className="ml-2 text-xs text-primary">Session actuelle</span>}
                     </p>
                     <p className="text-xs text-gray-500 flex items-center gap-1">
                       <MapPin className="h-3 w-3" /> {session.location} · {session.ip}
@@ -202,7 +202,7 @@ export const SecurityCenterScreen: React.FC = () => {
               onClick={() => setTwoFAEnabled(!twoFAEnabled)}
               className={cn(
                 'relative inline-flex h-7 w-12 items-center rounded-full transition-colors',
-                twoFAEnabled ? 'bg-pineapple' : 'bg-gray-300 dark:bg-slate-700'
+                twoFAEnabled ? 'bg-primary' : 'bg-gray-300 dark:bg-slate-700'
               )}
             >
               <span
@@ -225,7 +225,7 @@ export const SecurityCenterScreen: React.FC = () => {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
         <Card variant="flat" className="p-5">
           <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white flex items-center gap-2">
-            <KeyRound className="h-5 w-5 text-pineapple" />
+            <KeyRound className="h-5 w-5 text-primary" />
             Changer le mot de passe
           </h2>
           <form onSubmit={handlePasswordSubmit} className="space-y-4">
@@ -239,7 +239,7 @@ export const SecurityCenterScreen: React.FC = () => {
                 value={passwordForm.currentPassword}
                 onChange={handlePasswordChange}
                 required
-                className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+                className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
             <div>
@@ -253,7 +253,7 @@ export const SecurityCenterScreen: React.FC = () => {
                 onChange={handlePasswordChange}
                 required
                 minLength={8}
-                className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+                className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
             <div>
@@ -267,7 +267,7 @@ export const SecurityCenterScreen: React.FC = () => {
                 onChange={handlePasswordChange}
                 required
                 minLength={8}
-                className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+                className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
             {passwordError && (

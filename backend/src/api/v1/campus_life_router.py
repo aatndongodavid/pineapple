@@ -32,13 +32,9 @@ from campus_life_context.infrastructure.persistence.repositories import (
     PostgresRideRepository,
 )
 from shared_kernel.config import settings
+from shared_kernel.infrastructure.auth import get_current_user
 from shared_kernel.infrastructure.database import AsyncSessionLocal
 from shared_kernel.infrastructure.tenant_middleware import get_current_tenant_id
-
-# ---------------------------------------------------------------------------
-# Sécurité & dépendances transverses
-# ---------------------------------------------------------------------------
-security = HTTPBearer()
 
 
 async def get_session_factory() -> async_sessionmaker[AsyncSession]:
@@ -63,42 +59,28 @@ async def get_messaging_repo(
     return PostgresMessagingRepository(session_factory)
 
 
-# Provider de statut utilisateur (simulé pour l'instant)
-class SimpleUserStatusProvider:
-    """Vérifie le statut de certification de l'utilisateur via le contexte Identity (simplifié)."""
+from identity_context.domain.value_objects import AccountStatus, VerificationStatus
+from identity_context.infrastructure.persistence.repositories import PostgresUserRepository
+
+
+async def get_user_repo(
+    session_factory: async_sessionmaker[AsyncSession] = Depends(get_session_factory),
+) -> PostgresUserRepository:
+    return PostgresUserRepository(session_factory)
+
+
+class RealUserStatusProvider:
+    def __init__(self, user_repo: PostgresUserRepository, tenant_id: uuid.UUID):
+        self._user_repo = user_repo
+        self._tenant_id = tenant_id
 
     async def is_certified_active(self, user_id: uuid.UUID) -> bool:
-        # TODO: Appeler le service Identity pour récupérer verification_status et account_status.
-        # Pour la démonstration, on renvoie True (certifié actif).
-        return True
-
-
-async def get_user_status_provider() -> SimpleUserStatusProvider:
-    return SimpleUserStatusProvider()
-
-
-async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
-) -> dict:
-    """Retourne l'utilisateur courant à partir du JWT."""
-    token = credentials.credentials
-    try:
-        payload = jwt.decode(
-            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
-        )
-        user_id = uuid.UUID(payload.get("sub"))
-        token_tenant = uuid.UUID(payload.get("tenant_id"))
-        if token_tenant != tenant_id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token tenant mismatch",
-            )
-        return {"user_id": user_id, "tenant_id": tenant_id}
-    except (JWTError, KeyError, ValueError):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication token",
+        user = await self._user_repo.get_by_id(user_id, self._tenant_id)
+        if not user:
+            return False
+        return (
+            user.verification_status == VerificationStatus.VERIFIED
+            and user.account_status == AccountStatus.ACTIVE
         )
 
 
@@ -141,12 +123,13 @@ async def create_listing(
     current_user: dict = Depends(get_current_user),
     tenant_id: uuid.UUID = Depends(get_current_tenant_id),
     marketplace_repo: PostgresMarketplaceRepository = Depends(get_marketplace_repo),
-    user_status_provider: SimpleUserStatusProvider = Depends(get_user_status_provider),
+    user_repo: PostgresUserRepository = Depends(get_user_repo),
 ):
     """
     Publier une annonce (réservé aux étudiants certifiés actifs).
     """
-    use_case = CreateMarketplaceListingUseCase(marketplace_repo, user_status_provider)
+    provider = RealUserStatusProvider(user_repo, tenant_id)
+    use_case = CreateMarketplaceListingUseCase(marketplace_repo, provider)
     try:
         listing = await use_case.execute(
             seller_id=current_user["user_id"],
@@ -203,16 +186,22 @@ async def create_ride(
     current_user: dict = Depends(get_current_user),
     tenant_id: uuid.UUID = Depends(get_current_tenant_id),
     ride_repo: PostgresRideRepository = Depends(get_ride_repo),
+    user_repo: PostgresUserRepository = Depends(get_user_repo),
 ):
     """
-    Proposer un trajet de covoiturage.
+    Proposer un trajet de covoiturage (réservé aux étudiants certifiés actifs).
     """
-    use_case = CreateRideShareUseCase(ride_repo)
-    ride = await use_case.execute(
-        driver_id=current_user["user_id"],
-        tenant_id=tenant_id,
-        dto=dto,
-    )
+    provider = RealUserStatusProvider(user_repo, tenant_id)
+    use_case = CreateRideShareUseCase(ride_repo, provider)
+    try:
+        ride = await use_case.execute(
+            driver_id=current_user["user_id"],
+            tenant_id=tenant_id,
+            dto=dto,
+        )
+    except UserNotEligibleError as e:
+        raise HTTPException(status_code=403, detail=str(e))
+
     return RideResponseDTO(
         id=ride.id,
         tenant_id=ride.tenant_id,
@@ -277,7 +266,18 @@ async def get_messages(
     """
     Obtenir l'historique de discussion d'une conversation.
     """
-    # TODO: Vérifier que l'utilisateur fait partie des participants de la conversation.
+    conversation = await messaging_repo.get_conversation_by_id(conversation_id)
+    if not conversation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Conversation introuvable",
+        )
+    user_id = current_user["user_id"]
+    if user_id not in conversation.participant_ids:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Accès interdit : vous ne faites pas partie de cette conversation",
+        )
     messages = await messaging_repo.list_messages(conversation_id)
     return [
         MessageResponseDTO(

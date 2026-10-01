@@ -121,7 +121,7 @@ export const OrganizationsScreen: React.FC = () => {
       {/* En-tête */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-          <Users className="h-7 w-7 text-pineapple" />
+          <Users className="h-7 w-7 text-primary" />
           Organisations
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -142,7 +142,7 @@ export const OrganizationsScreen: React.FC = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Rechercher une organisation..."
-          className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+          className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </motion.div>
 
@@ -160,8 +160,8 @@ export const OrganizationsScreen: React.FC = () => {
             className={cn(
               'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all',
               activeFilter === filter
-                ? 'bg-pineapple text-white shadow-neo-pressed dark:shadow-neo-dark-pressed'
-                : 'bg-background-light dark:bg-slate-800 text-gray-600 dark:text-gray-300 shadow-neo-extruded dark:shadow-neo-dark-extruded'
+                ? 'bg-primary text-white shadow-sm dark:shadow-sm'
+                : 'bg-background-light dark:bg-slate-800 text-gray-600 dark:text-gray-300 shadow-card dark:shadow-card'
             )}
           >
             {filter === 'ALL' ? 'Tous' : typeLabels[filter]}
@@ -183,13 +183,13 @@ export const OrganizationsScreen: React.FC = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.2 }}
           >
-            <Card variant="neo-extruded" className="h-full p-5 flex flex-col">
+            <Card variant="default" className="h-full p-5 flex flex-col">
               <div className="flex items-start gap-3">
-                <div className="w-12 h-12 rounded-xl bg-pineapple/20 flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
                   {org.logo_url ? (
                     <img src={org.logo_url} alt={org.name} className="w-full h-full object-cover rounded-xl" />
                   ) : (
-                    <Users className="h-6 w-6 text-pineapple" />
+                    <Users className="h-6 w-6 text-primary" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -248,7 +248,7 @@ export const OrganizationsScreen: React.FC = () => {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.3 }}
         onClick={() => setShowCreateModal(true)}
-        className="fixed bottom-24 md:bottom-8 right-6 md:right-10 z-40 w-14 h-14 rounded-full bg-pineapple text-white shadow-neo-extruded dark:shadow-neo-dark-extruded flex items-center justify-center hover:shadow-neo-pressed dark:hover:shadow-neo-dark-pressed transition-shadow"
+        className="fixed bottom-24 md:bottom-8 right-6 md:right-10 z-40 w-14 h-14 rounded-full bg-primary text-white shadow-card dark:shadow-card flex items-center justify-center hover:shadow-sm dark:hover:shadow-sm transition-shadow"
         aria-label="Créer une organisation"
       >
         <Plus className="h-7 w-7" />
@@ -268,7 +268,7 @@ export const OrganizationsScreen: React.FC = () => {
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="bg-white dark:bg-slate-900 rounded-3xl p-6 w-full max-w-md shadow-neo-extruded dark:shadow-neo-dark-extruded"
+              className="bg-white dark:bg-slate-900 rounded-3xl p-6 w-full max-w-md shadow-card dark:shadow-card"
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className="text-lg font-semibold mb-4">Créer une organisation</h2>

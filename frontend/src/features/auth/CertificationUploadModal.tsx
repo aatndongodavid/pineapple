@@ -131,7 +131,7 @@ export const CertificationUploadModal: React.FC<CertificationUploadModalProps> =
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.95, y: 20 }}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-neo-extruded dark:shadow-neo-dark-extruded p-6"
+            className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-card dark:shadow-card p-6"
             onClick={(e) => e.stopPropagation()}
           >
             {/* En-tête */}
@@ -139,7 +139,7 @@ export const CertificationUploadModal: React.FC<CertificationUploadModalProps> =
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                 Soumettre un justificatif
               </h3>
-              <button onClick={onClose} className="p-1 rounded-full hover:bg-pineapple/10">
+              <button onClick={onClose} className="p-1 rounded-full hover:bg-primary/10">
                 <X className="h-5 w-5 text-gray-500" />
               </button>
             </div>
@@ -155,7 +155,7 @@ export const CertificationUploadModal: React.FC<CertificationUploadModalProps> =
                     className={cn(
                       'flex flex-col items-center p-3 rounded-xl transition-all',
                       selectedType === opt.type
-                        ? 'bg-pineapple/15 border-2 border-pineapple text-pineapple'
+                        ? 'bg-primary/15 border-2 border-primary text-primary'
                         : 'bg-background-light dark:bg-slate-800 border-2 border-transparent text-gray-600 dark:text-gray-300',
                     )}
                   >
@@ -175,8 +175,8 @@ export const CertificationUploadModal: React.FC<CertificationUploadModalProps> =
               className={cn(
                 'border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-colors',
                 isDragOver
-                  ? 'border-pineapple bg-pineapple/5'
-                  : 'border-gray-300 dark:border-slate-700 hover:border-pineapple',
+                  ? 'border-primary bg-primary/5'
+                  : 'border-gray-300 dark:border-slate-700 hover:border-primary',
               )}
             >
               <input

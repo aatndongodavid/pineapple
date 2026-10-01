@@ -60,11 +60,11 @@ export const RideCard: React.FC<RideCardProps> = ({ ride, onBook }) => {
       whileHover={{ y: -4 }}
       transition={{ duration: 0.2 }}
     >
-      <Card variant="neo-extruded" className="p-5 h-full flex flex-col">
+      <Card variant="default" className="p-5 h-full flex flex-col">
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1 text-sm font-medium text-gray-800 dark:text-white">
-              <MapPin className="h-4 w-4 text-pineapple" />
+              <MapPin className="h-4 w-4 text-primary" />
               <span className="truncate">{ride.departure}</span>
             </div>
             <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300 mt-1">
@@ -110,7 +110,7 @@ export const RideCard: React.FC<RideCardProps> = ({ ride, onBook }) => {
         </div>
 
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-lg font-bold text-pineapple">
+          <span className="text-lg font-bold text-primary">
             {ride.pricePerSeat.toLocaleString('fr-FR')} FCFA
           </span>
           <span className="text-xs text-gray-400">/ place</span>

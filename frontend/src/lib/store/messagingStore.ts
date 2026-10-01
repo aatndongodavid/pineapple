@@ -39,12 +39,17 @@ interface MessagingState {
   isLoadingConversations: boolean;
   isLoadingMessages: boolean;
   error: string | null;
+  // Contrôle l'ouverture du tiroir de messagerie (ChatDrawer) depuis
+  // n'importe quel composant (Header, MobileNav, ...) sans prop-drilling.
+  isChatDrawerOpen: boolean;
 
   fetchConversations: () => Promise<void>;
   fetchMessages: (conversationId: string) => Promise<void>;
   sendMessage: (conversationId: string, content: string) => Promise<void>;
   receiveWebSocketMessage: (message: MessageDTO) => void;
   setActiveConversation: (conversationId: string | null) => void;
+  openChatDrawer: () => void;
+  closeChatDrawer: () => void;
 }
 
 export const useMessagingStore = create<MessagingState>((set, get) => ({
@@ -54,6 +59,7 @@ export const useMessagingStore = create<MessagingState>((set, get) => ({
   isLoadingConversations: false,
   isLoadingMessages: false,
   error: null,
+  isChatDrawerOpen: false,
 
   /**
    * Charge la liste des conversations de l'utilisateur.
@@ -211,5 +217,24 @@ export const useMessagingStore = create<MessagingState>((set, get) => ({
    */
   setActiveConversation: (conversationId: string | null) => {
     set({ activeConversationId: conversationId });
+  },
+
+  /**
+   * Ouvre le tiroir de messagerie. Si aucune conversation n'est active,
+   * sélectionne la plus récente pour éviter un tiroir vide.
+   */
+  openChatDrawer: () => {
+    const { activeConversationId, conversations } = get();
+    if (!activeConversationId && conversations.length > 0) {
+      set({ activeConversationId: conversations[0].id });
+    }
+    set({ isChatDrawerOpen: true });
+  },
+
+  /**
+   * Ferme le tiroir de messagerie.
+   */
+  closeChatDrawer: () => {
+    set({ isChatDrawerOpen: false });
   },
 }));

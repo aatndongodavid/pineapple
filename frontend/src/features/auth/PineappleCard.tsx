@@ -98,7 +98,7 @@ export const PineappleCard: React.FC<PineappleCardProps> = ({
       whileHover={{ scale: 1.02 }}
       className={cn(
         'relative w-full max-w-md mx-auto rounded-2xl p-6',
-        'bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-md border border-white/30 shadow-neo-extruded dark:shadow-neo-dark-extruded',
+        'bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-md border border-white/30 shadow-card dark:shadow-card',
         className
       )}
     >
@@ -107,27 +107,27 @@ export const PineappleCard: React.FC<PineappleCardProps> = ({
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Carte Étudiant</h3>
           <p className="text-xs text-gray-500 dark:text-gray-400">Pineapple ID</p>
         </div>
-        <ShieldCheck className="h-6 w-6 text-pineapple" />
+        <ShieldCheck className="h-6 w-6 text-primary" />
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 space-y-3">
           <div className="flex items-center gap-2">
-            <User className="h-5 w-5 text-pineapple" />
+            <User className="h-5 w-5 text-primary" />
             <span className="font-medium text-gray-800 dark:text-white">
               {firstName} {lastName}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <IdCard className="h-5 w-5 text-pineapple" />
+            <IdCard className="h-5 w-5 text-primary" />
             <span className="text-sm text-gray-700 dark:text-gray-300">{matricule}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Building className="h-5 w-5 text-pineapple" />
+            <Building className="h-5 w-5 text-primary" />
             <span className="text-sm text-gray-700 dark:text-gray-300">{campusName}</span>
           </div>
           <div className="flex items-center gap-2">
-            <GraduationCap className="h-5 w-5 text-pineapple" />
+            <GraduationCap className="h-5 w-5 text-primary" />
             <span className="text-sm text-gray-700 dark:text-gray-300">{faculty} - {filiere}</span>
           </div>
           <div className="text-xs text-gray-500 dark:text-gray-400">Année : {academicYear}</div>

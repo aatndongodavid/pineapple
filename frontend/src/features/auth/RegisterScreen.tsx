@@ -66,16 +66,16 @@ const StepIndicator: React.FC<{ currentStep: number }> = ({ currentStep }) => {
       {steps.map((step, index) => (
         <React.Fragment key={step}>
           {index > 0 && (
-            <div className={cn('h-1 w-10 mx-2 rounded', index <= currentStep ? 'bg-pineapple' : 'bg-gray-300')} />
+            <div className={cn('h-1 w-10 mx-2 rounded', index <= currentStep ? 'bg-primary' : 'bg-gray-300')} />
           )}
           <div className="flex flex-col items-center">
             <div
               className={cn(
                 'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium',
                 index < currentStep
-                  ? 'bg-pineapple text-white'
+                  ? 'bg-primary text-white'
                   : index === currentStep
-                    ? 'bg-pineapple/20 text-pineapple border-2 border-pineapple'
+                    ? 'bg-primary/20 text-primary border-2 border-primary'
                     : 'bg-gray-200 text-gray-500'
               )}
             >
@@ -179,9 +179,9 @@ export const RegisterScreen: React.FC = () => {
         transition={{ duration: 0.4, ease: 'easeOut' }}
         className="w-full max-w-lg"
       >
-        <Card variant="neo-extruded" className="p-8">
+        <Card variant="default" className="p-8">
           <div className="flex flex-col items-center mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-pineapple flex items-center justify-center mb-4 shadow-neo-extruded dark:shadow-neo-dark-extruded">
+            <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mb-4 shadow-card dark:shadow-card">
               <span className="text-white text-2xl font-bold">P</span>
             </div>
             <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
@@ -203,7 +203,7 @@ export const RegisterScreen: React.FC = () => {
               <select
                 value={tenantCode}
                 onChange={(e) => setTenantCode(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 {TENANTS.map((t) => (
                   <option key={t.id} value={t.code}>
@@ -225,7 +225,7 @@ export const RegisterScreen: React.FC = () => {
                     value={formData.email}
                     onChange={(e) => updateField('email', e.target.value)}
                     placeholder="vous@exemple.cm"
-                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
@@ -238,7 +238,7 @@ export const RegisterScreen: React.FC = () => {
                     value={formData.password}
                     onChange={(e) => updateField('password', e.target.value)}
                     placeholder="••••••••"
-                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
@@ -251,7 +251,7 @@ export const RegisterScreen: React.FC = () => {
                     value={formData.confirmPassword}
                     onChange={(e) => updateField('confirmPassword', e.target.value)}
                     placeholder="••••••••"
-                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               </>
@@ -269,7 +269,7 @@ export const RegisterScreen: React.FC = () => {
                     value={formData.firstName}
                     onChange={(e) => updateField('firstName', e.target.value)}
                     placeholder="Votre prénom"
-                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
@@ -282,7 +282,7 @@ export const RegisterScreen: React.FC = () => {
                     value={formData.lastName}
                     onChange={(e) => updateField('lastName', e.target.value)}
                     placeholder="Votre nom"
-                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
@@ -295,7 +295,7 @@ export const RegisterScreen: React.FC = () => {
                     value={formData.matricule}
                     onChange={(e) => updateField('matricule', e.target.value)}
                     placeholder="ENSPD2026001"
-                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               </>
@@ -315,7 +315,7 @@ export const RegisterScreen: React.FC = () => {
                       updateField('faculty', faculty);
                       updateField('filiere', filieres[0] || '');
                     }}
-                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     {FACULTIES.map((f) => (
                       <option key={f} value={f}>
@@ -331,7 +331,7 @@ export const RegisterScreen: React.FC = () => {
                   <select
                     value={formData.filiere}
                     onChange={(e) => updateField('filiere', e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     {(FILIERES[formData.faculty] || []).map((f) => (
                       <option key={f} value={f}>
@@ -347,7 +347,7 @@ export const RegisterScreen: React.FC = () => {
                   <select
                     value={formData.academicYear}
                     onChange={(e) => updateField('academicYear', e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     {ACADEMIC_YEARS.map((y) => (
                       <option key={y} value={y}>
@@ -402,7 +402,7 @@ export const RegisterScreen: React.FC = () => {
 
             <div className="text-center text-sm text-gray-500 dark:text-gray-400">
               Déjà un compte ?{' '}
-              <Link to="/login" className="text-pineapple hover:underline font-medium">
+              <Link to="/login" className="text-primary hover:underline font-medium">
                 Se connecter
               </Link>
             </div>

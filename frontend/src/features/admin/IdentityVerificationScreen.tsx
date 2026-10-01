@@ -97,7 +97,7 @@ export const IdentityVerificationScreen: React.FC = () => {
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-          <UserCheck className="h-7 w-7 text-pineapple" />
+          <UserCheck className="h-7 w-7 text-primary" />
           Certification des étudiants
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -105,7 +105,7 @@ export const IdentityVerificationScreen: React.FC = () => {
         </p>
       </motion.div>
 
-      <Card variant="neo-extruded" className="p-4 md:p-6 overflow-x-auto">
+      <Card variant="default" className="p-4 md:p-6 overflow-x-auto">
         {requests.length === 0 ? (
           <div className="text-center py-12">
             <CheckCircle className="h-16 w-16 text-emerald-500 mx-auto mb-4" />
@@ -131,7 +131,7 @@ export const IdentityVerificationScreen: React.FC = () => {
             </thead>
             <tbody>
               {requests.map((req) => (
-                <tr key={req.id} className="border-b border-gray-200 dark:border-slate-800 hover:bg-pineapple/5 transition-colors">
+                <tr key={req.id} className="border-b border-gray-200 dark:border-slate-800 hover:bg-primary/5 transition-colors">
                   <td className="px-4 py-3 text-gray-800 dark:text-white font-medium">{req.lastName}</td>
                   <td className="px-4 py-3 text-gray-800 dark:text-white">{req.firstName}</td>
                   <td className="px-4 py-3 text-gray-600 dark:text-gray-300 font-mono text-xs">{req.matricule}</td>
@@ -188,7 +188,7 @@ export const IdentityVerificationScreen: React.FC = () => {
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
-              className="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-md shadow-neo-extruded dark:shadow-neo-dark-extruded"
+              className="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-md shadow-card dark:shadow-card"
               onClick={(e) => e.stopPropagation()}
             >
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
@@ -200,7 +200,7 @@ export const IdentityVerificationScreen: React.FC = () => {
                 onChange={(e) => setRejectionReason(e.target.value)}
                 placeholder="Précisez le motif du rejet..."
                 rows={4}
-                className="w-full px-4 py-3 rounded-xl bg-background-light dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple resize-none"
+                className="w-full px-4 py-3 rounded-xl bg-background-light dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
               />
               <div className="flex justify-end gap-3 mt-4">
                 <Button variant="secondary" onClick={() => setShowRejectModal(false)}>

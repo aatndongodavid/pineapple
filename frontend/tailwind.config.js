@@ -9,23 +9,29 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        pineapple: {
-          DEFAULT: '#10B981',
-          dark: '#14312a',
-          light: '#A7F3D0',
+        primary: {
+          DEFAULT: '#F97316',
+          dark: '#C2410C',
+          light: '#FDBA74',
         },
+        secondary: {
+          DEFAULT: '#16A34A',
+          dark: '#15803D',
+        },
+        accent: '#FACC15',
+        success: '#16A34A',
+        warning: '#D97706',
+        danger: '#DC2626',
+        info: '#0EA5E9',
         background: {
-          light: '#E0E5EC',
-          dark: '#0F172A',
+          light: '#FFF8F1',
+          dark: '#1C1410',
         },
+        'text-secondary': '#44403C',
       },
       boxShadow: {
-        'neo-extruded': '8px 8px 16px #b8bec7, -8px -8px 16px #ffffff',
-        'neo-inset': 'inset 4px 4px 8px #b8bec7, inset -4px -4px 8px #ffffff',
-        'neo-pressed': 'inset 2px 2px 4px #b8bec7, inset -2px -2px 4px #ffffff',
-        'neo-dark-extruded': '8px 8px 16px #0a0f18, -8px -8px 16px #14203a',
-        'neo-dark-inset': 'inset 4px 4px 8px #0a0f18, inset -4px -4px 8px #14203a',
-        'neo-dark-pressed': 'inset 2px 2px 4px #0a0f18, inset -2px -2px 4px #14203a',
+        card: '0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.08)',
+        'card-hover': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
       },
       backgroundImage: {
         'glass-gradient': 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',

@@ -65,7 +65,7 @@ export const ElectionCard: React.FC<ElectionCardProps> = ({ election, onClick, c
         onClick={onClick}
         className={cn(
           'w-full text-left p-4 rounded-2xl bg-white/20 dark:bg-slate-800/50 backdrop-blur-md border border-white/30 dark:border-slate-700',
-          'hover:bg-white/30 dark:hover:bg-slate-800/70 transition-colors shadow-neo-extruded dark:shadow-neo-dark-extruded',
+          'hover:bg-white/30 dark:hover:bg-slate-800/70 transition-colors shadow-card dark:shadow-card',
           className
         )}
       >

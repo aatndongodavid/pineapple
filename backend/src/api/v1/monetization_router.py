@@ -40,28 +40,7 @@ async def get_monetization_repo(
     return PostgresMonetizationRepository(session_factory)
 
 
-async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
-) -> dict:
-    token = credentials.credentials
-    try:
-        payload = jwt.decode(
-            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
-        )
-        user_id = uuid.UUID(payload.get("sub"))
-        token_tenant = uuid.UUID(payload.get("tenant_id"))
-        if token_tenant != tenant_id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token tenant mismatch",
-            )
-        return {"user_id": user_id, "tenant_id": tenant_id}
-    except (JWTError, KeyError, ValueError):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication token",
-        )
+from shared_kernel.infrastructure.auth import get_current_user
 
 
 router = APIRouter(prefix="/monetization", tags=["Monetization & Licenses"])

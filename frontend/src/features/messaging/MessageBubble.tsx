@@ -37,7 +37,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isOwn }) 
         className={cn(
           'max-w-[80%] px-4 py-2 rounded-2xl shadow-sm',
           isOwn
-            ? 'bg-pineapple text-white rounded-br-md'
+            ? 'bg-primary text-white rounded-br-md'
             : 'bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-200 rounded-bl-md'
         )}
       >

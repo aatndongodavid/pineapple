@@ -154,3 +154,27 @@ class PostgresAuditLedgerRepository:
             session.add(model)
             await session.commit()
         return entry
+
+    async def list_entries_by_election(
+        self, election_id: uuid.UUID, tenant_id: uuid.UUID
+    ) -> list[dict[str, Any]]:
+        async with self._session_factory() as session:
+            result = await session.execute(
+                select(DemocracyAuditLogModel).where(
+                    DemocracyAuditLogModel.tenant_id == tenant_id
+                )
+            )
+            models = result.scalars().all()
+            filtered = []
+            for m in models:
+                meta = m.metadata_ or {}
+                if meta.get("election_id") == str(election_id):
+                    filtered.append({
+                        "id": str(m.id),
+                        "tenant_id": str(m.tenant_id),
+                        "action": m.action,
+                        "metadata": m.metadata_,
+                        "hash": m.hash,
+                        "created_at": m.created_at.isoformat() if m.created_at else None,
+                    })
+            return filtered

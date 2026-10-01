@@ -111,7 +111,7 @@ export const TrustSafetyScreen: React.FC = () => {
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-          <ShieldAlert className="h-7 w-7 text-pineapple" />
+          <ShieldAlert className="h-7 w-7 text-primary" />
           Trust & Safety
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -126,7 +126,7 @@ export const TrustSafetyScreen: React.FC = () => {
           .map((report) => {
             const TargetIcon = targetTypeIcons[report.targetType];
             return (
-              <Card key={report.id} variant="neo-extruded" className="p-4">
+              <Card key={report.id} variant="default" className="p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
@@ -159,7 +159,7 @@ export const TrustSafetyScreen: React.FC = () => {
           })}
 
         {reports.filter((r) => r.status === 'PENDING' || r.status === 'INVESTIGATING').length === 0 && (
-          <Card variant="neo-inset" className="p-8 text-center">
+          <Card variant="outline" className="p-8 text-center">
             <CheckCircle className="h-16 w-16 text-emerald-500 mx-auto mb-4" />
             <p className="text-gray-600 dark:text-gray-300">Aucun signalement en attente.</p>
           </Card>
@@ -180,7 +180,7 @@ export const TrustSafetyScreen: React.FC = () => {
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
-              className="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-2xl shadow-neo-extruded dark:shadow-neo-dark-extruded"
+              className="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-2xl shadow-card dark:shadow-card"
               onClick={(e) => e.stopPropagation()}
             >
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">

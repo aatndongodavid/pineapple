@@ -110,7 +110,7 @@ export const PineappleReaderScreen: React.FC<PineappleReaderScreenProps> = ({
       {/* Barre supérieure */}
       <div className="flex items-center justify-between p-4 bg-gray-900/80 border-b border-gray-800">
         <div className="flex items-center gap-3 min-w-0">
-          <ShieldCheck className="h-6 w-6 text-pineapple shrink-0" />
+          <ShieldCheck className="h-6 w-6 text-primary shrink-0" />
           <div className="min-w-0">
             <h2 className="text-white font-semibold truncate">
               {documentTitle || 'Document sécurisé'}
@@ -196,7 +196,7 @@ export const PineappleReaderScreen: React.FC<PineappleReaderScreenProps> = ({
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.3 }}
         onClick={onClose}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-pineapple text-white shadow-neo-extruded dark:shadow-neo-dark-extruded flex items-center justify-center hover:shadow-neo-pressed dark:hover:shadow-neo-dark-pressed transition-shadow md:hidden"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-primary text-white shadow-card dark:shadow-card flex items-center justify-center hover:shadow-sm dark:hover:shadow-sm transition-shadow md:hidden"
         aria-label="Fermer le lecteur"
       >
         <X className="h-7 w-7" />

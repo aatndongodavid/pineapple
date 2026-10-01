@@ -7,6 +7,7 @@ from identity_context.domain.value_objects import (
     AccountStatus,
     AcademicStatus,
     DocumentType,
+    UserRole,
     VerificationStatus,
 )
 
@@ -25,11 +26,13 @@ class UserRegisterDTO(BaseDTO):
     faculty: str
     filiere: str
     academic_year: str
+    role: UserRole = UserRole.STUDENT
 
 
 class UserLoginDTO(BaseDTO):
     email: EmailStr
     password: str
+    totp_code: Optional[str] = None
 
 
 class TokenResponseDTO(BaseDTO):
@@ -37,6 +40,7 @@ class TokenResponseDTO(BaseDTO):
     token_type: str = "bearer"
     user_id: UUID
     tenant_id: UUID
+    role: UserRole = UserRole.STUDENT
 
 
 class CertificationSubmitDTO(BaseDTO):
@@ -63,4 +67,5 @@ class UserResponseDTO(BaseDTO):
     account_status: AccountStatus
     verification_status: VerificationStatus
     academic_status: AcademicStatus
+    role: UserRole = UserRole.STUDENT
     campus_status_display: str

@@ -8,10 +8,10 @@ import {
   Vote,
   Flag,
   CreditCard,
-  Building2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTenantStore } from '@/lib/store/tenantStore';
+import { LogoMark } from '@/components/ui/LogoMark';
 
 const adminNavItems = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -25,17 +25,17 @@ export const AdminSidebar: React.FC = () => {
   const { campusName } = useTenantStore();
 
   return (
-    <aside className="hidden md:flex flex-col w-72 h-screen bg-gray-900 text-gray-300 shadow-2xl">
-      <div className="p-6 border-b border-gray-800">
+    <aside className="hidden md:flex flex-col w-72 h-screen bg-stone-900 text-stone-300 shadow-2xl border-r border-stone-800">
+      <div className="p-6 border-b border-stone-800">
         <div className="flex items-center gap-3">
-          <Building2 className="h-8 w-8 text-pineapple" />
+          <LogoMark size={32} />
           <div>
             <p className="text-white font-bold leading-tight">Pineapple</p>
-            <p className="text-xs text-gray-500">Campus Control Center</p>
+            <p className="text-xs text-stone-400">Campus Control Center</p>
           </div>
         </div>
-        <div className="mt-4 px-3 py-2 rounded-lg bg-gray-800/50 border border-gray-700">
-          <p className="text-xs font-semibold text-pineapple uppercase tracking-wider">
+        <div className="mt-4 px-3 py-2 rounded-lg bg-stone-800/80 border border-stone-700">
+          <p className="text-xs font-semibold text-primary uppercase tracking-wider">
             {campusName || 'Établissement'}
           </p>
         </div>
@@ -51,8 +51,8 @@ export const AdminSidebar: React.FC = () => {
               cn(
                 'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors',
                 isActive
-                  ? 'bg-pineapple/20 text-pineapple'
-                  : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                  ? 'bg-primary/20 text-primary-light font-semibold'
+                  : 'text-stone-400 hover:bg-stone-800 hover:text-white'
               )
             }
           >
@@ -62,9 +62,9 @@ export const AdminSidebar: React.FC = () => {
         ))}
       </nav>
 
-      <div className="p-4 border-t border-gray-800 text-xs text-gray-500">
+      <div className="p-4 border-t border-stone-800 text-xs text-stone-500">
         Pineapple OS v3.0.0 — Admin
       </div>
     </aside>
   );
-};
+};

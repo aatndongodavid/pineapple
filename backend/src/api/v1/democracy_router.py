@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, WebSocket
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -37,17 +37,23 @@ from democracy_context.infrastructure.persistence.repositories import (
     RSACryptoEngine,
 )
 from shared_kernel.config import settings
+from shared_kernel.infrastructure.auth import get_current_user, require_role
 from shared_kernel.infrastructure.database import AsyncSessionLocal
 from shared_kernel.infrastructure.tenant_middleware import get_current_tenant_id
 
-# ---------------------------------------------------------------------------
-# Sécurité & dépendances transverses
-# ---------------------------------------------------------------------------
-security = HTTPBearer()
+
+from identity_context.domain.value_objects import VerificationStatus
+from identity_context.infrastructure.persistence.repositories import PostgresUserRepository
 
 
 async def get_session_factory() -> async_sessionmaker[AsyncSession]:
     return AsyncSessionLocal
+
+
+async def get_user_repo(
+    session_factory: async_sessionmaker[AsyncSession] = Depends(get_session_factory),
+) -> PostgresUserRepository:
+    return PostgresUserRepository(session_factory)
 
 
 async def get_election_repo(
@@ -72,39 +78,28 @@ async def get_audit_repo(
     return PostgresAuditLedgerRepository(session_factory)
 
 
-async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
-) -> dict:
-    """Retourne l'utilisateur courant à partir du JWT (simplifié : id + tenant)."""
-    token = credentials.credentials
-    try:
-        payload = jwt.decode(
-            token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
-        )
-        user_id = uuid.UUID(payload.get("sub"))
-        token_tenant = uuid.UUID(payload.get("tenant_id"))
-        if token_tenant != tenant_id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token tenant mismatch",
-            )
-        return {"user_id": user_id, "tenant_id": tenant_id}
-    except (JWTError, KeyError, ValueError):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication token",
-        )
-
-
-# NOTE: Pour les opérations admin, il faudrait un rôle vérifié.
-# On suppose qu'une dépendance get_admin_user vérifie le rôle admin.
-# Ici, on se contente d'authentifier l'utilisateur et on documente la nécessité du contrôle RBAC.
 async def get_admin_user(
-    current_user: dict = Depends(get_current_user),
+    admin: dict = Depends(require_role("ADMIN")),
 ) -> dict:
-    # TODO: Implémenter la vérification du rôle admin (cf. A.15 RBAC)
-    return current_user
+    return admin
+
+
+class RealDemocracyUserInfoProvider:
+    def __init__(self, user_repo: PostgresUserRepository, tenant_id: uuid.UUID):
+        self._user_repo = user_repo
+        self._tenant_id = tenant_id
+
+    async def get_user_info(self, user_id: uuid.UUID) -> dict:
+        user = await self._user_repo.get_by_id(user_id, self._tenant_id)
+        if not user:
+            return {}
+        return {
+            "academic_status": user.academic_status.value if hasattr(user.academic_status, "value") else str(user.academic_status),
+            "is_certified": user.verification_status == VerificationStatus.VERIFIED,
+            "faculty": user.faculty,
+            "filiere": user.filiere,
+            "academic_year": user.academic_year,
+        }
 
 
 # ---------------------------------------------------------------------------
@@ -178,32 +173,22 @@ async def cast_vote(
     vote_repo: PostgresVoteRepository = Depends(get_vote_repo),
     crypto_engine: RSACryptoEngine = Depends(get_crypto_engine),
     audit_repo: PostgresAuditLedgerRepository = Depends(get_audit_repo),
+    user_repo: PostgresUserRepository = Depends(get_user_repo),
 ):
     """
     Exprime un vote pour une élection donnée.
     Vérifie l'éligibilité, l'unicité et chiffre le bulletin avant enregistrement.
     """
-    # Le use case requiert un UserInfoProvider ; pour la démonstration on fournit un provider simple.
-    class UserInfoProvider:
-        def get_user_info(self, user_id: uuid.UUID) -> dict:
-            # TODO: Appel au service Identity pour obtenir les infos académiques.
-            # Pour l'exemple, on suppose que l'utilisateur est éligible.
-            return {
-                "academic_status": "student",
-                "is_certified": True,
-                "level": "L3",
-            }
+    provider = RealDemocracyUserInfoProvider(user_repo, tenant_id)
 
     use_case = CastVoteUseCase(
         election_repo=election_repo,
         vote_repo=vote_repo,
         crypto_engine=crypto_engine,
         audit_ledger=audit_repo,
-        user_info_provider=UserInfoProvider(),
+        user_info_provider=provider,
     )
 
-    # Clé publique à récupérer depuis la configuration ou un service de clés.
-    # Pour le prototype, on met une clé factice (à remplacer).
     PUBLIC_KEY_PEM = "-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----"
 
     try:
@@ -222,7 +207,39 @@ async def cast_vote(
     except AlreadyVotedError:
         raise HTTPException(status_code=409, detail="User has already voted")
 
+    # Diffusion en temps réel du décompte des votes via Pub/Sub (Vélocité Z2)
+    from shared_kernel.infrastructure.websocket_pubsub import ws_manager
+    asyncio.create_task(
+        ws_manager.broadcast_to_local(
+            conversation_id=f"election_tally_{dto.election_id}",
+            message_data={
+                "type": "NEW_VOTE_CAST",
+                "election_id": str(dto.election_id),
+                "timestamp": str(datetime.now(timezone.utc)),
+            }
+        )
+    )
+
     return {"message": "Vote cast successfully"}
+
+
+@router.websocket("/ws/live-tally/{election_id}")
+async def live_tally_websocket(
+    websocket: WebSocket,
+    election_id: uuid.UUID,
+):
+    """
+    Canal WebSocket temps réel pour la diffusion dynamique du décompte des voix (Vélocité Z2).
+    """
+    from shared_kernel.infrastructure.websocket_pubsub import ws_manager
+    channel_id = f"election_tally_{election_id}"
+    await ws_manager.connect(channel_id, websocket)
+    try:
+        while True:
+            # Maintenir la connexion active
+            await websocket.receive_text()
+    except Exception:
+        ws_manager.disconnect(channel_id, websocket)
 
 
 @router.post("/elections/{election_id}/tally", response_model=ElectionResultsDTO)
@@ -245,7 +262,6 @@ async def tally_election(
         audit_ledger=audit_repo,
     )
 
-    # Clé privée à récupérer depuis un stockage sécurisé (jamais en clair dans le code).
     PRIVATE_KEY_PEM = "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
 
     try:
@@ -268,9 +284,9 @@ async def get_election_audit(
     """
     Consulte le registre immuable de l'élection (réservé aux administrateurs).
     """
-    # TODO: Implémenter une méthode de listing des entrées d'audit filtrées par élection.
-    # Pour le moment, on renvoie un message indiquant que la fonctionnalité est en cours.
+    entries = await audit_repo.list_entries_by_election(election_id, tenant_id)
     return {
-        "message": "Audit log query not yet implemented",
         "election_id": str(election_id),
+        "total_entries": len(entries),
+        "entries": entries,
     }

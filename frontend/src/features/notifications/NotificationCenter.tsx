@@ -54,7 +54,7 @@ const mockNotifications: Notification[] = [
 
 const typeConfig: Record<NotificationType, { icon: React.ElementType; color: string }> = {
   admin: { icon: ShieldAlert, color: 'text-blue-500' },
-  democracy: { icon: Vote, color: 'text-pineapple' },
+  democracy: { icon: Vote, color: 'text-primary' },
   community: { icon: MessageCircle, color: 'text-purple-500' },
 };
 
@@ -111,7 +111,7 @@ export const NotificationCenter: React.FC = () => {
       <button
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-full hover:bg-pineapple/10 transition-colors"
+        className="relative p-2 rounded-full hover:bg-primary/10 transition-colors"
         aria-label="Notifications"
       >
         <Bell className="h-5 w-5 text-gray-600 dark:text-gray-300" />
@@ -131,7 +131,7 @@ export const NotificationCenter: React.FC = () => {
             exit={isMobile ? { y: '100%', opacity: 0 } : { opacity: 0, y: -10 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={cn(
-              'bg-white dark:bg-slate-900 rounded-t-3xl md:rounded-2xl shadow-neo-extruded dark:shadow-neo-dark-extruded overflow-hidden',
+              'bg-white dark:bg-slate-900 rounded-t-3xl md:rounded-2xl shadow-card dark:shadow-card overflow-hidden',
               isMobile
                 ? 'fixed bottom-0 left-0 right-0 z-50 max-h-[80vh]'
                 : 'absolute right-0 top-full mt-2 w-80 z-50'
@@ -141,16 +141,24 @@ export const NotificationCenter: React.FC = () => {
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-slate-800">
               <h3 className="font-semibold text-gray-800 dark:text-white">Notifications</h3>
               <div className="flex items-center gap-2">
+                {typeof window !== 'undefined' && 'Notification' in window && Notification.permission !== 'granted' && (
+                  <button
+                    onClick={() => Notification.requestPermission()}
+                    className="text-xs text-amber-500 hover:underline"
+                  >
+                    Activer Push
+                  </button>
+                )}
                 <button
                   onClick={markAllAsRead}
-                  className="text-xs text-pineapple hover:underline flex items-center gap-1"
+                  className="text-xs text-primary hover:underline flex items-center gap-1"
                 >
                   <CheckCheck className="h-4 w-4" />
                   Tout marquer comme lu
                 </button>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-1 rounded-full hover:bg-pineapple/10 md:hidden"
+                  className="p-1 rounded-full hover:bg-primary/10 md:hidden"
                 >
                   <X className="h-5 w-5 text-gray-500" />
                 </button>
@@ -172,7 +180,7 @@ export const NotificationCenter: React.FC = () => {
                         'w-full text-left px-4 py-3 border-b border-gray-200 dark:border-slate-800 transition-colors',
                         notification.isRead
                           ? 'bg-white dark:bg-slate-900'
-                          : 'bg-pineapple/5 dark:bg-pineapple/10'
+                          : 'bg-primary/5 dark:bg-primary/10'
                       )}
                     >
                       <div className="flex gap-3">

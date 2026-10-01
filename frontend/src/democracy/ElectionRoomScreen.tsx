@@ -130,8 +130,8 @@ export const ElectionRoomScreen: React.FC = () => {
               className={cn(
                 'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all',
                 activeTab === tab.id
-                  ? 'bg-pineapple text-white shadow-neo-pressed dark:shadow-neo-dark-pressed'
-                  : 'bg-background-light dark:bg-slate-800 text-gray-600 dark:text-gray-300 shadow-neo-extruded dark:shadow-neo-dark-extruded'
+                  ? 'bg-primary text-white shadow-sm dark:shadow-sm'
+                  : 'bg-background-light dark:bg-slate-800 text-gray-600 dark:text-gray-300 shadow-card dark:shadow-card'
               )}
             >
               <tab.icon className="h-4 w-4" />
@@ -150,7 +150,7 @@ export const ElectionRoomScreen: React.FC = () => {
           transition={{ duration: 0.2 }}
         >
           {activeTab === 'overview' && (
-            <Card variant="neo-extruded" className="p-6">
+            <Card variant="default" className="p-6">
               <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Vue d'ensemble</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="p-4 rounded-2xl bg-background-light dark:bg-slate-800">
@@ -176,12 +176,12 @@ export const ElectionRoomScreen: React.FC = () => {
           )}
 
           {activeTab === 'candidates' && (
-            <Card variant="neo-extruded" className="p-6">
+            <Card variant="default" className="p-6">
               <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Candidats</h2>
               <div className="space-y-3">
                 {mockCandidates.map((candidate) => (
                   <div key={candidate.id} className="flex items-center gap-4 p-3 rounded-xl bg-background-light dark:bg-slate-800">
-                    <div className="w-10 h-10 rounded-full bg-pineapple/20 flex items-center justify-center text-pineapple font-bold">
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
                       {candidate.name.charAt(0)}
                     </div>
                     <div className="flex-1">
@@ -195,7 +195,7 @@ export const ElectionRoomScreen: React.FC = () => {
           )}
 
           {activeTab === 'campaign' && (
-            <Card variant="neo-extruded" className="p-6">
+            <Card variant="default" className="p-6">
               <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Campagne</h2>
               <p className="text-gray-600 dark:text-gray-300">Programme et sondages de campagne.</p>
               <div className="mt-4 grid gap-3">
@@ -212,7 +212,7 @@ export const ElectionRoomScreen: React.FC = () => {
           )}
 
           {activeTab === 'voting' && (
-            <Card variant="neo-extruded" className="p-6">
+            <Card variant="default" className="p-6">
               <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Interface de vote</h2>
               {election.status === 'VOTING_OPEN' ? (
                 <div className="space-y-4">
@@ -221,7 +221,7 @@ export const ElectionRoomScreen: React.FC = () => {
                   </p>
                   <div className="grid gap-3">
                     {mockCandidates.map((candidate) => (
-                      <button key={candidate.id} className="p-4 rounded-xl bg-background-light dark:bg-slate-800 hover:shadow-neo-pressed dark:hover:shadow-neo-dark-pressed transition-shadow text-left">
+                      <button key={candidate.id} className="p-4 rounded-xl bg-background-light dark:bg-slate-800 hover:shadow-sm dark:hover:shadow-sm transition-shadow text-left">
                         <p className="font-medium text-gray-800 dark:text-white">{candidate.name}</p>
                         <p className="text-sm text-gray-500">{candidate.movement} - {candidate.position}</p>
                       </button>
@@ -241,7 +241,7 @@ export const ElectionRoomScreen: React.FC = () => {
           )}
 
           {activeTab === 'results' && (
-            <Card variant="neo-extruded" className="p-6">
+            <Card variant="default" className="p-6">
               <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Résultats</h2>
               <p className="text-gray-600 dark:text-gray-300">Résultats officiels publiés.</p>
               {/* Graphique ou tableau */}
@@ -249,19 +249,19 @@ export const ElectionRoomScreen: React.FC = () => {
           )}
 
           {activeTab === 'audit' && (
-            <Card variant="neo-extruded" className="p-6">
+            <Card variant="default" className="p-6">
               <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Registre immuable</h2>
               <div className="space-y-2">
                 <div className="flex items-center gap-2 p-3 rounded-xl bg-background-light dark:bg-slate-800">
-                  <Eye className="h-4 w-4 text-pineapple" />
+                  <Eye className="h-4 w-4 text-primary" />
                   <span className="text-sm">Election created</span>
                 </div>
                 <div className="flex items-center gap-2 p-3 rounded-xl bg-background-light dark:bg-slate-800">
-                  <Eye className="h-4 w-4 text-pineapple" />
+                  <Eye className="h-4 w-4 text-primary" />
                   <span className="text-sm">Campaign opened</span>
                 </div>
                 <div className="flex items-center gap-2 p-3 rounded-xl bg-background-light dark:bg-slate-800">
-                  <Eye className="h-4 w-4 text-pineapple" />
+                  <Eye className="h-4 w-4 text-primary" />
                   <span className="text-sm">Voting opened</span>
                 </div>
               </div>

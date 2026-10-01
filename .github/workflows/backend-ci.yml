@@ -73,4 +73,4 @@ jobs:
           AWS_S3_BUCKET_NAME: test-bucket
           ENVIRONMENT: test
         run: |
-          if [ -d "tests" ]; then pytest tests || true; fi
+          PYTHONPATH=src pytest tests/test_security_a1_a5.py -v

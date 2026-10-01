@@ -17,6 +17,7 @@ from monetization_context.domain.value_objects import (
 )
 from monetization_context.infrastructure.persistence.models import (
     CampusLicenseModel,
+    ClubSubscriptionModel,
     SponsorshipModel,
 )
 from shared_kernel.domain.value_objects import Money
@@ -141,7 +142,7 @@ class PostgresMonetizationRepository(MonetizationRepositoryPort):
             models = result.scalars().all()
             return [self._license_to_entity(m) for m in models]
 
-    # ----- Club Subscription (simplified) -----
+    # ----- Club Subscription -----
     async def save_club_subscription(
         self,
         tenant_id: UUID,
@@ -151,7 +152,18 @@ class PostgresMonetizationRepository(MonetizationRepositoryPort):
         end_date: datetime,
         is_active: bool = True,
     ) -> None:
-        # Implémentation minimale : à compléter selon les besoins (table spécifique)
-        # Pour l'instant, on lève une exception ou on ne fait rien.
-        # Le port l'exige, mais on peut laisser une implémentation factice.
-        pass
+        async with self._session_factory() as session:
+            sub = ClubSubscriptionModel(
+                tenant_id=tenant_id,
+                organization_id=organization_id,
+                plan=plan,
+                start_date=start_date,
+                end_date=end_date,
+                is_active=is_active,
+            )
+            try:
+                session.add(sub)
+                await session.commit()
+            except Exception:
+                await session.rollback()
+                raise

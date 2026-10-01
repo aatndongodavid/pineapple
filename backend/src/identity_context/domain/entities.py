@@ -8,6 +8,7 @@ from identity_context.domain.value_objects import (
     AcademicStatus,
     CampusStatusDisplay,
     DocumentType,
+    UserRole,
     VerificationStatus,
 )
 
@@ -25,6 +26,16 @@ class CertificationDocument:
 
 
 @dataclass
+class LegalAcceptance:
+    """Acceptation d'un document légal par un utilisateur."""
+    id: UUID
+    user_id: UUID
+    document_type: str  # ex: STUDENT_CGU, ENTERPRISE_CGU, PRIVACY_POLICY
+    version: str  # ex: 1.0.0
+    accepted_at: datetime = datetime.utcnow()
+
+
+@dataclass
 class User:
     """Agrégat racine du contexte Identity."""
     id: UUID
@@ -32,20 +43,34 @@ class User:
     email: str
     first_name: str
     last_name: str
-    matricule: str
-    faculty: str
-    filiere: str
-    academic_year: str
-    account_status: AccountStatus
-    verification_status: VerificationStatus
-    academic_status: AcademicStatus
+    matricule: Optional[str] = None
+    faculty: Optional[str] = None
+    filiere: Optional[str] = None
+    academic_year: Optional[str] = None
+    phone_number: Optional[str] = None
+    sms_consent: bool = False
+    account_status: AccountStatus = AccountStatus.ACTIVE
+    verification_status: VerificationStatus = VerificationStatus.UNVERIFIED
+    academic_status: AcademicStatus = AcademicStatus.STUDENT
+    role: UserRole = UserRole.STUDENT
     created_at: datetime = datetime.utcnow()
     password_hash: str = ""
+
+    def __post_init__(self) -> None:
+        if self.academic_status != AcademicStatus.ENTERPRISE:
+            if not self.matricule or not self.faculty or not self.filiere or not self.academic_year:
+                # Si aucun champ académique n'est fourni pour un compte classique, utiliser une valeur par défaut vide
+                self.matricule = self.matricule or "N/A"
+                self.faculty = self.faculty or "Général"
+                self.filiere = self.filiere or "Général"
+                self.academic_year = self.academic_year or "2026"
 
     def resolve_campus_status(self) -> CampusStatusDisplay:
         """Calcule le statut d'affichage public selon la matrice de visibilité."""
         if self.account_status == AccountStatus.ARCHIVED:
             return CampusStatusDisplay.ARCHIVED
+        if self.academic_status == AcademicStatus.ENTERPRISE:
+            return CampusStatusDisplay.ENTERPRISE
         if self.academic_status == AcademicStatus.TEACHER and self.verification_status == VerificationStatus.VERIFIED:
             return CampusStatusDisplay.VERIFIED_TEACHER
         if self.academic_status == AcademicStatus.ALUMNI:

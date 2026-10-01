@@ -1,9 +1,11 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, ForeignKey, String, Text, func
+from sqlalchemy import DateTime, Enum, ForeignKey, JSON, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
+
+JSONBType = JSON().with_variant(JSONB, "postgresql")
 
 from democracy_context.domain.entities import ElectionStatus
 from shared_kernel.infrastructure.database import Base
@@ -21,8 +23,8 @@ class ElectionModel(Base):
         nullable=False,
         default=ElectionStatus.DRAFT,
     )
-    eligibility_rules: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
-    config: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+    eligibility_rules: Mapped[dict] = mapped_column(JSONBType, nullable=False, default=dict)
+    config: Mapped[dict] = mapped_column(JSONBType, nullable=False, default=dict)
     voting_start_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     voting_end_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
@@ -63,7 +65,7 @@ class DemocracyAuditLogModel(Base):
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     tenant_id: Mapped[uuid.UUID] = mapped_column(index=True, nullable=False)
     action: Mapped[str] = mapped_column(String(200), nullable=False)
-    metadata_: Mapped[dict] = mapped_column("metadata", JSONB, nullable=False, default=dict)
+    metadata_: Mapped[dict] = mapped_column("metadata", JSONBType, nullable=False, default=dict)
     hash: Mapped[str] = mapped_column(String(255), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False

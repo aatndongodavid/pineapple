@@ -97,7 +97,7 @@ export const MonetizationScreen: React.FC = () => {
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-          <CreditCard className="h-7 w-7 text-pineapple" />
+          <CreditCard className="h-7 w-7 text-primary" />
           Monétisation & Licences
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -109,7 +109,7 @@ export const MonetizationScreen: React.FC = () => {
       <Card variant="glass" className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Building2 className="h-6 w-6 text-pineapple" />
+            <Building2 className="h-6 w-6 text-primary" />
             <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Campus License</h2>
           </div>
           <Badge variant={tierVariants[licenseData.tier]}>
@@ -143,7 +143,7 @@ export const MonetizationScreen: React.FC = () => {
             </p>
             <div className="h-1.5 bg-gray-200 dark:bg-slate-700 rounded-full mt-2">
               <div
-                className="h-full bg-pineapple rounded-full"
+                className="h-full bg-primary rounded-full"
                 style={{ width: `${usagePercentage}%` }}
               />
             </div>
@@ -152,7 +152,7 @@ export const MonetizationScreen: React.FC = () => {
       </Card>
 
       {/* Section Sponsorships */}
-      <Card variant="neo-extruded" className="p-6">
+      <Card variant="default" className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Sponsorships</h2>
           <Button variant="primary" size="sm" onClick={() => setShowAddSponsor(true)} icon={Plus}>
@@ -178,7 +178,7 @@ export const MonetizationScreen: React.FC = () => {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-pineapple">{sponsor.budget.toLocaleString('fr-FR')} FCFA</p>
+                  <p className="font-bold text-primary">{sponsor.budget.toLocaleString('fr-FR')} FCFA</p>
                   <Badge variant="success">Actif</Badge>
                 </div>
               </div>
@@ -190,7 +190,7 @@ export const MonetizationScreen: React.FC = () => {
       {/* Modale Ajouter sponsor (simple) */}
       {showAddSponsor && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-md shadow-neo-extruded dark:shadow-neo-dark-extruded">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-md shadow-card dark:shadow-card">
             <h3 className="text-lg font-semibold mb-4">Ajouter un sponsor</h3>
             <div className="space-y-3">
               <input
@@ -198,19 +198,19 @@ export const MonetizationScreen: React.FC = () => {
                 placeholder="Nom de l'entreprise"
                 value={newSponsor.companyName}
                 onChange={(e) => setNewSponsor({ ...newSponsor, companyName: e.target.value })}
-                className="w-full px-4 py-2 rounded-xl bg-background-light dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-pineapple"
+                className="w-full px-4 py-2 rounded-xl bg-background-light dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <input
                 type="number"
                 placeholder="Budget (FCFA)"
                 value={newSponsor.budget || ''}
                 onChange={(e) => setNewSponsor({ ...newSponsor, budget: parseInt(e.target.value) })}
-                className="w-full px-4 py-2 rounded-xl bg-background-light dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-pineapple"
+                className="w-full px-4 py-2 rounded-xl bg-background-light dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <select
                 value={newSponsor.reach}
                 onChange={(e) => setNewSponsor({ ...newSponsor, reach: e.target.value })}
-                className="w-full px-4 py-2 rounded-xl bg-background-light dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-pineapple"
+                className="w-full px-4 py-2 rounded-xl bg-background-light dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="Local">Local</option>
                 <option value="Multi-établissements">Multi-établissements</option>
@@ -220,13 +220,13 @@ export const MonetizationScreen: React.FC = () => {
                   type="date"
                   value={newSponsor.startDate}
                   onChange={(e) => setNewSponsor({ ...newSponsor, startDate: e.target.value })}
-                  className="w-full px-4 py-2 rounded-xl bg-background-light dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-pineapple"
+                  className="w-full px-4 py-2 rounded-xl bg-background-light dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary"
                 />
                 <input
                   type="date"
                   value={newSponsor.endDate}
                   onChange={(e) => setNewSponsor({ ...newSponsor, endDate: e.target.value })}
-                  className="w-full px-4 py-2 rounded-xl bg-background-light dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-pineapple"
+                  className="w-full px-4 py-2 rounded-xl bg-background-light dark:bg-slate-800 border border-white/20 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>

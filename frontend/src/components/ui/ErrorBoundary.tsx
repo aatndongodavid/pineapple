@@ -37,7 +37,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center p-4 bg-background-light dark:bg-background-dark">
-          <Card variant="neo-extruded" className="p-8 max-w-md w-full text-center">
+          <Card variant="default" className="p-8 max-w-md w-full text-center">
             <AlertTriangle className="h-16 w-16 text-red-500 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
               Oops, une erreur inattendue est survenue

@@ -1,15 +1,68 @@
-name: Deploy Pipeline
+name: Azure Deployment Pipeline
 
 on:
   push:
-    branches: [deploy]
+    branches: [main, deploy]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
-  deploy:
+  deploy-azure:
+    name: Build & Deploy to Microsoft Azure
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Deploy status
-        run: echo "Ready for deployment."
+      # 1. Authentification Azure sans clé statique (OIDC Federated Identity)
+      - name: Log in to Azure via OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # 2. Authentification sur Azure Container Registry (ACR)
+      - name: Log in to Azure Container Registry
+        run: |
+          az acr login --name acrpineappleprod
+
+      # 3. Build & Push de l'image Docker Backend
+      - name: Build & Push Backend Docker Image
+        run: |
+          IMAGE_TAG=${{ github.sha }}
+          docker build -t acrpineappleprod.azurecr.io/pineapple-backend:${IMAGE_TAG} -t acrpineappleprod.azurecr.io/pineapple-backend:latest -f backend/Dockerfile .
+          docker push acrpineappleprod.azurecr.io/pineapple-backend:${IMAGE_TAG}
+          docker push acrpineappleprod.azurecr.io/pineapple-backend:latest
+
+      # 4. Exécution des migrations Alembic AVANT le basculement de trafic
+      - name: Run Database Migrations (Alembic)
+        env:
+          DATABASE_URL: ${{ secrets.AZURE_DATABASE_URL }}
+        run: |
+          cd backend
+          pip install -r requirements.prod.txt
+          alembic upgrade head
+
+      # 5. Déploiement du Backend sur Azure Container Apps
+      - name: Deploy Backend to Azure Container Apps
+        run: |
+          az containerapp update \
+            --name ca-pineapple-backend-prod \
+            --resource-group rg-pineapple-prod \
+            --image acrpineappleprod.azurecr.io/pineapple-backend:${{ github.sha }}
+
+      # 6. Build & Déploiement du Frontend PWA sur Azure Static Web Apps
+      - name: Build & Deploy Frontend to Azure Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "/frontend"
+          api_location: ""
+          output_location: "dist"

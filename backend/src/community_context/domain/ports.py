@@ -26,6 +26,9 @@ class PostRepositoryPort(ABC):
         user_id: UUID,
         limit: int = 20,
         offset: int = 0,
+        faculty: Optional[str] = None,
+        filiere: Optional[str] = None,
+        academic_year: Optional[str] = None,
     ) -> List[Post]:
         """
         Récupère le fil d'actualité pour un utilisateur donné.

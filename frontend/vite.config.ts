@@ -14,8 +14,8 @@ export default defineConfig({
         name: 'Pineapple OS',
         short_name: 'Pineapple',
         description: 'Le système d\'exploitation numérique des campus africains',
-        theme_color: '#10B981',
-        background_color: '#0F172A',
+        theme_color: '#F97316',
+        background_color: '#FFF8F1',
         display: 'standalone',
         start_url: '/',
         icons: [
@@ -30,7 +30,7 @@ export default defineConfig({
             type: 'image/png',
           },
           {
-            src: '/icons/icon-512x512.png',
+            src: '/icons/icon-maskable-512x512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
@@ -40,6 +40,20 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         cleanupOutdatedCaches: true,
+        runtimeCaching: [
+          {
+            urlPattern: /^https?:\/\/.*\/api\/v1\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'pineapple-api-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 24 * 60 * 60, // 24 heures
+              },
+              networkTimeoutSeconds: 5,
+            },
+          },
+        ],
       },
     }),
   ],

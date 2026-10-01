@@ -7,12 +7,15 @@ from sqlalchemy import (
     Enum,
     ForeignKey,
     Integer,
+    JSON,
     String,
     Text,
     func,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
+
+JSONBType = JSON().with_variant(JSONB, "postgresql")
 
 from community_context.domain.value_objects import (
     AudienceScope,
@@ -36,7 +39,7 @@ class PostModel(Base):
         Enum(PostType, name="post_type_enum"), nullable=False
     )
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    media_urls: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
+    media_urls: Mapped[list] = mapped_column(JSONBType, nullable=False, default=list)
     scope: Mapped[AudienceScope] = mapped_column(
         Enum(AudienceScope, name="audience_scope_enum"), nullable=False
     )

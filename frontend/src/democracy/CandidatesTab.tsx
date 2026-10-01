@@ -55,9 +55,9 @@ export const CandidatesTab: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
         >
-          <Card variant="neo-extruded" className="p-6">
+          <Card variant="default" className="p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-pineapple/20 flex items-center justify-center text-pineapple font-bold">
+              <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center text-primary font-bold">
                 {movement.name.charAt(0)}
               </div>
               <div>
@@ -77,7 +77,7 @@ export const CandidatesTab: React.FC = () => {
                   className="flex items-center gap-3 p-3 rounded-xl bg-background-light dark:bg-slate-800"
                 >
                   <div className="w-9 h-9 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center">
-                    <User className="h-5 w-5 text-pineapple" />
+                    <User className="h-5 w-5 text-primary" />
                   </div>
                   <div className="flex-1">
                     <p className="font-medium text-gray-800 dark:text-white">

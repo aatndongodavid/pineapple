@@ -118,7 +118,7 @@ export const LibraryScreen: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2"
       >
-        <GraduationCap className="h-7 w-7 text-pineapple" />
+        <GraduationCap className="h-7 w-7 text-primary" />
         Académie
       </motion.h1>
 
@@ -129,8 +129,8 @@ export const LibraryScreen: React.FC = () => {
           className={cn(
             'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all',
             activeTab === 'formations'
-              ? 'bg-pineapple text-white shadow-neo-pressed dark:shadow-neo-dark-pressed'
-              : 'bg-background-light dark:bg-slate-800 text-gray-600 dark:text-gray-300 shadow-neo-extruded dark:shadow-neo-dark-extruded'
+              ? 'bg-primary text-white shadow-sm dark:shadow-sm'
+              : 'bg-background-light dark:bg-slate-800 text-gray-600 dark:text-gray-300 shadow-card dark:shadow-card'
           )}
         >
           <BookOpen className="h-4 w-4" />
@@ -141,8 +141,8 @@ export const LibraryScreen: React.FC = () => {
           className={cn(
             'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all',
             activeTab === 'bibliotheque'
-              ? 'bg-pineapple text-white shadow-neo-pressed dark:shadow-neo-dark-pressed'
-              : 'bg-background-light dark:bg-slate-800 text-gray-600 dark:text-gray-300 shadow-neo-extruded dark:shadow-neo-dark-extruded'
+              ? 'bg-primary text-white shadow-sm dark:shadow-sm'
+              : 'bg-background-light dark:bg-slate-800 text-gray-600 dark:text-gray-300 shadow-card dark:shadow-card'
           )}
         >
           <BookOpen className="h-4 w-4" />
@@ -153,8 +153,8 @@ export const LibraryScreen: React.FC = () => {
           className={cn(
             'flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all',
             activeTab === 'premium'
-              ? 'bg-pineapple text-white shadow-neo-pressed dark:shadow-neo-dark-pressed'
-              : 'bg-background-light dark:bg-slate-800 text-gray-600 dark:text-gray-300 shadow-neo-extruded dark:shadow-neo-dark-extruded'
+              ? 'bg-primary text-white shadow-sm dark:shadow-sm'
+              : 'bg-background-light dark:bg-slate-800 text-gray-600 dark:text-gray-300 shadow-card dark:shadow-card'
           )}
         >
           <Star className="h-4 w-4" />
@@ -170,7 +170,7 @@ export const LibraryScreen: React.FC = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Rechercher un document..."
-          className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 shadow-neo-inset dark:shadow-neo-dark-inset focus:outline-none focus:ring-2 focus:ring-pineapple"
+          className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-white/20 dark:border-slate-700 border border-stone-200 dark:border-stone-800 dark:border border-stone-800 focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>
 
@@ -179,7 +179,7 @@ export const LibraryScreen: React.FC = () => {
         <select
           value={facultyFilter}
           onChange={(e) => setFacultyFilter(e.target.value)}
-          className="px-3 py-2 rounded-xl bg-background-light dark:bg-slate-800 text-sm text-gray-600 dark:text-gray-300 shadow-neo-extruded dark:shadow-neo-dark-extruded focus:outline-none focus:ring-2 focus:ring-pineapple"
+          className="px-3 py-2 rounded-xl bg-background-light dark:bg-slate-800 text-sm text-gray-600 dark:text-gray-300 shadow-card dark:shadow-card focus:outline-none focus:ring-2 focus:ring-primary"
         >
           {faculties.map((f) => (
             <option key={f} value={f}>{f}</option>
@@ -188,7 +188,7 @@ export const LibraryScreen: React.FC = () => {
         <select
           value={levelFilter}
           onChange={(e) => setLevelFilter(e.target.value)}
-          className="px-3 py-2 rounded-xl bg-background-light dark:bg-slate-800 text-sm text-gray-600 dark:text-gray-300 shadow-neo-extruded dark:shadow-neo-dark-extruded focus:outline-none focus:ring-2 focus:ring-pineapple"
+          className="px-3 py-2 rounded-xl bg-background-light dark:bg-slate-800 text-sm text-gray-600 dark:text-gray-300 shadow-card dark:shadow-card focus:outline-none focus:ring-2 focus:ring-primary"
         >
           {levels.map((l) => (
             <option key={l} value={l}>{l}</option>

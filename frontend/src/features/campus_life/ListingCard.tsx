@@ -46,7 +46,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing, onContact }) 
       whileHover={{ y: -4 }}
       transition={{ duration: 0.2 }}
     >
-      <Card variant="neo-extruded" className="overflow-hidden h-full flex flex-col">
+      <Card variant="default" className="overflow-hidden h-full flex flex-col">
         {/* Image */}
         <div className="relative h-40 w-full bg-gray-200 dark:bg-slate-700">
           <img
@@ -67,7 +67,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing, onContact }) 
           <h3 className="font-semibold text-gray-800 dark:text-white truncate">
             {listing.title}
           </h3>
-          <p className="text-lg font-bold text-pineapple mt-1">
+          <p className="text-lg font-bold text-primary mt-1">
             {formatPrice(listing.price)}
           </p>
           <div className="flex items-center gap-1 mt-2 text-xs text-gray-500">
