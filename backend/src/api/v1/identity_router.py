@@ -110,7 +110,13 @@ async def login(
     normalized_email = dto.email.lower().strip()
     user = (await db.execute(select(UserModel).where(UserModel.email == normalized_email))).scalars().first()
 
-    if not user or not pwd_context.verify(dto.password, user.hashed_password):
+    DUMMY_HASH = "$argon2id$v=19$m=65536,t=3,p=4$R1Z0M3Bvd3NlY3VyZQ$vV4tU3KzR6bB0xX2N4V6bB0xX2N4V6bB0xX2N4V6bB0"
+
+    user_exists = user is not None
+    target_hash = user.hashed_password if user_exists else DUMMY_HASH
+    is_valid_pwd = pwd_context.verify(dto.password, target_hash)
+
+    if not user_exists or not is_valid_pwd:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Identifiant ou mot de passe incorrect",
