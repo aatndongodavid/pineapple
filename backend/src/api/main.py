@@ -3,7 +3,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from shared_kernel.config import settings
 from shared_kernel.infrastructure.tenant_middleware import TenantMiddleware
+
+# Valider la sécurité au chargement des configurations
+settings.validate_production_security()
+
 
 # Import des routeurs v1
 from api.v1.identity_router import router as identity_router

@@ -32,5 +32,13 @@ class Settings(BaseSettings):
     # --- Stockage objet ---
     AWS_S3_BUCKET_NAME: str = "pineapple-dev-bucket"
 
+    def validate_production_security(self) -> None:
+        """Vérifie qu'en environnement de production, les clés secrètes de dev ne sont pas utilisées."""
+        if self.ENVIRONMENT.lower() == "production":
+            if "development" in self.JWT_SECRET_KEY.lower() or "secret" in self.JWT_SECRET_KEY.lower() or len(self.JWT_SECRET_KEY) < 32:
+                raise RuntimeError("PROD_SECRET_KEY_INVALID: Clé JWT non sécurisée en production.")
+            if "dev" in self.ELECTION_PEPPER_SECRET.lower() or len(self.ELECTION_PEPPER_SECRET) < 16:
+                raise RuntimeError("PROD_SECRET_KEY_INVALID: Secret d'élection non sécurisé en production.")
+
 
 settings = Settings()
