@@ -119,7 +119,7 @@ export const useCommunityStore = create<CommunityState>((set, get) => ({
 
     try {
       await apiClient.post(
-        API_ENDPOINTS.community.declareRoom,
+        API_ENDPOINTS.community.declareRoom(roomId),
         {
           room_id: roomId,
           status,

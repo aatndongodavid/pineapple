@@ -25,6 +25,22 @@ class AcademicStatus(str, Enum):
     ALUMNI = "ALUMNI"
 
 
+class MembershipRole(str, Enum):
+    STUDENT = "STUDENT"
+    DELEGATE = "DELEGATE"
+    TEACHER = "TEACHER"
+    STAFF = "STAFF"
+    TENANT_ADMIN = "TENANT_ADMIN"
+    VISITOR = "VISITOR"
+
+
+class MembershipStatus(str, Enum):
+    PENDING = "PENDING"
+    ACTIVE = "ACTIVE"
+    SUSPENDED = "SUSPENDED"
+    ENDED = "ENDED"
+
+
 class DocumentType(str, Enum):
     CARTE_ETUDIANT = "CARTE_ETUDIANT"
     QUITTANCE = "QUITTANCE"

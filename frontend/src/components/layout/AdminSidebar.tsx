@@ -4,25 +4,39 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
+  Users,
+  Mail,
+  UserCheck,
+  GraduationCap,
+  DoorOpen,
   ShieldCheck,
+  Settings,
+  CreditCard,
+  FileText,
+  Building2,
   Vote,
   Flag,
-  CreditCard,
-  Building2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTenantStore } from '@/lib/store/tenantStore';
+import { useAuthStore } from '@/lib/store/authStore';
 
 const adminNavItems = [
-  { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
-  { to: '/admin/identity', label: 'Identity & Certifications', icon: ShieldCheck },
-  { to: '/admin/democracy', label: 'Democracy Control', icon: Vote },
-  { to: '/admin/trust-safety', label: 'Trust & Safety', icon: Flag },
-  { to: '/admin/monetization', label: 'Monetization', icon: CreditCard },
+  { to: '/admin', label: 'Tableau de bord', icon: LayoutDashboard, end: true },
+  { to: '/admin/roster', label: 'Registre Étudiants', icon: Users },
+  { to: '/admin/invitations', label: 'Invitations (Mode B)', icon: Mail },
+  { to: '/admin/requests', label: 'Demandes (Mode A)', icon: UserCheck },
+  { to: '/admin/classes', label: 'Gestion des Classes', icon: GraduationCap },
+  { to: '/admin/rooms', label: 'Salles Physiques', icon: DoorOpen },
+  { to: '/admin/delegates', label: 'Désignation Délégués', icon: ShieldCheck },
+  { to: '/admin/settings', label: 'Paramètres Établissement', icon: Settings },
+  { to: '/admin/subscription', label: 'Abonnement & Sièges', icon: CreditCard },
+  { to: '/admin/audit', label: 'Journal d\'Audit', icon: FileText },
+  { to: '/admin/democracy', label: 'Démocratie', icon: Vote },
+  { to: '/admin/trust-safety', label: 'Modération', icon: Flag },
 ];
 
 export const AdminSidebar: React.FC = () => {
-  const { campusName } = useTenantStore();
+  const { tenant } = useAuthStore();
 
   return (
     <aside className="hidden md:flex flex-col w-72 h-screen bg-gray-900 text-gray-300 shadow-2xl">
@@ -34,14 +48,17 @@ export const AdminSidebar: React.FC = () => {
             <p className="text-xs text-gray-500">Campus Control Center</p>
           </div>
         </div>
-        <div className="mt-4 px-3 py-2 rounded-lg bg-gray-800/50 border border-gray-700">
-          <p className="text-xs font-semibold text-pineapple uppercase tracking-wider">
-            {campusName || 'Établissement'}
+        <div className="mt-4 px-3 py-2 rounded-lg bg-gray-800/50 border border-gray-700 flex items-center justify-between">
+          <p className="text-xs font-semibold text-pineapple uppercase tracking-wider truncate">
+            {tenant?.name || 'Établissement'}
           </p>
+          <span className="text-[10px] bg-pineapple/20 text-pineapple px-1.5 py-0.5 rounded font-mono font-bold">
+            {tenant?.code || 'ENSPD'}
+          </span>
         </div>
       </div>
 
-      <nav className="flex-1 px-4 py-4 space-y-1">
+      <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
         {adminNavItems.map((item) => (
           <NavLink
             key={item.to}
@@ -49,21 +66,24 @@ export const AdminSidebar: React.FC = () => {
             end={item.end}
             className={({ isActive }) =>
               cn(
-                'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors',
+                'flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-medium transition-colors',
                 isActive
-                  ? 'bg-pineapple/20 text-pineapple'
+                  ? 'bg-pineapple/20 text-pineapple font-bold'
                   : 'text-gray-400 hover:bg-gray-800 hover:text-white'
               )
             }
           >
-            <item.icon className="h-5 w-5" />
+            <item.icon className="h-4 w-4" />
             {item.label}
           </NavLink>
         ))}
       </nav>
 
-      <div className="p-4 border-t border-gray-800 text-xs text-gray-500">
-        Pineapple OS v3.0.0 — Admin
+      <div className="p-4 border-t border-gray-800 text-xs text-gray-500 flex items-center justify-between">
+        <span>Pineapple OS Admin</span>
+        <NavLink to="/" className="text-pineapple hover:underline">
+          Quitter l'admin
+        </NavLink>
       </div>
     </aside>
   );

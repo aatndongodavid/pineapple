@@ -6,11 +6,11 @@ from sqlalchemy import (
     Enum,
     ForeignKey,
     Integer,
+    JSON,
     String,
     Text,
     func,
 )
-from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from campus_life_context.domain.value_objects import (
@@ -39,7 +39,7 @@ class MarketplaceListingModel(Base):
         nullable=False,
         default=ListingStatus.ACTIVE,
     )
-    image_urls: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
+    image_urls: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -57,7 +57,7 @@ class RideShareModel(Base):
     total_seats: Mapped[int] = mapped_column(Integer, nullable=False)
     available_seats: Mapped[int] = mapped_column(Integer, nullable=False)
     price_per_seat: Mapped[int] = mapped_column(Integer, nullable=False)
-    passenger_ids: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
+    passenger_ids: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     status: Mapped[RideStatus] = mapped_column(
         Enum(RideStatus, name="ride_status_enum"),
         nullable=False,
@@ -70,7 +70,7 @@ class ConversationModel(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     tenant_id: Mapped[uuid.UUID] = mapped_column(index=True, nullable=False)
-    participant_ids: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
+    participant_ids: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     context_type: Mapped[str | None] = mapped_column(String(50), nullable=True)
     context_id: Mapped[uuid.UUID | None] = mapped_column(nullable=True)
     last_message_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

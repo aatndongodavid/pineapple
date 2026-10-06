@@ -1,127 +1,138 @@
 // frontend/src/routes/AppRouter.tsx
 
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { AdminLayout } from '@/components/layout/AdminLayout';
-import { ProtectedRoute } from './ProtectedRoute';
-import { AdminRoute } from './AdminRoute';
+import { RequireAuth, RequireMembership, RequireRole } from './RouteGuards';
+import { useAuthStore } from '@/lib/store/authStore';
 
-// Import des écrans publics
+// Public Screens
 import { LoginScreen } from '@/features/auth/LoginScreen';
 import { RegisterScreen } from '@/features/auth/RegisterScreen';
+import { ActivateAccountScreen } from '@/features/enrollment/ActivateAccountScreen';
 
-// Import des écrans protégés (utilisateurs)
+// Visitor & General Screens
+import { VisitorFeed } from '@/features/feed/VisitorFeed';
 import { FeedScreen } from '@/features/feed/FeedScreen';
+import { JoinSchoolWizard } from '@/features/enrollment/JoinSchoolWizard';
 import { ProfileScreen } from '@/features/auth/ProfileScreen';
 import { SecurityCenterScreen } from '@/features/auth/SecurityCenterScreen';
 import { SettingsScreen } from '@/features/settings/SettingsScreen';
-import { OrganizationsScreen } from '@/features/community/OrganizationsScreen';
+
+// Member Tool Screens
 import { RoomsScreen } from '@/features/community/RoomsScreen';
-import { ElectionRoomScreen } from '@/democracy/ElectionRoomScreen';
+import { ClassDashboardScreen } from '@/features/community/ClassDashboardScreen';
 import { LibraryScreen } from '@/features/academy/LibraryScreen';
 import { PineappleReaderScreen } from '@/features/academy/PineappleReaderScreen';
+import { ElectionRoomScreen } from '@/democracy/ElectionRoomScreen';
 import { MarketplaceScreen } from '@/features/campus_life/MarketplaceScreen';
 import { PineappleRideScreen } from '@/features/campus_life/PineappleRideScreen';
 import { OpportunitiesScreen } from '@/features/opportunities/OpportunitiesScreen';
-import { ElectionCard } from '@/democracy/ElectionCard';
 
-// Import des écrans admin
+// Admin Screens
 import { AdminDashboardScreen } from '@/features/admin/AdminDashboardScreen';
+import { AdminRosterScreen } from '@/features/admin/AdminRosterScreen';
+import { AdminInvitationsScreen } from '@/features/admin/AdminInvitationsScreen';
+import { AdminRequestsScreen } from '@/features/admin/AdminRequestsScreen';
+import { AdminClassesScreen } from '@/features/admin/AdminClassesScreen';
+import { AdminRoomsScreen } from '@/features/admin/AdminRoomsScreen';
+import { AdminDelegatesScreen } from '@/features/admin/AdminDelegatesScreen';
+import { AdminSettingsScreen } from '@/features/admin/AdminSettingsScreen';
+import { AdminSubscriptionScreen } from '@/features/admin/AdminSubscriptionScreen';
+import { AdminAuditScreen } from '@/features/admin/AdminAuditScreen';
 import { IdentityVerificationScreen } from '@/features/admin/IdentityVerificationScreen';
 import { DemocracyControlScreen } from '@/features/admin/DemocracyControlScreen';
 import { TrustSafetyScreen } from '@/features/admin/TrustSafetyScreen';
 import { MonetizationScreen } from '@/features/admin/MonetizationScreen';
 
-// ---------------------------------------------------------------
-// Petit écran temporaire pour la liste des élections (ou import réel)
-// ---------------------------------------------------------------
-const ElectionsListScreen: React.FC = () => {
-  // Exemple de données (à remplacer par un vrai store)
-  const elections = [
-    {
-      id: 'e1',
-      title: 'Élection BDE ENSPD 2027',
-      electionType: 'BDE',
-      status: 'VOTING_OPEN' as const,
-      votingStartAt: '2027-03-15T08:00:00Z',
-      votingEndAt: '2027-03-15T18:00:00Z',
-    },
-  ];
+// Platform Super Admin Screens
+import { PlatformTenantsScreen } from '@/features/platform/PlatformTenantsScreen';
 
-  return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Élections</h1>
-      {elections.map((election) => (
-        <ElectionCard
-          key={election.id}
-          election={election}
-          onClick={() => window.location.href = `/democracy/${election.id}`}
-        />
-      ))}
-    </div>
-  );
+// Smart feed router (Visitor vs Member)
+const SmartFeedRouter: React.FC = () => {
+  const { membership } = useAuthStore();
+  return membership ? <FeedScreen /> : <VisitorFeed />;
 };
 
-// ---------------------------------------------------------------
-// Écran 404 (NotFound)
-// ---------------------------------------------------------------
+// 404 Screen
 const NotFoundScreen: React.FC = () => {
+  const navigate = useNavigate();
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-800 dark:text-white">404</h1>
-        <p className="text-gray-500">Page introuvable</p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900 p-4">
+      <div className="text-center space-y-4">
+        <h1 className="text-6xl font-black text-pineapple">404</h1>
+        <p className="text-gray-600 dark:text-gray-300 font-medium">Page introuvable</p>
+        <button
+          onClick={() => navigate('/')}
+          className="px-4 py-2 bg-pineapple text-white text-sm font-bold rounded-xl shadow-md"
+        >
+          Retour au fil d'actualité
+        </button>
       </div>
     </div>
   );
 };
 
-// ---------------------------------------------------------------
-// Routeur principal
-// ---------------------------------------------------------------
 export const AppRouter: React.FC = () => {
   return (
     <Routes>
-      {/* Routes publiques */}
+      {/* Public Routes */}
       <Route path="/login" element={<LoginScreen />} />
       <Route path="/register" element={<RegisterScreen />} />
+      <Route path="/activate" element={<ActivateAccountScreen />} />
 
-      {/* Routes protégées avec layout principal */}
-      <Route element={<ProtectedRoute />}>
+      {/* Main Layout Authenticated Routes */}
+      <Route element={<RequireAuth />}>
         <Route element={<MainLayout />}>
-          <Route path="/" element={<FeedScreen />} />
+          <Route path="/" element={<SmartFeedRouter />} />
+          <Route path="/join-school" element={<JoinSchoolWizard />} />
           <Route path="/profile" element={<ProfileScreen />} />
           <Route path="/security" element={<SecurityCenterScreen />} />
           <Route path="/settings" element={<SettingsScreen />} />
 
-          <Route path="/community/organizations" element={<OrganizationsScreen />} />
-          <Route path="/community/rooms" element={<RoomsScreen />} />
-
-          <Route path="/democracy" element={<ElectionsListScreen />} />
-          <Route path="/democracy/:id" element={<ElectionRoomScreen />} />
-
-          <Route path="/academy/library" element={<LibraryScreen />} />
-          <Route
-            path="/academy/reader/:id"
-            element={<PineappleReaderScreen documentId=":id" onClose={() => window.history.back()} />}
-          />
-
-          <Route path="/campus-life/marketplace" element={<MarketplaceScreen />} />
-          <Route path="/campus-life/ride" element={<PineappleRideScreen />} />
-
-          <Route path="/opportunities" element={<OpportunitiesScreen />} />
+          {/* Member-Only Tools */}
+          <Route element={<RequireMembership />}>
+            <Route path="/rooms" element={<RoomsScreen />} />
+            <Route path="/class" element={<ClassDashboardScreen />} />
+            <Route path="/academy/library" element={<LibraryScreen />} />
+            <Route
+              path="/academy/reader/:id"
+              element={<PineappleReaderScreen documentId=":id" onClose={() => window.history.back()} />}
+            />
+            <Route path="/democracy" element={<ElectionRoomScreen />} />
+            <Route path="/democracy/:id" element={<ElectionRoomScreen />} />
+            <Route path="/campus-life/marketplace" element={<MarketplaceScreen />} />
+            <Route path="/campus-life/ride" element={<PineappleRideScreen />} />
+            <Route path="/opportunities" element={<OpportunitiesScreen />} />
+          </Route>
         </Route>
       </Route>
 
-      {/* Routes d'administration */}
-      <Route element={<AdminRoute />}>
+      {/* School Admin Routes */}
+      <Route element={<RequireRole roles={['TENANT_ADMIN', 'STAFF']} />}>
         <Route element={<AdminLayout />}>
           <Route path="/admin" element={<AdminDashboardScreen />} />
+          <Route path="/admin/roster" element={<AdminRosterScreen />} />
+          <Route path="/admin/invitations" element={<AdminInvitationsScreen />} />
+          <Route path="/admin/requests" element={<AdminRequestsScreen />} />
+          <Route path="/admin/classes" element={<AdminClassesScreen />} />
+          <Route path="/admin/rooms" element={<AdminRoomsScreen />} />
+          <Route path="/admin/delegates" element={<AdminDelegatesScreen />} />
+          <Route path="/admin/settings" element={<AdminSettingsScreen />} />
+          <Route path="/admin/subscription" element={<AdminSubscriptionScreen />} />
+          <Route path="/admin/audit" element={<AdminAuditScreen />} />
           <Route path="/admin/identity" element={<IdentityVerificationScreen />} />
           <Route path="/admin/democracy" element={<DemocracyControlScreen />} />
           <Route path="/admin/trust-safety" element={<TrustSafetyScreen />} />
           <Route path="/admin/monetization" element={<MonetizationScreen />} />
+        </Route>
+      </Route>
+
+      {/* Platform Super Admin Routes */}
+      <Route element={<RequireRole roles={['PLATFORM_SUPER_ADMIN']} />}>
+        <Route element={<AdminLayout />}>
+          <Route path="/platform/tenants" element={<PlatformTenantsScreen />} />
         </Route>
       </Route>
 

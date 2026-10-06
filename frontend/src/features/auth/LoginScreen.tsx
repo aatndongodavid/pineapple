@@ -20,7 +20,7 @@ const TENANTS = [
 
 export const LoginScreen: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuthStore();
+  const { setAuthData } = useAuthStore();
   const { setTenant } = useTenantStore();
 
   const [tenantCode, setTenantCode] = useState(TENANTS[0].code);
@@ -67,13 +67,7 @@ export const LoginScreen: React.FC = () => {
       const userData = meResponse.data;
 
       // 3. Mettre à jour le store d'authentification
-      login(access_token, {
-        id: userData.id,
-        email: userData.email,
-        firstName: userData.first_name,
-        lastName: userData.last_name,
-        matricule: userData.matricule,
-      }, userData.campus_status_display);
+      setAuthData(access_token, meResponse.data);
 
       // Redirection vers la page d'accueil
       navigate('/');

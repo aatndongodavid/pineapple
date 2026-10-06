@@ -10,6 +10,7 @@ pydantic-settings==2.5.2
 
 # --- Base de données & Migrations ---
 sqlalchemy>=2.0.30
+greenlet
 asyncpg==0.29.0
 alembic==1.13.2
 

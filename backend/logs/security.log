@@ -1,0 +1,24 @@
+[2026-09-30 13:06:01,885] [SECURITY] [WARNING] EVENT=LOGIN_FAILED email=test@pineapple.cm ip=127.0.0.1 reason='Wrong pass' timestamp=2026-09-30T11:06:01.885542+00:00
+[2026-09-30 13:06:01,885] [SECURITY] [WARNING] EVENT=ACCESS_DENIED user_id=user-1 role=STUDENT resource='/admin/dashboard' ip=127.0.0.1 timestamp=2026-09-30T11:06:01.885887+00:00
+[2026-09-30 13:06:01,886] [SECURITY] [WARNING] EVENT=RATE_LIMIT_EXCEEDED ip=127.0.0.1 endpoint='/api/v1/auth/login' timestamp=2026-09-30T11:06:01.886105+00:00
+[2026-09-30 13:06:01,886] [SECURITY] [INFO] EVENT=TOKEN_REVOKED jti=jti-123 user_id=user-1 reason='User logout' timestamp=2026-09-30T11:06:01.886290+00:00
+[2026-09-30 13:06:36,681] [SECURITY] [WARNING] EVENT=LOGIN_FAILED email=test@pineapple.cm ip=127.0.0.1 reason='Wrong pass' timestamp=2026-09-30T11:06:36.681757+00:00
+[2026-09-30 13:06:36,682] [SECURITY] [WARNING] EVENT=ACCESS_DENIED user_id=user-1 role=STUDENT resource='/admin/dashboard' ip=127.0.0.1 timestamp=2026-09-30T11:06:36.682185+00:00
+[2026-09-30 13:06:36,682] [SECURITY] [WARNING] EVENT=RATE_LIMIT_EXCEEDED ip=127.0.0.1 endpoint='/api/v1/auth/login' timestamp=2026-09-30T11:06:36.682322+00:00
+[2026-09-30 13:06:36,682] [SECURITY] [INFO] EVENT=TOKEN_REVOKED jti=jti-123 user_id=user-1 reason='User logout' timestamp=2026-09-30T11:06:36.682409+00:00
+[2026-09-30 13:08:07,964] [SECURITY] [WARNING] EVENT=LOGIN_FAILED email=test@pineapple.cm ip=127.0.0.1 reason='Wrong pass' timestamp=2026-09-30T11:08:07.964934+00:00
+[2026-09-30 13:08:07,965] [SECURITY] [WARNING] EVENT=ACCESS_DENIED user_id=user-1 role=STUDENT resource='/admin/dashboard' ip=127.0.0.1 timestamp=2026-09-30T11:08:07.965147+00:00
+[2026-09-30 13:08:07,965] [SECURITY] [WARNING] EVENT=RATE_LIMIT_EXCEEDED ip=127.0.0.1 endpoint='/api/v1/auth/login' timestamp=2026-09-30T11:08:07.965295+00:00
+[2026-09-30 13:08:07,965] [SECURITY] [INFO] EVENT=TOKEN_REVOKED jti=jti-123 user_id=user-1 reason='User logout' timestamp=2026-09-30T11:08:07.965433+00:00
+[2026-10-01 23:27:06,184] [SECURITY] [WARNING] EVENT=LOGIN_FAILED email=test@pineapple.cm ip=127.0.0.1 reason='Wrong pass' timestamp=2026-10-01T21:27:06.184243+00:00
+[2026-10-01 23:27:06,197] [SECURITY] [WARNING] EVENT=ACCESS_DENIED user_id=user-1 role=STUDENT resource='/admin/dashboard' ip=127.0.0.1 timestamp=2026-10-01T21:27:06.197479+00:00
+[2026-10-01 23:27:06,197] [SECURITY] [WARNING] EVENT=RATE_LIMIT_EXCEEDED ip=127.0.0.1 endpoint='/api/v1/auth/login' timestamp=2026-10-01T21:27:06.197644+00:00
+[2026-10-01 23:27:06,197] [SECURITY] [INFO] EVENT=TOKEN_REVOKED jti=jti-123 user_id=user-1 reason='User logout' timestamp=2026-10-01T21:27:06.197740+00:00
+[2026-10-02 01:41:09,597] [SECURITY] [WARNING] EVENT=LOGIN_FAILED email=test@pineapple.cm ip=127.0.0.1 reason='Wrong pass' timestamp=2026-10-01T23:41:09.597107+00:00
+[2026-10-02 01:41:09,597] [SECURITY] [WARNING] EVENT=ACCESS_DENIED user_id=user-1 role=STUDENT resource='/admin/dashboard' ip=127.0.0.1 timestamp=2026-10-01T23:41:09.597463+00:00
+[2026-10-02 01:41:09,597] [SECURITY] [WARNING] EVENT=RATE_LIMIT_EXCEEDED ip=127.0.0.1 endpoint='/api/v1/auth/login' timestamp=2026-10-01T23:41:09.597665+00:00
+[2026-10-02 01:41:09,597] [SECURITY] [INFO] EVENT=TOKEN_REVOKED jti=jti-123 user_id=user-1 reason='User logout' timestamp=2026-10-01T23:41:09.597865+00:00
+[2026-10-02 01:51:11,608] [SECURITY] [WARNING] EVENT=LOGIN_FAILED email=test@pineapple.cm ip=127.0.0.1 reason='Wrong pass' timestamp=2026-10-01T23:51:11.608146+00:00
+[2026-10-02 01:51:11,608] [SECURITY] [WARNING] EVENT=ACCESS_DENIED user_id=user-1 role=STUDENT resource='/admin/dashboard' ip=127.0.0.1 timestamp=2026-10-01T23:51:11.608510+00:00
+[2026-10-02 01:51:11,608] [SECURITY] [WARNING] EVENT=RATE_LIMIT_EXCEEDED ip=127.0.0.1 endpoint='/api/v1/auth/login' timestamp=2026-10-01T23:51:11.608714+00:00
+[2026-10-02 01:51:11,608] [SECURITY] [INFO] EVENT=TOKEN_REVOKED jti=jti-123 user_id=user-1 reason='User logout' timestamp=2026-10-01T23:51:11.608839+00:00

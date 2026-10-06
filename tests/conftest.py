@@ -22,7 +22,7 @@ from shared_kernel.infrastructure.database import Base, get_db_session
 # ---------------------------------------------------------------------------
 TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL",
-    "postgresql+asyncpg://pineapple:pineapple_dev_password@localhost:5432/pineapple_test",
+    "sqlite+aiosqlite:///test.db",
 )
 
 # ---------------------------------------------------------------------------
