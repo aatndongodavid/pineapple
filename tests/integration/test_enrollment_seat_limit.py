@@ -9,17 +9,19 @@ from identity_context.infrastructure.persistence.models import (
     MembershipModel,
     UserModel,
 )
+from shared_kernel.infrastructure.encryption import normalize_matricule, normalize_text
 
 @pytest.mark.asyncio
 async def test_sec_002_claim_fails_when_seats_limit_exceeded(async_db_session, async_client):
     """SEC-002: Le rattachement doit être refusé avec 403 SEAT_LIMIT_EXCEEDED si le quota de sièges est atteint."""
     tenant_id = uuid.uuid4()
+    code_suffix = uuid.uuid4().hex[:6]
     
     # 1. Créer l'établissement avec 1 seul siège autorisé
     tenant = TenantModel(
         id=tenant_id,
         name="École Test Quota",
-        code="ETQ-001",
+        code=f"ETQ-{code_suffix}",
         enrollment_mode="BOTH",
         auto_approve_claims=True,
         current_academic_year="2026-2027",
@@ -40,7 +42,7 @@ async def test_sec_002_claim_fails_when_seats_limit_exceeded(async_db_session, a
     # 2. Créer 1 membre déjà actif (quota atteint : 1 / 1)
     user_1 = UserModel(
         id=uuid.uuid4(),
-        email="existing_student@test.com",
+        email=f"existing_{code_suffix}@test.com",
         hashed_password="hash",
         first_name="Jean",
         last_name="Dupont",
@@ -60,19 +62,20 @@ async def test_sec_002_claim_fails_when_seats_limit_exceeded(async_db_session, a
     async_db_session.add(member_1)
     
     # 3. Créer un nouvel étudiant dans le registre
+    matricule_raw = f"24X{code_suffix}"
     roster_2 = RosterEntryModel(
         id=uuid.uuid4(),
         tenant_id=tenant_id,
-        matricule="24X002",
+        matricule=matricule_raw,
         last_name="KOUAM",
         first_name="Paul",
         birth_date="2003-05-12",
         birth_place="Douala",
-        norm_matricule="24X002",
-        norm_last_name="KOUAM",
-        norm_first_name="PAUL",
+        norm_matricule=normalize_matricule(matricule_raw),
+        norm_last_name=normalize_text("KOUAM"),
+        norm_first_name=normalize_text("Paul"),
         norm_birth_date="2003-05-12",
-        norm_birth_place="DOUALA",
+        norm_birth_place=normalize_text("Douala"),
         academic_year="2026-2027",
         status="NOT_CLAIMED",
     )
@@ -81,7 +84,7 @@ async def test_sec_002_claim_fails_when_seats_limit_exceeded(async_db_session, a
     # Créer le compte utilisateur du 2ème étudiant
     user_2 = UserModel(
         id=uuid.uuid4(),
-        email="paul.kouam@test.com",
+        email=f"paul_{code_suffix}@test.com",
         hashed_password="hash",
         first_name="Paul",
         last_name="Kouam",
@@ -97,7 +100,7 @@ async def test_sec_002_claim_fails_when_seats_limit_exceeded(async_db_session, a
     headers = {"Authorization": f"Bearer {token_2}"}
     payload = {
         "tenant_id": str(tenant_id),
-        "matricule": "24X002",
+        "matricule": matricule_raw,
         "first_name": "Paul",
         "last_name": "Kouam",
         "birth_date": "2003-05-12",
