@@ -15,6 +15,7 @@ from identity_context.infrastructure.persistence.models import (
     MembershipModel,
     RosterEntryModel,
     TenantModel,
+    TenantSubscriptionModel,
     UserModel,
 )
 from shared_kernel.infrastructure.audit_log import log_audit_event
@@ -135,6 +136,18 @@ async def claim_school_membership(
     if not roster_entry:
         await _log_attempt(db, tenant_uuid, ctx.user_id, client_ip, "CLAIM", False, "Mismatch sur les 5 champs civil_status")
         raise HTTPException(status_code=400, detail={"code": "ENROLLMENT_FAILED", "message": GENERIC_CLAIM_ERROR})
+
+    # 4.b Vérification du quota de sièges (SEC-002)
+    sub = (await db.execute(select(TenantSubscriptionModel).where(TenantSubscriptionModel.tenant_id == tenant_uuid))).scalars().first()
+    if sub:
+        active_count = (await db.execute(select(func.count(MembershipModel.id)).where(MembershipModel.tenant_id == tenant_uuid, MembershipModel.status == "ACTIVE"))).scalar() or 0
+        if active_count >= sub.seats_limit:
+            await _log_attempt(db, tenant_uuid, ctx.user_id, client_ip, "CLAIM", False, "Quota de sièges dépassé")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail={"code": "SEAT_LIMIT_EXCEEDED", "message": "Le quota de licences de votre établissement est atteint."},
+            )
+
 
     # 5. Création atomique du Membership & Mise à jour du RosterEntry
     membership_status = "ACTIVE" if tenant.auto_approve_claims else "PENDING"
