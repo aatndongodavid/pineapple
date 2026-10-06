@@ -210,6 +210,19 @@ def create_jwt_token(
 create_access_token = create_jwt_token
 
 
+_REVOKED_JTIS: Set[str] = set()
+
+
+def blacklist_jti(jti: str) -> None:
+    """Ajoute un JTI à la liste noire des jetons révoqués."""
+    _REVOKED_JTIS.add(jti)
+
+
+def is_jti_blacklisted(jti: str) -> bool:
+    """Vérifie si un JTI a été révoqué."""
+    return jti in _REVOKED_JTIS
+
+
 def decode_jwt_token(token: str) -> dict:
     """Décode et valide un JWT."""
     try:
@@ -221,6 +234,7 @@ def decode_jwt_token(token: str) -> dict:
             detail="Token d'authentification invalide ou expiré",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
 
 
 class AuthenticatedUserContext:
@@ -269,8 +283,16 @@ async def get_user_context(
         )
 
     payload = decode_jwt_token(auth.credentials)
+    jti = payload.get("jti")
+    if jti and is_jti_blacklisted(jti):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Jeton d'authentification révoqué",
+        )
+
     user_id = uuid.UUID(payload["sub"])
     jwt_tid = payload.get("tid")
+
 
     # Décision D4 : si X-Tenant-ID est présent et != tid dans JWT, refuser avec 403
     if x_tenant_id and jwt_tid and x_tenant_id != jwt_tid:

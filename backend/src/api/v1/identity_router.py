@@ -249,7 +249,27 @@ async def change_password(
     return {"status": "ok", "message": "Mot de passe modifié avec succès"}
 
 
+from shared_kernel.infrastructure.security import (
+    AuthenticatedUserContext,
+    blacklist_jti,
+    create_jwt_token,
+    decode_jwt_token,
+    get_user_context,
+    security_scheme,
+)
+from fastapi.security import HTTPAuthorizationCredentials
+
 @router.post("/revoke-token")
-async def revoke_token():
+async def revoke_token(
+    auth: Optional[HTTPAuthorizationCredentials] = Depends(security_scheme),
+):
     """Révocation du jeton de session courant (déconnexion)."""
-    return {"status": "ok", "message": "Jeton révoqué"}
+    if auth and auth.credentials:
+        try:
+            payload = decode_jwt_token(auth.credentials)
+            jti = payload.get("jti")
+            if jti:
+                blacklist_jti(jti)
+        except Exception:
+            pass
+    return {"status": "ok", "message": "Jeton révoqué avec succès"}
