@@ -28,7 +28,7 @@ from identity_context.infrastructure.persistence.models import (
 from shared_kernel.infrastructure.audit_log import AuditLogModel, log_audit_event
 from shared_kernel.infrastructure.database import get_db_session
 from shared_kernel.infrastructure.email_gateway import email_gateway
-from shared_kernel.infrastructure.encryption import encrypt_field, normalize_matricule, normalize_text
+from shared_kernel.infrastructure.encryption import encrypt_field, normalize_matricule, normalize_text, sanitize_csv_cell
 from shared_kernel.infrastructure.security import AuthenticatedUserContext, require_permission
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
@@ -213,11 +213,11 @@ async def import_roster_csv(
             continue
 
         valid_rows.append({
-            "matricule": mat.strip(),
-            "last_name": nom.strip(),
-            "first_name": prenom.strip(),
+            "matricule": sanitize_csv_cell(mat),
+            "last_name": sanitize_csv_cell(nom),
+            "first_name": sanitize_csv_cell(prenom),
             "birth_date": bdate.strip(),
-            "birth_place": bplace.strip(),
+            "birth_place": sanitize_csv_cell(bplace),
             "official_email": email.strip() if email else None,
         })
 

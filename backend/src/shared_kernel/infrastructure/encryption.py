@@ -59,3 +59,14 @@ def normalize_matricule(matricule: Optional[str]) -> str:
         return ""
     cleaned = re.sub(r'[\s\-]+', '', matricule.upper())
     return cleaned.strip()
+
+
+def sanitize_csv_cell(val: Optional[str]) -> str:
+    """Neutralise les injections de formules CSV (OWASP CSV Injection)."""
+    if not val:
+        return ""
+    stripped = val.strip()
+    if stripped.startswith(("=", "+", "-", "@", "\t", "\r")):
+        return "'" + stripped
+    return stripped
+
