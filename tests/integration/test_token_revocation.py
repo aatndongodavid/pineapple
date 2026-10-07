@@ -2,7 +2,7 @@
 import pytest
 import uuid
 from identity_context.infrastructure.persistence.models import UserModel
-from shared_kernel.infrastructure.security import create_jwt_token, is_token_blacklisted
+from shared_kernel.infrastructure.security import create_jwt_token, is_jti_blacklisted
 
 @pytest.mark.asyncio
 async def test_sec_001_revoke_token_blacklists_jwt(async_db_session, async_client):
