@@ -50,6 +50,8 @@ ALL_PERMISSIONS = {
     "admin.membership.review",
     "admin.class.manage",
     "admin.room.manage",
+    "admin.timetable.manage",
+    "timetable.request_change",
     # Admin Établissement (TENANT_ADMIN)
     "admin.delegate.manage",
     "admin.settings.manage",
@@ -149,6 +151,8 @@ ROLE_PERMISSIONS_MAP: Dict[str, Set[str]] = {
         "admin.membership.review",
         "admin.class.manage",
         "admin.room.manage",
+        "admin.timetable.manage",
+        "timetable.request_change",
     },
     "TENANT_ADMIN": {
         "feed.view_ads",
@@ -171,6 +175,8 @@ ROLE_PERMISSIONS_MAP: Dict[str, Set[str]] = {
         "admin.membership.review",
         "admin.class.manage",
         "admin.room.manage",
+        "admin.timetable.manage",
+        "timetable.request_change",
         "admin.delegate.manage",
         "admin.settings.manage",
         "admin.subscription.view",

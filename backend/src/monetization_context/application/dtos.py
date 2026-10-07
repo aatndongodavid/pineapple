@@ -143,4 +143,19 @@ class MobileMoneyPaymentDTO(BaseModel):
     invoice_id: UUID
     phone_number: str
     operator: str = "MTN"  # MTN or ORANGE
+
+
+class ReconciliationAnomalyDTO(BaseDTO):
+    attempt_id: UUID
+    tenant_id: UUID
+    invoice_id: UUID
+    provider_name: str
+    provider_ref: str
+    db_status: str
+    provider_status: str
+    db_amount_xaf: int
+    provider_amount_xaf: int
+    anomaly_type: str
+    details: str
+
 
