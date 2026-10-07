@@ -161,4 +161,100 @@ async def download_invoice_pdf(
             content=pdf_bytes,
             media_type="application/pdf",
             headers={"Content-Disposition": f"attachment; filename=Facture-{invoice_id}.pdf"},
-        )
+        )
+
+
+# --- ENCAISSEMENT & WEBHOOKS (PHASE 3) ---
+
+from fastapi import Request
+from monetization_context.application.dtos import (
+    ManualPaymentProofDTO,
+    ManualProofCreateDTO,
+    ManualProofReviewDTO,
+    MobileMoneyPaymentDTO,
+    PaymentAttemptDTO,
+)
+from monetization_context.application.services.payment_application_service import PaymentApplicationService
+from monetization_context.infrastructure.adapters.fake_payment_provider import FakePaymentProviderAdapter
+
+
+@router.post("/payments/manual-proof", response_model=ManualPaymentProofDTO, status_code=status.HTTP_201_CREATED)
+async def submit_manual_payment_proof(
+    dto: ManualProofCreateDTO,
+    current_user: dict = Depends(get_current_user),
+    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    session_factory: async_sessionmaker[AsyncSession] = Depends(get_session_factory),
+):
+    """Téléverser une preuve de virement / dépôt d'espèces pour règlement d'une facture."""
+    async with session_factory() as session:
+        service = PaymentApplicationService(session)
+        return await service.submit_manual_proof(
+            tenant_id=tenant_id,
+            invoice_id=dto.invoice_id,
+            file_path=dto.file_path,
+            amount_declared_xaf=dto.amount_declared_xaf,
+            payment_reference=dto.payment_reference,
+        )
+
+
+@router.post("/payments/manual-proof/{proof_id}/review", response_model=ManualPaymentProofDTO)
+async def review_manual_payment_proof(
+    proof_id: uuid.UUID,
+    dto: ManualProofReviewDTO,
+    current_user: dict = Depends(get_current_user),
+    session_factory: async_sessionmaker[AsyncSession] = Depends(get_session_factory),
+):
+    """Validation / Rejet d'une preuve de paiement par le Super-Admin."""
+    if current_user.get("user_type") != "PLATFORM_ADMIN":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Action réservée au Super-Admin")
+
+    async with session_factory() as session:
+        service = PaymentApplicationService(session)
+        return await service.review_manual_proof(
+            proof_id=proof_id,
+            reviewer_user_id=current_user["user_id"],
+            approve=dto.approve,
+            rejection_reason=dto.rejection_reason,
+        )
+
+
+@router.post("/payments/mobile-money", response_model=PaymentAttemptDTO, status_code=status.HTTP_201_CREATED)
+async def initiate_mobile_money_payment(
+    dto: MobileMoneyPaymentDTO,
+    current_user: dict = Depends(get_current_user),
+    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    session_factory: async_sessionmaker[AsyncSession] = Depends(get_session_factory),
+):
+    """Initier un paiement Mobile Money (MTN MoMo / Orange Money) via agrégateur."""
+    provider = FakePaymentProviderAdapter(webhook_secret=settings.JWT_SECRET_KEY)
+    async with session_factory() as session:
+        service = PaymentApplicationService(session, payment_provider=provider)
+        return await service.initiate_mobile_money_payment(
+            tenant_id=tenant_id,
+            invoice_id=dto.invoice_id,
+            phone_number=dto.phone_number,
+            operator=dto.operator,
+        )
+
+
+@router.post("/webhooks/{provider_name}")
+async def handle_payment_webhook(
+    provider_name: str,
+    request: Request,
+    session_factory: async_sessionmaker[AsyncSession] = Depends(get_session_factory),
+):
+    """Endpoint webhook dédié pour la notification serveur-à-serveur des paiements (Signature HMAC + Idempotence)."""
+    payload_bytes = await request.body()
+    signature_header = request.headers.get("X-Signature") or request.headers.get("X-Campay-Signature")
+    secret = getattr(settings, f"{provider_name.upper()}_WEBHOOK_SECRET", settings.JWT_SECRET_KEY)
+
+    provider = FakePaymentProviderAdapter(webhook_secret=secret)
+    async with session_factory() as session:
+        service = PaymentApplicationService(session, payment_provider=provider)
+        return await service.process_webhook_payload(
+            provider_name=provider_name.upper(),
+            payload_bytes=payload_bytes,
+            signature_header=signature_header,
+            secret=secret,
+        )
+

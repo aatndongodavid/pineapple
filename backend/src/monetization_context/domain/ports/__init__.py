@@ -1,5 +1,3 @@
-# backend/src/monetization_context/domain/ports.py
-
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import List, Optional
@@ -10,6 +8,12 @@ from monetization_context.domain.value_objects import (
     CampusLicenseTier,
     SponsorshipStatus,
     SubscriptionPlan,
+)
+from monetization_context.domain.ports.payment_provider_port import (
+    PaymentProviderPort,
+    PaymentInitiationResult,
+    PaymentVerificationResult,
+    WebhookEventData,
 )
 
 

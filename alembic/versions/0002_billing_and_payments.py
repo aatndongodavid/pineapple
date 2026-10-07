@@ -105,14 +105,22 @@ def upgrade() -> None:
     op.create_table(
         'payment_attempts',
         sa.Column('id', sa.UUID(), nullable=False),
-        sa.Column('payment_id', sa.UUID(), nullable=False),
-        sa.Column('attempt_number', sa.Integer(), server_default='1', nullable=False),
-        sa.Column('status', sa.String(length=50), nullable=False),
-        sa.Column('response_payload_json', sa.Text(), nullable=True),
+        sa.Column('tenant_id', sa.UUID(), nullable=False),
+        sa.Column('invoice_id', sa.UUID(), nullable=False),
+        sa.Column('amount_xaf', sa.BigInteger(), nullable=False),
+        sa.Column('channel', sa.String(length=50), nullable=False),
+        sa.Column('provider_name', sa.String(length=50), nullable=False),
+        sa.Column('provider_ref', sa.String(length=255), nullable=True),
+        sa.Column('phone_number_masked', sa.String(length=50), nullable=True),
+        sa.Column('status', sa.String(length=50), server_default='PENDING', nullable=False),
+        sa.Column('failure_reason', sa.Text(), nullable=True),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
-        sa.ForeignKeyConstraint(['payment_id'], ['payments.id'], ondelete='CASCADE'),
+        sa.Column('completed_at', sa.DateTime(timezone=True), nullable=True),
+        sa.ForeignKeyConstraint(['invoice_id'], ['invoices.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['tenant_id'], ['tenants.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
+    op.create_index('idx_payment_attempt_provider_ref', 'payment_attempts', ['provider_ref'])
 
     # 6. Table payment_events
     op.create_table(

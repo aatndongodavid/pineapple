@@ -81,18 +81,28 @@ class TenantModel(Base):
 
 
 class TenantSubscriptionModel(Base):
-    """Abonnement d'un établissement."""
+    """Abonnement d'un établissement avec gestion du cycle de vie complet."""
     __tablename__ = "tenant_subscriptions"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     tenant_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("tenants.id", ondelete="CASCADE"), index=True, nullable=False)
+    plan_id: Mapped[Optional[uuid.UUID]] = mapped_column(ForeignKey("plans.id", ondelete="SET NULL"), nullable=True)
     plan: Mapped[str] = mapped_column(String(50), default="STANDARD", nullable=False)  # FREE_TRIAL, STANDARD, PREMIUM
-    status: Mapped[str] = mapped_column(String(50), default="ACTIVE", nullable=False)  # TRIAL, ACTIVE, PAST_DUE, SUSPENDED, EXPIRED
+    status: Mapped[str] = mapped_column(String(50), default="ACTIVE", nullable=False)  # TRIAL, ACTIVE, PAST_DUE, GRACE, SUSPENDED, EXPIRED, CANCELLED
     seats_limit: Mapped[int] = mapped_column(Integer, default=1000, nullable=False)
+    
+    current_period_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    current_period_end: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     starts_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     ends_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    
+    auto_renew: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    cancel_at_period_end: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    trial_ends_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    grace_ends_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     grace_days: Mapped[int] = mapped_column(Integer, default=7, nullable=False)
     payment_ref: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    billing_contact_email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)

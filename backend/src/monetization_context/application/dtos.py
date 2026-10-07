@@ -124,4 +124,23 @@ class SubscriptionDTO(BaseDTO):
     grace_ends_at: Optional[datetime] = None
     billing_contact_email: Optional[str] = None
     seats_used: int = 0
-    seats_included: int = 0
+    seats_included: int = 0
+
+
+class ManualProofCreateDTO(BaseModel):
+    invoice_id: UUID
+    file_path: str
+    amount_declared_xaf: int
+    payment_reference: Optional[str] = None
+
+
+class ManualProofReviewDTO(BaseModel):
+    approve: bool
+    rejection_reason: Optional[str] = None
+
+
+class MobileMoneyPaymentDTO(BaseModel):
+    invoice_id: UUID
+    phone_number: str
+    operator: str = "MTN"  # MTN or ORANGE
+

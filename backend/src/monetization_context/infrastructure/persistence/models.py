@@ -130,11 +130,17 @@ class PaymentAttemptModel(Base):
     __tablename__ = "payment_attempts"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
-    payment_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("payments.id", ondelete="CASCADE"), index=True, nullable=False)
-    attempt_number: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
-    status: Mapped[str] = mapped_column(String(50), nullable=False)
-    response_payload_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    tenant_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("tenants.id", ondelete="CASCADE"), index=True, nullable=False)
+    invoice_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("invoices.id", ondelete="CASCADE"), index=True, nullable=False)
+    amount_xaf: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    channel: Mapped[str] = mapped_column(String(50), nullable=False)  # MOBILE_MONEY, MANUAL
+    provider_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    provider_ref: Mapped[Optional[str]] = mapped_column(String(255), index=True, nullable=True)
+    phone_number_masked: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    status: Mapped[str] = mapped_column(String(50), default="PENDING", nullable=False)
+    failure_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class PaymentEventModel(Base):
@@ -146,7 +152,7 @@ class PaymentEventModel(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     provider_name: Mapped[str] = mapped_column(String(50), nullable=False)
-    event_type: Mapped[str] = mapped_column(String(100), nullable=False)
+    event_type: Mapped[str] = mapped_column(String(100), default="PAYMENT_NOTIFICATION", nullable=False)
     provider_event_id: Mapped[str] = mapped_column(String(255), nullable=False)
     payload_json: Mapped[str] = mapped_column(Text, nullable=False)
     is_signature_valid: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)

@@ -34,7 +34,10 @@ async def test_sec_002_claim_fails_when_seats_limit_exceeded(async_db_session, a
         tenant_id=tenant_id,
         plan="STANDARD",
         status="ACTIVE",
-        seats_limit=1,  # Limite 1 seul membre
+        seats_limit=1,
+        current_period_start=datetime.now(timezone.utc),
+        current_period_end=datetime.now(timezone.utc) + timedelta(days=30),
+        starts_at=datetime.now(timezone.utc),
         ends_at=datetime.now(timezone.utc) + timedelta(days=30),
     )
     async_db_session.add(sub)
