@@ -50,3 +50,50 @@ class RoomAvailabilityWebSocketManager:
 
 # Instance globale partagée
 room_ws_manager = RoomAvailabilityWebSocketManager()
+
+
+class NotificationWebSocketManager:
+    """
+    Gestionnaire WebSocket pour la livraison temps réel des notifications In-App ciblées par utilisateur et tenant.
+    """
+
+    def __init__(self):
+        # Map: (tenant_id, user_id) -> Set[WebSocket]
+        self._user_connections: Dict[str, Set[WebSocket]] = {}
+
+    def _key(self, tenant_id: str, user_id: str) -> str:
+        return f"{tenant_id}:{user_id}"
+
+    async def connect(self, tenant_id: str, user_id: str, websocket: WebSocket):
+        await websocket.accept()
+        key = self._key(tenant_id, user_id)
+        if key not in self._user_connections:
+            self._user_connections[key] = set()
+        self._user_connections[key].add(websocket)
+
+    def disconnect(self, tenant_id: str, user_id: str, websocket: WebSocket):
+        key = self._key(tenant_id, user_id)
+        if key in self._user_connections:
+            self._user_connections[key].discard(websocket)
+            if not self._user_connections[key]:
+                del self._user_connections[key]
+
+    async def send_user_notification(self, tenant_id: str, user_id: str, payload: dict):
+        key = self._key(tenant_id, user_id)
+        connections = self._user_connections.get(key, set())
+        if not connections:
+            return
+
+        message = json.dumps(payload)
+        to_remove = set()
+        for ws in connections:
+            try:
+                await ws.send_text(message)
+            except Exception:
+                to_remove.add(ws)
+
+        for ws in to_remove:
+            self.disconnect(tenant_id, user_id, ws)
+
+
+notification_ws_manager = NotificationWebSocketManager()

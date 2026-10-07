@@ -60,6 +60,7 @@ async def health_check():
 
 
 from api.v1.timetable_router import router as timetable_router
+from api.v1.notification_router import router as notification_router
 
 # Enregistrement des routeurs
 app.include_router(identity_router, prefix="/api/v1")
@@ -73,6 +74,7 @@ app.include_router(platform_router, prefix="/api/v1")
 app.include_router(democracy_router, prefix="/api/v1")
 app.include_router(academy_router, prefix="/api/v1")
 app.include_router(timetable_router, prefix="/api/v1")
+app.include_router(notification_router, prefix="/api/v1")
 app.include_router(campus_life_router, prefix="/api/v1")
 app.include_router(opportunities_router, prefix="/api/v1")
 app.include_router(monetization_router, prefix="/api/v1")

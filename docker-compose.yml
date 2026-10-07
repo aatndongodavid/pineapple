@@ -82,6 +82,27 @@ services:
              python -m scripts.seed_data &&
              uvicorn api.main:app --host 0.0.0.0 --port 8000"
 
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: pineapple_notification_worker
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      APP_NAME: "Pineapple OS Outbox Worker"
+      ENVIRONMENT: development
+      DATABASE_URL: "postgresql+asyncpg://pineapple:pineapple_dev_password@db:5432/pineapple"
+      REDIS_URL: "redis://redis:6379/0"
+      MAILHOG_HOST: "mailhog"
+      MAILHOG_PORT: "1025"
+      JWT_SECRET_KEY: "dev_secret_key_change_me"
+      JWT_ALGORITHM: "HS256"
+    command: python -m notification_context.worker
+
   frontend:
     build:
       context: .

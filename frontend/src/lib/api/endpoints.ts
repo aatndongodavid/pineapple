@@ -99,6 +99,18 @@ export const API_ENDPOINTS = {
     messages: (conversationId: string) => `/api/v1/messages/${conversationId}`,
     sendMessage: '/api/v1/messages/send',
   },
+  notifications: {
+    list: '/api/v1/notifications',
+    unreadCount: '/api/v1/notifications/unread-count',
+    markRead: (id: string) => `/api/v1/notifications/${id}/read`,
+    markAllRead: '/api/v1/notifications/read-all',
+    preferences: '/api/v1/notifications/preferences',
+    quietHours: '/api/v1/notifications/quiet-hours',
+    pushSubscribe: '/api/v1/notifications/push/subscribe',
+    pushUnsubscribe: '/api/v1/notifications/push/unsubscribe',
+    broadcast: '/api/v1/notifications/broadcast',
+    analytics: '/api/v1/notifications/admin/analytics',
+  },
 };
 
 export const endpoints = API_ENDPOINTS;
