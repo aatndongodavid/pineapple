@@ -19,6 +19,8 @@ from identity_context.infrastructure.persistence.models import (
 from monetization_context.infrastructure.persistence.models import (
     AdCampaignModel,
     AdCreativeModel,
+    BillingSettingsModel,
+    PlanModel,
 )
 from shared_kernel.infrastructure.database import AsyncSessionLocal, engine, Base
 from shared_kernel.infrastructure.encryption import encrypt_field, normalize_matricule, normalize_text
@@ -50,6 +52,65 @@ async def seed():
             )
             db.add(super_admin)
             print("  [+] Super Admin créé : superadmin@pineapple.cm / SuperAdmin2026!")
+
+        # 1.b Catalogue des Plans en FCFA (EXEMPLES - A FIXER PAR LA DIRECTION)
+        plan_stmt = select(PlanModel).where(PlanModel.code == "STANDARD_2026")
+        std_plan = (await db.execute(plan_stmt)).scalars().first()
+        if not std_plan:
+            plans_to_seed = [
+                PlanModel(
+                    id=uuid.uuid4(),
+                    code="BASIC_2026",
+                    name="Forfait Découverte (EXEMPLE — à fixer par la direction)",
+                    price_xaf=150000,
+                    billing_period="ACADEMIC_YEAR",
+                    seats_included=500,
+                    extra_seat_price_xaf=500,
+                    trial_days=14,
+                    features_json='["room_declaration", "class_announcements", "class_polls"]',
+                ),
+                PlanModel(
+                    id=uuid.uuid4(),
+                    code="STANDARD_2026",
+                    name="Forfait Standard Établissement (EXEMPLE — à fixer par la direction)",
+                    price_xaf=500000,
+                    billing_period="ACADEMIC_YEAR",
+                    seats_included=2000,
+                    extra_seat_price_xaf=350,
+                    trial_days=14,
+                    features_json='["room_declaration", "class_announcements", "class_polls", "elections", "academy_library"]',
+                ),
+                PlanModel(
+                    id=uuid.uuid4(),
+                    code="PREMIUM_2026",
+                    name="Forfait Excellence & Université (EXEMPLE — à fixer par la direction)",
+                    price_xaf=1200000,
+                    billing_period="ACADEMIC_YEAR",
+                    seats_included=5000,
+                    extra_seat_price_xaf=250,
+                    trial_days=30,
+                    features_json='["all_features", "priority_support", "custom_subdomain"]',
+                ),
+            ]
+            for p in plans_to_seed:
+                db.add(p)
+            print("  [+] Catalogue des Plans d'abonnements FCFA initialisé")
+
+        # 1.c Paramètres de facturation globaux
+        b_settings_stmt = select(BillingSettingsModel)
+        b_settings = (await db.execute(b_settings_stmt)).scalars().first()
+        if not b_settings:
+            b_settings = BillingSettingsModel(
+                id=uuid.uuid4(),
+                tax_rate_percent=0,  # Exonéré ou à valider par comptable
+                company_name="Pineapple OS Cameroun SARL",
+                company_address="Boulevard de la Liberté, Akwa, Douala, Cameroun",
+                legal_notice="Facture exprimée et payable en XAF (FCFA). Mentions légales et taxe à valider par le service comptable.",
+                default_grace_days=7,
+                default_trial_days=14,
+            )
+            db.add(b_settings)
+            print("  [+] Paramètres de facturation globaux initialisés")
 
         # 2. Établissement ENSPD (Abonnement Actif)
         enspd_stmt = select(TenantModel).where(TenantModel.code == "ENSPD")

@@ -29,33 +29,64 @@ class UserID:
 
 @dataclass(frozen=True)
 class Money:
-    amount: Decimal
+    amount_xaf: int
     currency: str = "XAF"
 
     def __post_init__(self) -> None:
-        if not isinstance(self.amount, Decimal):
-            raise DomainValidationError("Money amount must be a Decimal")
-        if self.amount < 0:
-            raise DomainValidationError("Money amount cannot be negative")
+        if isinstance(self.amount_xaf, float):
+            raise DomainValidationError("Money amount_xaf MUST be an integer, never a float.")
+        if not isinstance(self.amount_xaf, int):
+            try:
+                object.__setattr__(self, 'amount_xaf', int(self.amount_xaf))
+            except Exception:
+                raise DomainValidationError("Money amount_xaf must be an integer XAF amount.")
+        if self.amount_xaf < 0:
+            raise DomainValidationError("Money amount_xaf cannot be negative")
         if self.currency != "XAF":
             raise DomainValidationError(f"Unsupported currency: {self.currency}. Only XAF is allowed.")
+
+    @property
+    def amount(self) -> int:
+        return self.amount_xaf
 
     def __add__(self, other: "Money") -> "Money":
         if not isinstance(other, Money):
             raise DomainValidationError("Can only add Money to Money")
-        if self.currency != other.currency:
-            raise DomainValidationError("Currency mismatch")
-        return Money(amount=self.amount + other.amount, currency=self.currency)
+        return Money(amount_xaf=self.amount_xaf + other.amount_xaf, currency=self.currency)
 
     def __sub__(self, other: "Money") -> "Money":
         if not isinstance(other, Money):
             raise DomainValidationError("Can only subtract Money from Money")
-        if self.currency != other.currency:
-            raise DomainValidationError("Currency mismatch")
-        new_amount = self.amount - other.amount
-        if new_amount < 0:
+        res = self.amount_xaf - other.amount_xaf
+        if res < 0:
             raise DomainValidationError("Resulting Money cannot be negative")
-        return Money(amount=new_amount, currency=self.currency)
+        return Money(amount_xaf=res, currency=self.currency)
+
+    def add(self, other: "Money") -> "Money":
+        return self.__add__(other)
+
+    def subtract(self, other: "Money") -> "Money":
+        return self.__sub__(other)
+
+    def multiply(self, factor: int) -> "Money":
+        if isinstance(factor, float):
+            raise DomainValidationError("Multiplication factor must be an integer.")
+        return Money(amount_xaf=self.amount_xaf * int(factor), currency=self.currency)
+
+    def prorate(self, days_used: int, total_days: int) -> "Money":
+        """Calcul du prorata exact en entiers XAF FCFA (arrondi supérieur en entiers)."""
+        if total_days <= 0 or days_used <= 0:
+            return Money(amount_xaf=0, currency=self.currency)
+        if days_used >= total_days:
+            return self
+        prorated_amount = (self.amount_xaf * days_used + (total_days - 1)) // total_days
+        return Money(amount_xaf=prorated_amount, currency=self.currency)
+
+    def format_xaf(self) -> str:
+        """Formatage de présentation en FCFA (ex: '150 000 FCFA')."""
+        formatted = f"{self.amount_xaf:,}".replace(",", " ")
+        return f"{formatted} FCFA"
+
 
 
 @dataclass(frozen=True)
