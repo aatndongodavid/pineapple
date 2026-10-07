@@ -259,22 +259,101 @@ class CampusLicenseModel(Base):
     )
 
 
-class AdCampaignModel(Base):
-    """Campagne publicitaire pour le fil d'actualités des visiteurs."""
-    __tablename__ = "ad_campaigns"
+class AdvertiserModel(Base):
+    """Annonceur en libre-service (compte entreprise / publicitaire)."""
+    __tablename__ = "advertisers"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
-    title: Mapped[str] = mapped_column(String(200), nullable=False)
-    advertiser_name: Mapped[str] = mapped_column(String(200), nullable=False)
-    status: Mapped[str] = mapped_column(String(50), default="ACTIVE", nullable=False)  # ACTIVE, INACTIVE
-    starts_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    ends_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-    target_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    company_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    contact_email: Mapped[str] = mapped_column(String(255), nullable=False)
+    phone_number: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    country: Mapped[str] = mapped_column(String(100), default="CM", nullable=False)
+    status: Mapped[str] = mapped_column(String(50), default="ACTIVE", nullable=False)  # PENDING, ACTIVE, SUSPENDED
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+
+
+class AdvertiserUserModel(Base):
+    """Lien entre un utilisateur et un compte annonceur."""
+    __tablename__ = "advertiser_users"
+    __table_args__ = (
+        UniqueConstraint("advertiser_id", "user_id", name="uq_advertiser_user"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    advertiser_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("advertisers.id", ondelete="CASCADE"), index=True, nullable=False)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True, nullable=False)
+    role: Mapped[str] = mapped_column(String(50), default="ADVERTISER", nullable=False)
+
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
 
+class AdWalletModel(Base):
+    """Portefeuille prépayé en XAF d'un annonceur."""
+    __tablename__ = "ad_wallets"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    advertiser_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("advertisers.id", ondelete="CASCADE"), unique=True, index=True, nullable=False)
+    balance_xaf: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
+
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+
+
+class WalletTransactionModel(Base):
+    """Journal immuable des transactions de portefeuille (Crédits, Débits de diffusion, Remboursements)."""
+    __tablename__ = "wallet_transactions"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    wallet_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("ad_wallets.id", ondelete="CASCADE"), index=True, nullable=False)
+    type: Mapped[str] = mapped_column(String(50), nullable=False)  # DEPOSIT, AD_DELIVERY_DEBIT, REFUND, ADJUSTMENT
+    amount_xaf: Mapped[int] = mapped_column(BigInteger, nullable=False)  # Positif pour dépôt/remboursement, négatif pour débit
+    balance_after_xaf: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    reference_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+
+class AdCampaignModel(Base):
+    """Campagne publicitaire ciblée sur les visiteurs."""
+    __tablename__ = "ad_campaigns"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    advertiser_id: Mapped[Optional[uuid.UUID]] = mapped_column(ForeignKey("advertisers.id", ondelete="CASCADE"), index=True, nullable=True)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    advertiser_name: Mapped[str] = mapped_column(String(200), nullable=False)
+    objective: Mapped[str] = mapped_column(String(50), default="AWARENESS", nullable=False)  # AWARENESS, TRAFFIC
+    billing_model: Mapped[str] = mapped_column(String(50), default="CPM", nullable=False)  # CPM, CPC, FLAT_PERIOD
+    unit_price_xaf: Mapped[int] = mapped_column(BigInteger, default=1000, nullable=False)  # Prix par 1000 imp ou par clic
+    total_budget_xaf: Mapped[int] = mapped_column(BigInteger, default=50000, nullable=False)
+    spent_xaf: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
+    daily_budget_xaf: Mapped[int] = mapped_column(BigInteger, default=5000, nullable=False)
+    daily_spent_xaf: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
+    frequency_cap_per_session: Mapped[int] = mapped_column(Integer, default=3, nullable=False)
+    pacing_enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    status: Mapped[str] = mapped_column(String(50), default="ACTIVE", nullable=False)  # DRAFT, PENDING_REVIEW, ACTIVE, PAUSED, ENDED, REJECTED
+    starts_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    ends_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    target_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+
+class AdTargetingRuleModel(Base):
+    """Critères de ciblage géographique/comportemental grossier pour une campagne."""
+    __tablename__ = "ad_targeting_rules"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    campaign_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("ad_campaigns.id", ondelete="CASCADE"), unique=True, index=True, nullable=False)
+    cities_regions_json: Mapped[str] = mapped_column(Text, default="[]", nullable=False)
+    languages_json: Mapped[str] = mapped_column(Text, default="[]", nullable=False)
+    device_types_json: Mapped[str] = mapped_column(Text, default="[]", nullable=False)
+    hours_of_day_json: Mapped[str] = mapped_column(Text, default="[]", nullable=False)
+
+
 class AdCreativeModel(Base):
-    """Visuel / contenu d'une publicité."""
+    """Visuel / contenu d'une publicité avec modération."""
     __tablename__ = "ad_creatives"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
@@ -283,7 +362,83 @@ class AdCreativeModel(Base):
     body_text: Mapped[str] = mapped_column(Text, nullable=False)
     image_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     cta_text: Mapped[str] = mapped_column(String(100), default="En savoir plus", nullable=False)
+    target_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    review_status: Mapped[str] = mapped_column(String(50), default="APPROVED", nullable=False)  # PENDING_REVIEW, APPROVED, REJECTED
+    rejection_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+
+class AdReviewEventModel(Base):
+    """Historique des événements de modération des créations publicitaires."""
+    __tablename__ = "ad_review_events"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    creative_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("ad_creatives.id", ondelete="CASCADE"), index=True, nullable=False)
+    reviewer_user_id: Mapped[Optional[uuid.UUID]] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    previous_status: Mapped[str] = mapped_column(String(50), nullable=False)
+    new_status: Mapped[str] = mapped_column(String(50), nullable=False)
+    reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+
+class AdImpressionRawModel(Base):
+    """Impressions brutes en direct (pour comptage et vérification de jeton)."""
+    __tablename__ = "ad_impressions_raw"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    creative_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("ad_creatives.id", ondelete="CASCADE"), index=True, nullable=False)
+    campaign_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("ad_campaigns.id", ondelete="CASCADE"), index=True, nullable=False)
+    visitor_session_id: Mapped[str] = mapped_column(String(100), index=True, nullable=False)
+    token: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
+    ip: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    user_agent: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+
+class AdStatsDailyModel(Base):
+    """Agrégation quotidienne des statistiques de diffusion et de dépense."""
+    __tablename__ = "ad_stats_daily"
+    __table_args__ = (
+        UniqueConstraint("campaign_id", "creative_id", "stat_date", name="uq_ad_stats_daily_cmp_crt_date"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    campaign_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("ad_campaigns.id", ondelete="CASCADE"), index=True, nullable=False)
+    creative_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("ad_creatives.id", ondelete="CASCADE"), index=True, nullable=False)
+    stat_date: Mapped[str] = mapped_column(String(10), index=True, nullable=False)  # YYYY-MM-DD
+    impressions_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    clicks_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    spent_xaf: Mapped[int] = mapped_column(BigInteger, default=0, nullable=False)
+
+
+class AdUserFeedbackModel(Base):
+    """Signalements et masquages d'annonces par les visiteurs."""
+    __tablename__ = "ad_user_feedback"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    creative_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("ad_creatives.id", ondelete="CASCADE"), index=True, nullable=False)
+    visitor_session_id: Mapped[str] = mapped_column(String(100), index=True, nullable=False)
+    feedback_type: Mapped[str] = mapped_column(String(50), nullable=False)  # HIDE, REPORT
+    reason: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    details: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+
+class AdPolicyRuleModel(Base):
+    """Règles de politique et mots-clés interdits configurés par la plateforme."""
+    __tablename__ = "ad_policy_rules"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    category: Mapped[str] = mapped_column(String(100), unique=True, index=True, nullable=False)
+    forbidden_keywords_json: Mapped[str] = mapped_column(Text, default="[]", nullable=False)
+    is_enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
 

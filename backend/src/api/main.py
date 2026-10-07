@@ -62,11 +62,14 @@ async def health_check():
 from api.v1.timetable_router import router as timetable_router
 from api.v1.notification_router import router as notification_router
 
+from api.v1.advertiser_router import router as advertiser_router
+
 # Enregistrement des routeurs
 app.include_router(identity_router, prefix="/api/v1")
 app.include_router(schools_router, prefix="/api/v1")
 app.include_router(enrollment_router, prefix="/api/v1")
 app.include_router(ads_router, prefix="/api/v1")
+app.include_router(advertiser_router, prefix="/api/v1")
 app.include_router(community_router, prefix="/api/v1")
 app.include_router(class_delegate_router, prefix="/api/v1")
 app.include_router(admin_router, prefix="/api/v1")

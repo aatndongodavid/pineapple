@@ -20,7 +20,17 @@ export const API_ENDPOINTS = {
   },
   ads: {
     feed: '/api/v1/ads/feed',
-    events: '/api/v1/ads/events',
+    impression: '/api/v1/ads/impression',
+    click: (token: string) => `/api/v1/ads/click/${token}`,
+    feedback: '/api/v1/ads/feedback',
+  },
+  advertiser: {
+    register: '/api/v1/advertiser/register',
+    me: '/api/v1/advertiser/me',
+    walletTopup: '/api/v1/advertiser/wallet/topup',
+    campaigns: '/api/v1/advertiser/campaigns',
+    submitCreative: (campaignId: string) => `/api/v1/advertiser/campaigns/${campaignId}/creatives`,
+    campaignStats: (campaignId: string) => `/api/v1/advertiser/campaigns/${campaignId}/stats`,
   },
   feed: {
     posts: '/api/v1/community/feed',
