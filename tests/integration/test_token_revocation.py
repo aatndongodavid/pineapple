@@ -7,9 +7,10 @@ from shared_kernel.infrastructure.security import create_jwt_token, is_jti_black
 @pytest.mark.asyncio
 async def test_sec_001_revoke_token_blacklists_jwt(async_db_session, async_client):
     """SEC-001: La révocation de jeton doit invalider la session et bloquer tout appel ultérieur avec le même token."""
+    email_str = f"revocation_test_{uuid.uuid4().hex[:8]}@test.com"
     user = UserModel(
         id=uuid.uuid4(),
-        email="revocation_test@test.com",
+        email=email_str,
         hashed_password="hash",
         first_name="Jean",
         last_name="Test",

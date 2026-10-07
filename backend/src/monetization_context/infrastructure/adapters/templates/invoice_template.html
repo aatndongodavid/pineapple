@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Facture {{ invoice_number }} - Pineapple OS</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #1f2937;
+            font-size: 13px;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+        }
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .header-table td {
+            vertical-align: top;
+        }
+        .brand-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #047857;
+            margin: 0 0 4px 0;
+        }
+        .brand-subtitle {
+            font-size: 11px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .invoice-title {
+            text-align: right;
+            font-size: 20px;
+            font-weight: bold;
+            color: #111827;
+        }
+        .invoice-meta {
+            text-align: right;
+            font-size: 12px;
+            color: #4b5563;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 6px;
+        }
+        .status-PAID { background-color: #d1fae5; color: #065f46; }
+        .status-ISSUED { background-color: #dbeafe; color: #1e40af; }
+        .status-DRAFT { background-color: #f3f4f6; color: #374151; }
+        .status-OVERDUE { background-color: #fee2e2; color: #991b1b; }
+        .status-VOID { background-color: #f3f4f6; color: #9ca3af; }
+
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .details-table td {
+            width: 50%;
+            vertical-align: top;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            background-color: #f9fafb;
+        }
+        .section-heading {
+            font-size: 11px;
+            font-weight: bold;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .party-name {
+            font-size: 15px;
+            font-weight: bold;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+        .items-table th {
+            background-color: #047857;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            padding: 10px 12px;
+            text-align: left;
+        }
+        .items-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .items-table th.amount, .items-table td.amount {
+            text-align: right;
+        }
+        .items-table th.qty, .items-table td.qty {
+            text-align: center;
+        }
+
+        .totals-table {
+            width: 45%;
+            margin-left: auto;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .totals-table td {
+            padding: 6px 12px;
+            text-align: right;
+        }
+        .totals-table td.label {
+            font-weight: 500;
+            color: #4b5563;
+        }
+        .totals-table tr.grand-total td {
+            font-size: 16px;
+            font-weight: bold;
+            color: #047857;
+            border-top: 2px solid #047857;
+            padding-top: 10px;
+        }
+
+        .notice-box {
+            background-color: #f3f4f6;
+            border-left: 4px solid #047857;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 11px;
+            color: #4b5563;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+            font-size: 10px;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <table class="header-table">
+        <tr>
+            <td>
+                <div class="brand-title">Pineapple OS</div>
+                <div class="brand-subtitle">Système de gestion d'Établissements</div>
+            </td>
+            <td>
+                <div class="invoice-title">FACTURE {{ invoice_number }}</div>
+                <div class="invoice-meta">
+                    <strong>Date d'émission :</strong> {{ issue_date }}<br>
+                    <strong>Date d'échéance :</strong> {{ due_date }}<br>
+                    <span class="status-badge status-{{ status }}">{{ status }}</span>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Client and Seller Details -->
+    <table class="details-table">
+        <tr>
+            <td style="margin-right: 10px;">
+                <div class="section-heading">Émetteur</div>
+                <div class="party-name">{{ company_name }}</div>
+                <div>{{ company_address }}</div>
+                {% if tax_id_number %}
+                <div><strong>N° Contribuables :</strong> {{ tax_id_number }}</div>
+                {% endif %}
+            </td>
+            <td>
+                <div class="section-heading">Destinataire (Établissement)</div>
+                <div class="party-name">{{ tenant_name }}</div>
+                <div><strong>Code Établissement :</strong> {{ tenant_code }}</div>
+                {% if tenant_contact_email %}
+                <div><strong>Email :</strong> {{ tenant_contact_email }}</div>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <!-- Line Items Table -->
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th class="qty">Quantité</th>
+                <th class="amount">Prix unitaire (XAF)</th>
+                <th class="amount">Total HT (XAF)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for line in line_items %}
+            <tr>
+                <td>{{ line.description }}</td>
+                <td class="qty">{{ line.quantity }}</td>
+                <td class="amount">{{ line.unit_price_formatted }}</td>
+                <td class="amount">{{ line.total_formatted }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Totals Table -->
+    <table class="totals-table">
+        <tr>
+            <td class="label">Sous-total HT :</td>
+            <td class="amount"><strong>{{ subtotal_formatted }}</strong></td>
+        </tr>
+        {% if tax_rate_percent > 0 %}
+        <tr>
+            <td class="label">TVA ({{ tax_rate_percent }}%) :</td>
+            <td class="amount">{{ tax_formatted }}</td>
+        </tr>
+        {% endif %}
+        <tr class="grand-total">
+            <td class="label">Total TTC :</td>
+            <td class="amount">{{ total_formatted }}</td>
+        </tr>
+    </table>
+
+    <!-- Legal Notice & Payment Instructions -->
+    <div class="notice-box">
+        <strong>Mentions légales & Instructions de paiement :</strong><br>
+        {{ legal_notice }}<br>
+        <em>Règlement par Mobile Money (Orange Money / MTN MoMo) via Pineapple OS Admin ou par virement / dépôt bancaire.</em>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        Pineapple OS &bull; Facture générée automatiquement le {{ current_date }} &bull; Page 1/1
+    </div>
+
+</body>
+</html>

@@ -103,3 +103,62 @@ async def get_license_status(
         raise HTTPException(status_code=404, detail="No license found for this tenant")
 
     return status_dto
+
+
+# --- FACTURES & PDF (PHASE 2) ---
+
+from fastapi.responses import Response
+from monetization_context.application.dtos import InvoiceDTO
+from monetization_context.application.services.invoice_application_service import InvoiceApplicationService
+
+
+@router.get("/invoices", response_model=List[InvoiceDTO])
+async def list_invoices(
+    status_filter: Optional[str] = Query(None, alias="status"),
+    current_user: dict = Depends(get_current_user),
+    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    session_factory: async_sessionmaker[AsyncSession] = Depends(get_session_factory),
+):
+    """Lister les factures de l'établissement avec filtre optionnel par statut."""
+    async with session_factory() as session:
+        service = InvoiceApplicationService(session)
+        is_super_admin = current_user.get("user_type") == "PLATFORM_ADMIN"
+        return await service.get_tenant_invoices(tenant_id=tenant_id, status_filter=status_filter)
+
+
+@router.get("/invoices/{invoice_id}", response_model=InvoiceDTO)
+async def get_invoice_detail(
+    invoice_id: uuid.UUID,
+    current_user: dict = Depends(get_current_user),
+    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    session_factory: async_sessionmaker[AsyncSession] = Depends(get_session_factory),
+):
+    """Détail d'une facture avec vérification stricte de l'isolation inter-tenant."""
+    async with session_factory() as session:
+        service = InvoiceApplicationService(session)
+        is_super_admin = current_user.get("user_type") == "PLATFORM_ADMIN"
+        invoice_model = await service.get_invoice_by_id(
+            invoice_id=invoice_id, requesting_tenant_id=tenant_id, is_super_admin=is_super_admin
+        )
+        return service._map_to_dto(invoice_model)
+
+
+@router.get("/invoices/{invoice_id}/pdf")
+async def download_invoice_pdf(
+    invoice_id: uuid.UUID,
+    current_user: dict = Depends(get_current_user),
+    tenant_id: uuid.UUID = Depends(get_current_tenant_id),
+    session_factory: async_sessionmaker[AsyncSession] = Depends(get_session_factory),
+):
+    """Télécharger le PDF officiel de la facture (WeasyPrint / XAF)."""
+    async with session_factory() as session:
+        service = InvoiceApplicationService(session)
+        is_super_admin = current_user.get("user_type") == "PLATFORM_ADMIN"
+        pdf_bytes = await service.generate_invoice_pdf(
+            invoice_id=invoice_id, requesting_tenant_id=tenant_id, is_super_admin=is_super_admin
+        )
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename=Facture-{invoice_id}.pdf"},
+        )

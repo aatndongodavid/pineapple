@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy import (
     BigInteger,
@@ -18,7 +18,7 @@ from sqlalchemy import (
     UniqueConstraint,
     func,
 )
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from monetization_context.domain.value_objects import (
     BillingPeriod,
@@ -82,6 +82,10 @@ class InvoiceModel(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
+    lines: Mapped[List["InvoiceLineModel"]] = relationship(
+        "InvoiceLineModel", back_populates="invoice", cascade="all, delete-orphan", lazy="selectin"
+    )
+
 
 class InvoiceLineModel(Base):
     """Lignes de détail d'une facture."""
@@ -93,6 +97,8 @@ class InvoiceLineModel(Base):
     quantity: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     unit_price_xaf: Mapped[int] = mapped_column(BigInteger, nullable=False)
     total_xaf: Mapped[int] = mapped_column(BigInteger, nullable=False)
+
+    invoice: Mapped["InvoiceModel"] = relationship("InvoiceModel", back_populates="lines")
 
 
 class PaymentModel(Base):
