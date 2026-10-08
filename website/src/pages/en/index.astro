@@ -1,0 +1,167 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SocialProofPlaceholder from '../../components/SocialProofPlaceholder.astro';
+import siteConfig from '../../../site.config.json';
+---
+
+<Layout
+  title="Academic Management System for Higher Education"
+  description="Pineapple OS is the integrated management platform for students, timetables, rooms, and delegates tailored for universities and higher institutes in Cameroon."
+  lang="en"
+  alternateUrlFr="/fr/"
+  alternateUrlEn="/en/"
+>
+  <!-- Hero Section -->
+  <section class="relative bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-white pt-16 pb-24 border-b border-slate-800 overflow-hidden">
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="text-center max-w-4xl mx-auto">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 font-semibold text-xs mb-8">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+          Engineered for Cameroon and African Higher Education 🇨🇲
+        </div>
+
+        <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight leading-tight mb-8">
+          Manage your institution with the <span class="bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 bg-clip-text text-transparent">simplicity of a smartphone</span>
+        </h1>
+
+        <p class="text-lg sm:text-xl text-slate-300 mb-10 leading-relaxed max-w-3xl mx-auto">
+          Student registration, intelligent timetable scheduling, room conflict detection, and real-time delegate reporting. Works seamlessly even on unstable 2G/3G mobile networks.
+        </p>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a
+            href="/en/demo/"
+            class="w-full sm:w-auto px-8 py-4 rounded-xl font-extrabold text-base bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 hover:from-amber-400 hover:to-amber-500 shadow-xl shadow-amber-500/20 transition-all text-center"
+          >
+            🚀 Request a Free Demo
+          </a>
+          <a
+            href="https://demo.pineapple.cm"
+            target="_blank"
+            class="w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-base bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition-all text-center"
+          >
+            👀 Test Live Demo
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Social Proof Placeholder (Rule V3) -->
+  <SocialProofPlaceholder lang="en" />
+
+  <!-- Core Value Pillars -->
+  <section id="features" class="py-20 bg-slate-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <h2 class="text-xs uppercase tracking-widest font-extrabold text-amber-600 mb-3">Key Pillars</h2>
+        <p class="text-3xl font-extrabold text-slate-900 tracking-tight">A complete modular suite for your campus</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Pillar 1 -->
+        <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-md hover:shadow-xl transition-all">
+          <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl font-bold mb-6">
+            🎓
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 mb-3">Student Records & Management</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-4">
+            CSV batch imports, department/program management, official class lists, and administrative tracking without duplicate records.
+          </p>
+          <a href="/en/features/" class="text-xs font-bold text-amber-600 hover:underline">Learn more →</a>
+        </div>
+
+        <!-- Pillar 2 -->
+        <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-md hover:shadow-xl transition-all">
+          <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl font-bold mb-6">
+            🏫
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 mb-3">Timetables & Smart Rooms</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-4">
+            Dynamic course scheduling, real-time overlap prevention for lecture halls, and confrontation between official schedules and actual room usage.
+          </p>
+          <a href="/en/features/" class="text-xs font-bold text-amber-600 hover:underline">Learn more →</a>
+        </div>
+
+        <!-- Pillar 3 -->
+        <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-md hover:shadow-xl transition-all">
+          <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl font-bold mb-6">
+            🗳️
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 mb-3">Delegate Portal & Elections</h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-4">
+            Transparent election management, candidacy validation, and an official real-time room status reporting channel operated by class delegates.
+          </p>
+          <a href="/en/features/" class="text-xs font-bold text-amber-600 hover:underline">Learn more →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Low Bandwidth & Security Section -->
+  <section class="py-20 bg-slate-900 text-white border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <span class="text-xs uppercase tracking-widest font-extrabold text-amber-400 mb-2 block">Localized High Performance</span>
+          <h2 class="text-3xl font-extrabold tracking-tight mb-6">Built to perform on 2G/3G mobile networks</h2>
+          <p class="text-slate-300 text-base leading-relaxed mb-6">
+            In African campus environments, mobile connectivity inside lecture halls can fluctuate. Pineapple OS leverages an offline-first PWA architecture with automatic background sync.
+          </p>
+          <ul class="space-y-3 text-sm text-slate-300 mb-8">
+            <li class="flex items-center gap-3">
+              <span class="text-amber-400 font-bold">✓</span> Under 200 KB payload per page view
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="text-amber-400 font-bold">✓</span> Battery-saving dark mode for AMOLED screens
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="text-amber-400 font-bold">✓</span> Strict tenant data isolation (Multi-tenant DDD architecture)
+            </li>
+          </ul>
+          <a href="/en/security/" class="inline-flex items-center px-6 py-3 rounded-lg font-bold text-sm bg-slate-800 hover:bg-slate-700 text-white border border-slate-700">
+            Explore our security architecture →
+          </a>
+        </div>
+
+        <div class="bg-slate-950 p-8 rounded-2xl border border-slate-800 shadow-2xl">
+          <h3 class="font-extrabold text-lg text-white mb-4">💬 Operational Problems Solved Daily</h3>
+          <div class="space-y-4 text-xs text-slate-300">
+            <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+              <span class="font-bold text-amber-400 block mb-1">No double-booked lecture halls:</span>
+              Our scheduling algorithm prevents assigning the same classroom to multiple lecturers at the same time.
+            </div>
+            <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+              <span class="font-bold text-amber-400 block mb-1">Verified student affiliations:</span>
+              Every student account is linked to their school via official matriculation validated by academic administration.
+            </div>
+            <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+              <span class="font-bold text-amber-400 block mb-1">Instant targeted notifications:</span>
+              Free in-app and web push alerts for course cancellations or room changes.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Bottom -->
+  <section class="py-20 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+      <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4">Ready to modernize your academic management?</h2>
+      <p class="text-slate-900 text-base font-medium mb-8 max-w-2xl mx-auto">
+        Request a 20-minute tailored presentation for your executive board or test our live demo environment directly.
+      </p>
+      <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <a href="/en/demo/" class="px-8 py-4 rounded-xl font-extrabold text-base bg-slate-950 text-white hover:bg-slate-900 transition-all shadow-xl">
+          Get a Custom Demo
+        </a>
+        <a href="/en/pricing/" class="px-8 py-4 rounded-xl font-bold text-base bg-white/20 hover:bg-white/30 text-slate-950 transition-all border border-slate-950/20">
+          View XAF Pricing
+        </a>
+      </div>
+    </div>
+  </section>
+</Layout>

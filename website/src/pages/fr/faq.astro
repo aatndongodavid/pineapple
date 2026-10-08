@@ -1,0 +1,98 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const faqsFr = [
+  {
+    q: "1. Comment Pineapple OS gère-t-il les connexions internet instables (2G/3G) ?",
+    a: "Pineapple OS est construit sur une architecture PWA (Progressive Web App) 'offline-first'. Les emplois du temps et registres de la journée sont mis en cache localement sur le téléphone. La consultation est immédiate même sans réseau, et les mises à jour se synchronisent dès la reconnexion."
+  },
+  {
+    q: "2. Quelle est la durée nécessaire pour déployer la plateforme dans notre établissement ?",
+    a: "Le déploiement standard prend moins de 48 heures. Il suffit d'importer vos listes d'étudiants (au format CSV/Excel) et votre inventaire des salles pour que le système soit immédiatement opérationnel."
+  },
+  {
+    q: "3. Comment sont gérés les droits et accès des utilisateurs ?",
+    a: "Pineapple OS intègre un contrôle d'accès strict par rôles (RBAC). Le Directeur Général, le Secrétaire Général, le Chef de travaux, l'Enseignant et le Délégué disposent chacun d'un espace aux permissions adaptées."
+  },
+  {
+    q: "4. Nos données d'établissement sont-elles isolées des autres universités ?",
+    a: "Oui, totalement. L'architecture multi-tenant garantit une étanchéité cryptographique absolue grâce à des identifiants d'établissement (`tenant_id`) intégrés dans chaque jeton de connexion."
+  },
+  {
+    q: "5. Que se passe-t-il si un amphi est attribué à deux cours en même temps ?",
+    a: "L'algorithme de détection de conflits empêche l'enregistrement de l'emploi du temps et alerte immédiatement le planificateur avant toute publication."
+  },
+  {
+    q: "6. Quel est le rôle exact des délégués de classe ?",
+    a: "Les délégués valides signalent l'occupation réelle ou la libération des salles depuis leur smartphone, permettant de corriger en direct les écarts par rapport au planning théorique."
+  },
+  {
+    q: "7. Comment se passe la transition depuis nos fichiers Excel actuels ?",
+    a: "Nous fournissons des modèles d'importation CSV très simples pour vos étudiants et plannings. Notre équipe peut également effectuer l'importation initiale pour vous."
+  },
+  {
+    q: "8. Quel est le coût exact de l'abonnement et y a-t-il des frais cachés ?",
+    a: "Nos tarifs sont 100% transparents et annuels en FCFA (XAF). Par exemple, 150 000 FCFA/an pour moins de 300 étudiants. L'hébergement, la maintenance et le support sont inclus."
+  },
+  {
+    q: "9. Les étudiants doivent-ils payer pour utiliser l'application ?",
+    a: "Non, absolument pas. L'application est 100% gratuite pour tous les étudiants et enseignants de l'établissement abonné."
+  },
+  {
+    q: "10. L'application contient-elle des publicités pour les étudiants abonnés ?",
+    a: "Non. Aucune publicité tierce n'est affichée pour les membres d'un établissement abonné."
+  },
+  {
+    q: "11. Comment se passent les sauvegardes de données en cas de sinistre ?",
+    a: "Les sauvegardes automatiques chiffrées sont exécutées chaque jour. La durée maximale de perte de données (RPO) est inférieure à 1 heure."
+  },
+  {
+    q: "12. Est-il possible d'envoyer des SMS en cas d'absence d'Internet ?",
+    a: "Oui, l'option Pack SMS (10 FCFA/SMS) permet de diffuser des alertes urgentes par SMS directement sur le mobile des étudiants."
+  },
+  {
+    q: "13. Pineapple OS est-il conforme à la protection des données ?",
+    a: "Oui, toutes les données personnelles sont chiffrées (TLS 1.3 & AES-256) et hébergées conformément aux normes internationales de confidentialité."
+  },
+  {
+    q: "14. Proposez-vous une formation pour nos secrétariats académiques ?",
+    a: "Oui, nous organisons une session de prise en main de 1 heure pour vos secrétaires et chefs de travaux, en présentiel ou en visioconférence."
+  },
+  {
+    q: "15. Comment tester la plateforme avant de s'engager ?",
+    a: "Vous pouvez accéder directement à notre démo bac à sable en ligne sur demo.pineapple.cm ou solliciter une démo personnalisée gratuite."
+  },
+  {
+    q: "16. Quel est le taux de disponibilité garanti (SLA) ?",
+    a: "Nous garantissons un taux de disponibilité de 99.9% avec monitoring continu des serveurs."
+  }
+];
+---
+
+<Layout
+  title="Foire Aux Questions (FAQ)"
+  description="Réponses détaillées à toutes vos questions sur Pineapple OS : déploiement, sécurité, tarifs XAF, mode hors-ligne et délégués."
+  lang="fr"
+  alternateUrlFr="/fr/faq/"
+  alternateUrlEn="/en/faq/"
+>
+  <section class="py-16 bg-slate-900 text-white border-b border-slate-800 text-center">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-extrabold tracking-tight mb-4">Foire Aux Questions (FAQ)</h1>
+      <p class="text-lg text-slate-300 max-w-2xl mx-auto">
+        Toutes les réponses transparentes aux questions des Directeurs, Secrétaires Généraux et Chefs de travaux.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-20 bg-slate-50 text-slate-900">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      {faqsFr.map((faq) => (
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-md">
+          <h3 class="font-extrabold text-base text-slate-900 mb-2">{faq.q}</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">{faq.a}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+</Layout>

@@ -181,14 +181,18 @@ async def upload_document(
         price_fcfa=price_fcfa,
     )
     file_bytes = await file.read()
+    from shared_kernel.infrastructure.file_security import sanitize_filename, validate_file_magic_bytes
+    validated_mime = validate_file_magic_bytes(file_bytes, file.filename or "document.pdf")
+    safe_filename = sanitize_filename(file.filename or "document.pdf")
+
     use_case = UploadLibraryDocumentUseCase(library_repo, file_storage)
     doc = await use_case.execute(
         tenant_id=tenant_id,
         uploader_id=current_user["user_id"],
         dto=dto,
         file_bytes=file_bytes,
-        original_filename=file.filename or "document",
-        mime_type=file.content_type or "application/pdf",
+        original_filename=safe_filename,
+        mime_type=validated_mime,
     )
     return DocumentResponseDTO(
         id=doc.id,

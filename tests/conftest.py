@@ -22,7 +22,7 @@ from shared_kernel.infrastructure.database import Base, get_db_session
 # ---------------------------------------------------------------------------
 TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL",
-    "postgresql+asyncpg://pineapple:pineapple_dev_password@localhost:5432/pineapple_test",
+    "sqlite+aiosqlite:///test.db",
 )
 
 # ---------------------------------------------------------------------------
@@ -49,6 +49,7 @@ async def db_engine():
     )
     # Création des tables (en développement, utilisez Alembic pour les migrations)
     async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
     yield engine
     await engine.dispose()

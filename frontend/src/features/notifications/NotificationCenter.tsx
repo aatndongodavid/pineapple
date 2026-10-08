@@ -73,6 +73,34 @@ export const NotificationCenter: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Sync with API when opened
+  useEffect(() => {
+    if (!isOpen) return;
+    const fetchNotifications = async () => {
+      try {
+        const res = await fetch('/api/v1/notifications');
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setNotifications(
+              data.map((n: any) => ({
+                id: n.id,
+                type: n.category === 'CRITICAL' ? 'admin' : n.category === 'IMPORTANT' ? 'democracy' : 'community',
+                title: n.title,
+                description: n.body,
+                timestamp: n.created_at,
+                isRead: n.is_read,
+              }))
+            );
+          }
+        }
+      } catch (err) {
+        // Fallback to local mock state
+      }
+    };
+    fetchNotifications();
+  }, [isOpen]);
+
   // Fermer si clic extérieur (pour desktop)
   useEffect(() => {
     if (!isOpen) return;
@@ -90,14 +118,20 @@ export const NotificationCenter: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
 
-  const markAllAsRead = () => {
+  const markAllAsRead = async () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    try {
+      await fetch('/api/v1/notifications/read-all', { method: 'POST' });
+    } catch (err) {}
   };
 
-  const markAsRead = (id: string) => {
+  const markAsRead = async (id: string) => {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
     );
+    try {
+      await fetch(`/api/v1/notifications/${id}/read`, { method: 'PATCH' });
+    } catch (err) {}
   };
 
   const formatTime = (iso: string) => {

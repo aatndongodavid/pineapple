@@ -1,0 +1,81 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Fonctionnalités par Profil"
+  description="Découvrez les fonctionnalités de Pineapple OS adaptées aux Directeurs, Secrétaires Généraux, Scolarités, Enseignants, Délégués et Étudiants."
+  lang="fr"
+  alternateUrlFr="/fr/fonctionnalites/"
+  alternateUrlEn="/en/features/"
+>
+  <section class="py-16 bg-slate-900 text-white border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-4xl font-extrabold tracking-tight mb-4">Une solution pensée pour chaque acteur du campus</h1>
+      <p class="text-lg text-slate-300 max-w-3xl mx-auto">
+        Chaque rôle dispose d'un espace ergonomique adapté à ses responsabilités quotidiennes.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-20 bg-slate-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+      <!-- Directeurs & SG -->
+      <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-lg grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+        <div class="md:col-span-1">
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-100 px-3 py-1 rounded-full">Direction</span>
+          <h2 class="text-2xl font-extrabold text-slate-900 mt-3 mb-2">Directeurs Généraux & Secrétaires Généraux</h2>
+          <p class="text-sm text-slate-600">Vision globale, gouvernance et sécurité juridique de l'établissement.</p>
+        </div>
+        <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-700">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="font-bold text-slate-900 block mb-1">📊 Tableau de bord d'occupation</span>
+            Suivi du taux d'utilisation des salles et amphis en temps réel.
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="font-bold text-slate-900 block mb-1">🔐 Contrôle des accès & rôles</span>
+            Gestion fine des permissions administratives sans risque de fuite de données.
+          </div>
+        </div>
+      </div>
+
+      <!-- Scolarité & Chefs de travaux -->
+      <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-lg grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+        <div class="md:col-span-1">
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-100 px-3 py-1 rounded-full">Administration</span>
+          <h2 class="text-2xl font-extrabold text-slate-900 mt-3 mb-2">Scolarité & Chefs de Travaux</h2>
+          <p class="text-sm text-slate-600">Gestion quotidienne des emplois du temps et registres d'effectifs.</p>
+        </div>
+        <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-700">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="font-bold text-slate-900 block mb-1">📅 Planification intelligente</span>
+            Création d'emplois du temps avec détection immédiate des doublons de salles.
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="font-bold text-slate-900 block mb-1">📥 Import / Export CSV simple</span>
+            Importation massive des registres étudiants depuis Excel / CSV.
+          </div>
+        </div>
+      </div>
+
+      <!-- Délégués & Enseignants -->
+      <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-lg grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+        <div class="md:col-span-1">
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-100 px-3 py-1 rounded-full">Terrain & Classes</span>
+          <h2 class="text-2xl font-extrabold text-slate-900 mt-3 mb-2">Enseignants & Délégués de classe</h2>
+          <p class="text-sm text-slate-600">Communication directe et remontée de terrain instantanée.</p>
+        </div>
+        <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-700">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="font-bold text-slate-900 block mb-1">📢 Signalement des salles</span>
+            Les délégués déclarent l'occupation réelle ou la libération d'une salle.
+          </div>
+          <div class="p-4 rounded-xl bg-slate-90 border border-slate-200">
+            <span class="font-bold text-slate-900 block mb-1">🔔 Diffusion de notifications</span>
+            Information instantanée des étudiants en cas de déplacement de cours.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

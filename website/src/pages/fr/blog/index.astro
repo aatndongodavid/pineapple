@@ -1,0 +1,59 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+const articlesFr = [
+  {
+    id: '1',
+    title: "Comment éliminer les conflits d'amphis dans l'enseignement supérieur au Cameroun",
+    date: "5 Octobre 2026",
+    summary: "Découvrez comment un algorithme de vérification en temps réel combiné à la remontée terrain des délégués élimine définitivement les amphis réservés en double.",
+    href: "/fr/blog/1/"
+  },
+  {
+    id: '2',
+    title: "Le rôle clé des délégués de classe dans la gestion des emplois du temps",
+    date: "28 Septembre 2026",
+    summary: "Pourquoi l'implication des délégués de promotion transforme la gestion des salles et renforce la démocratie de campus.",
+    href: "/fr/blog/2/"
+  },
+  {
+    id: '3',
+    title: "Pourquoi les applications lourdes échouent sur les réseaux 2G/3G de campus",
+    date: "15 Septembre 2026",
+    summary: "Une analyse technique du choix de l'architecture Progressive Web App (PWA) offline-first pour les étudiants en Afrique.",
+    href: "/fr/blog/3/"
+  }
+];
+---
+
+<Layout
+  title="Blog & Articles Académiques"
+  description="Guides, analyses et retours d'expérience sur la digitalisation de l'enseignement supérieur au Cameroun et en Afrique."
+  lang="fr"
+  alternateUrlFr="/fr/blog/"
+  alternateUrlEn="/en/blog/"
+>
+  <section class="py-16 bg-slate-900 text-white border-b border-slate-800 text-center">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-extrabold tracking-tight mb-4">Blog & Publications Académiques</h1>
+      <p class="text-lg text-slate-300 max-w-2xl mx-auto">
+        Réflexions et conseils pour les dirigeants d'établissements d'enseignement supérieur.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-20 bg-slate-50 text-slate-900">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+      {articlesFr.map((art) => (
+        <article class="bg-white p-6 rounded-2xl border border-slate-200 shadow-md hover:shadow-xl transition-all flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-bold text-amber-600 block mb-2">{art.date}</span>
+            <h2 class="text-lg font-bold text-slate-900 mb-3 leading-snug">{art.title}</h2>
+            <p class="text-xs text-slate-600 leading-relaxed mb-6">{art.summary}</p>
+          </div>
+          <a href={art.href} class="text-xs font-extrabold text-amber-600 hover:underline">Lire l'article complet →</a>
+        </article>
+      ))}
+    </div>
+  </section>
+</Layout>

@@ -2,9 +2,9 @@ name: Frontend CI
 
 on:
   pull_request:
-    branches: [main, deploy, feature-*]
+    branches: [main, deploy, refactor/*, feature-*]
   push:
-    branches: [main, deploy, feature-*]
+    branches: [main, deploy, refactor/*, feature-*]
 
 jobs:
   build-and-test-frontend:
@@ -23,19 +23,11 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        with:
-          path: frontend/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
       - name: Install dependencies
         run: npm install
 
       - name: Type-check with TypeScript
-        run: npx tsc --noEmit || true
+        run: npm run type-check
 
       - name: Build PWA
-        run: npm run build || true
+        run: npm run build

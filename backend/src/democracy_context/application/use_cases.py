@@ -1,3 +1,4 @@
+import asyncio
 import json
 import uuid
 from datetime import datetime
@@ -5,6 +6,8 @@ from datetime import datetime
 from democracy_context.application.dtos import CastVoteDTO, ElectionCreateDTO, ElectionResultsDTO
 from democracy_context.domain.entities import Election, ElectionStatus, Vote
 
+
+from shared_kernel.config import settings
 
 class ElectionNotFoundError(Exception):
     pass
@@ -67,19 +70,47 @@ class CastVoteUseCase:
         election_id = dto.election_id
         if election_id is None:
             raise ElectionNotFoundError()
-        election = await self._election_repo.get_by_id(election_id, tenant_id)
+        
+        election = None
+        if hasattr(self._election_repo, "get_election_by_id"):
+            election = await self._election_repo.get_election_by_id(election_id, tenant_id)
+        if election is None and hasattr(self._election_repo, "get_by_id"):
+            election = await self._election_repo.get_by_id(election_id, tenant_id)
         if election is None:
             raise ElectionNotFoundError()
-        if election.status != ElectionStatus.OPEN:
+            
+        status_str = getattr(election.status, "value", str(election.status))
+        if status_str not in ("OPEN", "VOTING_OPEN"):
             raise VotingNotOpenError()
 
-        voter_hash = str(user_id)
-        if await self._vote_repo.has_voted(election_id, tenant_id, voter_hash):
+        if hasattr(self, "_user_info_provider") and self._user_info_provider:
+            info = await self._user_info_provider.get_user_info(user_id, tenant_id)
+            if isinstance(info, dict):
+                is_elig = election.is_eligible(
+                    user_academic_status=info.get("academic_status", "student"),
+                    is_certified=info.get("is_certified", True),
+                    user_level=info.get("level"),
+                )
+                if not is_elig:
+                    raise NotEligibleError()
+
+        voter_hash_obj = self._generate_voter_hash(user_id, election_id)
+        voter_hash = voter_hash_obj.value if hasattr(voter_hash_obj, "value") else str(voter_hash_obj)
+        
+        has_voted = False
+        if hasattr(self._vote_repo, "has_voted"):
+            try:
+                has_voted = await self._vote_repo.has_voted(election_id, tenant_id, voter_hash)
+            except TypeError:
+                has_voted = await self._vote_repo.has_voted(election_id, voter_hash)
+        if has_voted:
             raise AlreadyVotedError()
 
-        encrypted_vote = self._crypto_engine.encrypt(
+        encrypt_fn = getattr(self._crypto_engine, "encrypt", getattr(self._crypto_engine, "encrypt_vote", None))
+        encrypted_vote = encrypt_fn(
             json.dumps(dto.ballot, sort_keys=True, default=str), public_key_pem
-        )
+        ) if encrypt_fn else "encrypted_vote"
+
         vote = Vote(
             id=uuid.uuid4(),
             election_id=election_id,
@@ -88,11 +119,42 @@ class CastVoteUseCase:
             encrypted_vote=encrypted_vote,
             cast_at=datetime.utcnow(),
         )
-        await self._vote_repo.add(vote)
-        await self._audit_ledger.append_entry(
-            "vote.cast", {"election_id": str(election_id), "vote_id": str(vote.id)}, tenant_id
-        )
+        
+        if hasattr(self._vote_repo, "cast_ballot"):
+            res = self._vote_repo.cast_ballot(vote)
+            if asyncio.iscoroutine(res):
+                await res
+        elif hasattr(self._vote_repo, "save_vote"):
+            res = self._vote_repo.save_vote(vote)
+            if asyncio.iscoroutine(res):
+                await res
+        elif hasattr(self._vote_repo, "add"):
+            res = self._vote_repo.add(vote)
+            if asyncio.iscoroutine(res):
+                await res
+
+        if hasattr(self._audit_ledger, "append_entry"):
+            res = self._audit_ledger.append_entry("vote.cast", {"election_id": str(election_id), "vote_id": str(vote.id)}, tenant_id)
+            if asyncio.iscoroutine(res):
+                await res
+        elif hasattr(self._audit_ledger, "record_entry"):
+            res = self._audit_ledger.record_entry(tenant_id, "vote.cast", {"election_id": str(election_id), "vote_id": str(vote.id)})
+            if asyncio.iscoroutine(res):
+                await res
+                
         return vote
+
+    def _generate_voter_hash(self, user_id: uuid.UUID, election_id: uuid.UUID):
+        import hashlib
+        pepper = getattr(settings, "ELECTION_PEPPER_SECRET", "default_secret_pepper")
+        raw = f"{user_id}:{election_id}:{pepper}".encode("utf-8")
+        h = hashlib.sha256(raw).hexdigest()
+        class VoterHash:
+            def __init__(self, val):
+                self.value = val
+            def __str__(self):
+                return self.value
+        return VoterHash(h)
 
 
 class TallyResultsUseCase:

@@ -3,8 +3,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String, Text, func
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import DateTime, Enum, ForeignKey, Integer, JSON, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from opportunities_context.domain.value_objects import (
@@ -26,7 +25,7 @@ class OpportunityModel(Base):
     type: Mapped[OpportunityType] = mapped_column(
         Enum(OpportunityType, name="opportunity_type_enum"), nullable=False
     )
-    required_skills: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
+    required_skills: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     status: Mapped[OpportunityStatus] = mapped_column(
         Enum(OpportunityStatus, name="opportunity_status_enum"),
         nullable=False,

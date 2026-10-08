@@ -9,8 +9,8 @@ class ElectionStatus(str, Enum):
     CAMPAIGN = "CAMPAIGN"
     UPCOMING = "UPCOMING"
     OPEN = "OPEN"
-    VOTING_OPEN = "VOTING_OPEN"
-    VOTING_CLOSED = "VOTING_CLOSED"
+    VOTING_OPEN = "OPEN"
+    VOTING_CLOSED = "CLOSED"
     RESULTS_PUBLISHED = "RESULTS_PUBLISHED"
     ARCHIVED = "ARCHIVED"
     CLOSED = "CLOSED"
@@ -35,6 +35,28 @@ class Election:
     eligibility_rules: dict[str, Any]
     voting_start_at: datetime
     voting_end_at: datetime
+    created_at: datetime = field(default_factory=datetime.utcnow)
+
+    def is_eligible(self, user_academic_status: str, is_certified: bool, user_level: str = None) -> bool:
+        if self.eligibility_rules.get("certified") and not is_certified:
+            return False
+        if "level" in self.eligibility_rules and user_level and self.eligibility_rules["level"] != user_level:
+            return False
+        return True
+
+    def can_vote(self, at_time: datetime = None) -> bool:
+        status_str = getattr(self.status, "value", str(self.status))
+        if status_str not in ("OPEN", "VOTING_OPEN"):
+            return False
+        now = at_time or datetime.utcnow()
+        if self.voting_start_at and now < self.voting_start_at:
+            return False
+        if self.voting_end_at and now > self.voting_end_at:
+            return False
+        return True
+
+    def close_voting(self) -> None:
+        self.status = ElectionStatus.VOTING_CLOSED
 
 
 @dataclass

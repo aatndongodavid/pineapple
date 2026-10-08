@@ -20,3 +20,29 @@ class WatermarkMetadata:
     user_matricule: str
     ip_address: str
     timestamp: str
+
+
+class CalendarExceptionType(str, Enum):
+    HOLIDAY = "HOLIDAY"
+    VACATION = "VACATION"
+    EXAM_PERIOD = "EXAM_PERIOD"
+
+
+class TimetableExceptionType(str, Enum):
+    CANCELLED = "CANCELLED"
+    MOVED = "MOVED"
+    ROOM_CHANGED = "ROOM_CHANGED"
+    TEACHER_CHANGED = "TEACHER_CHANGED"
+
+
+class ReservationStatus(str, Enum):
+    PENDING = "PENDING"
+    APPROVED = "APPROVED"
+    REJECTED = "REJECTED"
+
+
+class ChangeRequestStatus(str, Enum):
+    PENDING = "PENDING"
+    APPROVED = "APPROVED"
+    REJECTED = "REJECTED"
+

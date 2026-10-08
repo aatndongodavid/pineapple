@@ -1,0 +1,59 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import DemoRequestForm from '../../components/DemoRequestForm.astro';
+---
+
+<Layout
+  title="Demander une Démo Gratuite"
+  description="Réservez une démonstration personnalisée de Pineapple OS ou accédez immédiatement à notre environnement de démo en ligne."
+  lang="fr"
+  alternateUrlFr="/fr/demo/"
+  alternateUrlEn="/en/demo/"
+>
+  <section class="py-16 bg-slate-900 text-white border-b border-slate-800 text-center">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-extrabold tracking-tight mb-4">Découvrez Pineapple OS en action</h1>
+      <p class="text-lg text-slate-300 max-w-2xl mx-auto">
+        Remplissez le formulaire ci-dessous pour planifier une démo guidée de 20 min avec un expert ou essayez le bac à sable directement.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-20 bg-slate-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+      <!-- Left: Demo Request Form -->
+      <div class="lg:col-span-7">
+        <DemoRequestForm lang="fr" />
+      </div>
+
+      <!-- Right: Direct Instant Sandbox Link & Expectations -->
+      <div class="lg:col-span-5 space-y-8">
+        <div class="bg-slate-900 text-white p-8 rounded-2xl border border-slate-800 shadow-xl">
+          <span class="text-xs uppercase font-extrabold text-amber-400 tracking-wider mb-2 block">Accès Immédiat</span>
+          <h2 class="text-xl font-bold mb-4">👀 Vous préférez tester par vous-même ?</h2>
+          <p class="text-slate-300 text-sm leading-relaxed mb-6">
+            Explorez notre établissement fictif (« Établissement Démo Pineapple ») pré-chargé avec 60 étudiants, 4 filières, 8 amphis et des emplois du temps réels.
+          </p>
+          <a
+            href="https://demo.pineapple.cm"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-block w-full text-center py-3.5 px-6 rounded-xl font-extrabold text-sm bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 hover:from-amber-400 hover:to-amber-500 transition-all shadow-lg"
+          >
+            👉 Lancer la Démo Bac à Sable
+          </a>
+        </div>
+
+        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-md text-slate-700 text-xs space-y-4">
+          <h3 class="font-bold text-slate-900 text-sm">📋 Ce que comprend votre rendez-vous démo :</h3>
+          <ul class="space-y-2">
+            <li class="flex items-center gap-2">✓ Analyse de vos problématiques académiques actuelles</li>
+            <li class="flex items-center gap-2">✓ Présentation adaptée aux rôles de votre équipe (DG, SG, Scolarité)</li>
+            <li class="flex items-center gap-2">✓ Simulation d'importation de vos listes d'étudiants actuelles</li>
+            <li class="flex items-center gap-2">✓ Devis chiffré sans engagement adapté à vos effectifs</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,81 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Features by Profile"
+  description="Explore Pineapple OS features tailored for Directors, Secretaries General, Academic Staff, Lecturers, Delegates, and Students."
+  lang="en"
+  alternateUrlFr="/fr/fonctionnalites/"
+  alternateUrlEn="/en/features/"
+>
+  <section class="py-16 bg-slate-900 text-white border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-4xl font-extrabold tracking-tight mb-4">A solution designed for every stakeholder on campus</h1>
+      <p class="text-lg text-slate-300 max-w-3xl mx-auto">
+        Every role gets an intuitive interface aligned with their daily responsibilities.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-20 bg-slate-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+      <!-- Directors & SG -->
+      <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-lg grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+        <div class="md:col-span-1">
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-100 px-3 py-1 rounded-full">Executive Leadership</span>
+          <h2 class="text-2xl font-extrabold text-slate-900 mt-3 mb-2">Directors General & Secretaries General</h2>
+          <p class="text-sm text-slate-600">Global institutional oversight, governance, and compliance assurance.</p>
+        </div>
+        <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-700">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="font-bold text-slate-900 block mb-1">📊 Room Utilization Dashboard</span>
+            Real-time monitoring of lecture hall and classroom occupancy rates.
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="font-bold text-slate-900 block mb-1">🔐 Access Control & Role Management</span>
+            Fine-grained administrative permission scoping preventing data leaks.
+          </div>
+        </div>
+      </div>
+
+      <!-- Academic Staff -->
+      <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-lg grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+        <div class="md:col-span-1">
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-100 px-3 py-1 rounded-full">Academic Office</span>
+          <h2 class="text-2xl font-extrabold text-slate-900 mt-3 mb-2">Academic Registrar & Schedulers</h2>
+          <p class="text-sm text-slate-600">Daily management of timetables and official student registers.</p>
+        </div>
+        <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-700">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="font-bold text-slate-900 block mb-1">📅 Smart Timetabling</span>
+            Course schedule creation with instant room collision detection.
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="font-bold text-slate-900 block mb-1">📥 Simple CSV Import / Export</span>
+            Mass student registration uploads directly from Excel or CSV.
+          </div>
+        </div>
+      </div>
+
+      <!-- Lecturers & Delegates -->
+      <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-lg grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+        <div class="md:col-span-1">
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-100 px-3 py-1 rounded-full">On-Ground & Classrooms</span>
+          <h2 class="text-2xl font-extrabold text-slate-900 mt-3 mb-2">Lecturers & Class Delegates</h2>
+          <p class="text-sm text-slate-600">Direct communication and real-time field status updates.</p>
+        </div>
+        <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-700">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="font-bold text-slate-900 block mb-1">📢 Room Status Declaration</span>
+            Delegates report real-time room availability or ongoing lectures.
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="font-bold text-slate-900 block mb-1">🔔 Broadcast Notifications</span>
+            Instant student alerts for rescheduled or moved lectures.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

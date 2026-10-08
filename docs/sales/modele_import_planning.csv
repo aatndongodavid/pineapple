@@ -1,0 +1,5 @@
+jour,heure_debut,heure_fin,filiere,niveau,code_cours,nom_cours,salle,enseignant
+Lundi,08:00,10:00,Informatique,L3,INF301,Algorithmique Avancee,Amphi A,Dr. Fouda
+Lundi,10:15,12:15,Informatique,L3,INF302,Bases de Donnees Relationnelles,Amphi A,Prof. Kamga
+Mardi,08:00,10:00,Gestion,M1,GES401,Comptabilite Analytique,Salle 102,Dr. Ngo
+Mardi,10:15,12:15,Gestion,M1,GES402,Finance d'Entreprise,Salle 102,Prof. Biya

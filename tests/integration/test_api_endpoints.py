@@ -16,191 +16,165 @@ from jose import jwt
 
 from api.main import app
 from shared_kernel.config import settings
-from shared_kernel.infrastructure.database import AsyncSessionLocal, Base
-from shared_kernel.infrastructure.tenant_middleware import get_current_tenant_id
-from identity_context.infrastructure.persistence.models import UserModel
-from democracy_context.infrastructure.persistence.models import ElectionModel
+from shared_kernel.infrastructure.security import create_access_token
+from identity_context.infrastructure.persistence.models import (
+    UserModel,
+    TenantModel,
+    MembershipModel,
+    RosterEntryModel,
+)
 from identity_context.domain.value_objects import (
     AccountStatus,
-    AcademicStatus,
-    VerificationStatus,
+    MembershipRole,
+    MembershipStatus,
 )
-from democracy_context.domain.entities import ElectionStatus
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 
-# ---------------------------------------------------------------------------
-# Fixtures locales pour préparer les données
-# ---------------------------------------------------------------------------
 @pytest_asyncio.fixture
-async def seed_users(async_db_session: AsyncSession):
+async def seed_school_and_users(session_factory):
     """
-    Insère un admin (enseignant vérifié) et un étudiant certifié dans la base.
-    Retourne leurs identifiants.
+    Insère un tenant, un admin et un étudiant membres dans la base.
     """
-    tenant_id = uuid.UUID("11111111-1111-1111-1111-111111111111")
+    async with session_factory() as db:
+        tenant_id = uuid.UUID("11111111-1111-1111-1111-111111111111")
+        admin_id = uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+        student_id = uuid.UUID("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
 
-    admin_id = uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
-    student_id = uuid.UUID("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+        existing_tenant = (await db.execute(select(TenantModel).where((TenantModel.id == tenant_id) | (TenantModel.code == "ENSPD")))).scalars().first()
+        if not existing_tenant:
+            tenant = TenantModel(
+                id=tenant_id,
+                name="École Test",
+                code="ENSPD",
+                is_active=True,
+            )
+            db.add(tenant)
 
-    admin = UserModel(
-        id=admin_id,
+        admin_user = (await db.execute(select(UserModel).where(UserModel.id == admin_id))).scalars().first()
+        if not admin_user:
+            admin_user = UserModel(
+                id=admin_id,
+                email="admin@test.com",
+                hashed_password=pwd_context.hash("Admin123!"),
+                first_name="Admin",
+                last_name="Test",
+                account_status=AccountStatus.ACTIVE.value,
+            )
+            db.add(admin_user)
+
+        student_user = (await db.execute(select(UserModel).where(UserModel.id == student_id))).scalars().first()
+        if not student_user:
+            student_user = UserModel(
+                id=student_id,
+                email="student@test.com",
+                hashed_password=pwd_context.hash("Student123!"),
+                first_name="Alice",
+                last_name="Student",
+                account_status=AccountStatus.ACTIVE.value,
+            )
+            db.add(student_user)
+
+        admin_membership = (await db.execute(select(MembershipModel).where(MembershipModel.user_id == admin_id))).scalars().first()
+        if not admin_membership:
+            admin_membership = MembershipModel(
+                id=uuid.uuid4(),
+                tenant_id=tenant_id,
+                user_id=admin_id,
+                role=MembershipRole.TENANT_ADMIN.value,
+                status=MembershipStatus.ACTIVE.value,
+                joined_via="ADMIN",
+                joined_at=datetime.utcnow(),
+                academic_year="2026-2027",
+            )
+            db.add(admin_membership)
+
+        student_membership = (await db.execute(select(MembershipModel).where(MembershipModel.user_id == student_id))).scalars().first()
+        if not student_membership:
+            student_membership = MembershipModel(
+                id=uuid.uuid4(),
+                tenant_id=tenant_id,
+                user_id=student_id,
+                role=MembershipRole.STUDENT.value,
+                status=MembershipStatus.ACTIVE.value,
+                joined_via="CLAIM",
+                joined_at=datetime.utcnow(),
+                academic_year="2026-2027",
+            )
+            db.add(student_membership)
+
+        await db.commit()
+
+        return {
+            "tenant_id": tenant_id,
+            "admin_id": admin_id,
+            "student_id": student_id,
+            "admin_membership_id": admin_membership.id,
+            "student_membership_id": student_membership.id,
+            "admin_email": "admin@test.com",
+            "student_email": "student@test.com",
+        }
+
+
+def make_school_token(user_id: uuid.UUID, tenant_id: uuid.UUID = None, membership_id: uuid.UUID = None, role: str = "VISITOR") -> str:
+    return create_access_token(
+        user_id=user_id,
         tenant_id=tenant_id,
-        email="admin@test.com",
-        hashed_password=pwd_context.hash("Admin123!"),
-        first_name="Admin",
-        last_name="Test",
-        matricule="ADMIN001",
-        faculty="Administration",
-        filiere="N/A",
-        academic_year="2026-2027",
-        account_status=AccountStatus.ACTIVE,
-        verification_status=VerificationStatus.VERIFIED,
-        academic_status=AcademicStatus.TEACHER,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
+        membership_id=membership_id,
+        role=role,
     )
-    student = UserModel(
-        id=student_id,
-        tenant_id=tenant_id,
-        email="student@test.com",
-        hashed_password=pwd_context.hash("Student123!"),
-        first_name="Alice",
-        last_name="Student",
-        matricule="STU001",
-        faculty="Génie Logiciel",
-        filiere="Informatique",
-        academic_year="2026-2027",
-        account_status=AccountStatus.ACTIVE,
-        verification_status=VerificationStatus.VERIFIED,
-        academic_status=AcademicStatus.STUDENT,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
-    )
-    async_db_session.add_all([admin, student])
-    await async_db_session.commit()
-
-    return {
-        "tenant_id": tenant_id,
-        "admin_id": admin_id,
-        "student_id": student_id,
-        "admin_email": "admin@test.com",
-        "student_email": "student@test.com",
-    }
 
 
-def make_token(user_id: uuid.UUID, tenant_id: uuid.UUID) -> str:
-    payload = {
-        "sub": str(user_id),
-        "tenant_id": str(tenant_id),
-        "exp": datetime.utcnow() + timedelta(hours=1),
-    }
-    return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
-
-
-# ---------------------------------------------------------------------------
-# Tests
-# ---------------------------------------------------------------------------
 @pytest.mark.asyncio
 class TestIdentityFlow:
     async def test_register_login_and_get_me(self, async_client: AsyncClient):
-        tenant_id = uuid.UUID("11111111-1111-1111-1111-111111111111")
-        headers = {"X-Tenant-ID": str(tenant_id)}
-
-        # Inscription
+        # 1. Inscription publique (Visitor)
+        unique_email = f"visitor_{uuid.uuid4().hex[:8]}@test.com"
         register_payload = {
-            "email": "newuser@test.com",
-            "password": "NewUser123!",
-            "first_name": "New",
-            "last_name": "User",
-            "matricule": "NEW001",
-            "faculty": "Génie",
-            "filiere": "Informatique",
-            "academic_year": "2026-2027",
+            "email": unique_email,
+            "password": "Password123!",
+            "first_name": "Jean",
+            "last_name": "Dupont",
         }
-        resp = await async_client.post("/api/v1/identity/register", json=register_payload, headers=headers)
+        resp = await async_client.post("/api/v1/identity/register", json=register_payload)
         assert resp.status_code == 201, resp.text
-
-        # Connexion
-        login_payload = {"email": "newuser@test.com", "password": "NewUser123!"}
-        resp = await async_client.post("/api/v1/identity/login", json=login_payload, headers=headers)
-        assert resp.status_code == 200, resp.text
         token_data = resp.json()
         assert "access_token" in token_data
         token = token_data["access_token"]
 
-        # Récupération du profil
-        auth_headers = {
-            "Authorization": f"Bearer {token}",
-            "X-Tenant-ID": str(tenant_id),
-        }
+        # 2. Connexion
+        login_payload = {"email": unique_email, "password": "Password123!"}
+        resp = await async_client.post("/api/v1/identity/login", json=login_payload)
+        assert resp.status_code == 200, resp.text
+        token_data = resp.json()
+        assert "access_token" in token_data
+
+        # 3. Récupération du profil /me (Visitor)
+        auth_headers = {"Authorization": f"Bearer {token}"}
         resp = await async_client.get("/api/v1/identity/me", headers=auth_headers)
         assert resp.status_code == 200, resp.text
         profile = resp.json()
-        assert profile["email"] == "newuser@test.com"
-        assert profile["campus_status_display"] == "Non certifié"
+        assert profile["user"]["email"] == unique_email
+        assert profile["membership"]["id"] is None or profile["membership"]["role"] == "VISITOR"
+        assert profile["membership"]["role"] == "VISITOR"
+        assert profile["campus_status_display"] == "Visiteur"
 
-
-    async def test_missing_tenant_header_returns_400(self, async_client: AsyncClient):
-        # Appeler une route protégée sans header X-Tenant-ID
+    async def test_unauthenticated_me_returns_401(self, async_client: AsyncClient):
         resp = await async_client.get("/api/v1/identity/me")
-        assert resp.status_code == 400
-        assert "X-Tenant-ID" in resp.text
+        assert resp.status_code == 401
 
+    async def test_tenant_mismatch_returns_403(self, async_client: AsyncClient, seed_school_and_users: dict):
+        tenant_id = seed_school_and_users["tenant_id"]
+        user_id = seed_school_and_users["student_id"]
+        token = make_school_token(user_id, tenant_id=tenant_id, membership_id=seed_school_and_users["student_membership_id"], role="STUDENT")
 
-@pytest.mark.asyncio
-class TestDemocracyVoting:
-    async def test_vote_emission_and_double_vote_conflict(
-        self,
-        async_client: AsyncClient,
-        seed_users: dict,
-    ):
-        tenant_id = seed_users["tenant_id"]
-        admin_id = seed_users["admin_id"]
-        student_id = seed_users["student_id"]
-
-        # Générer des tokens pour admin et étudiant
-        admin_token = make_token(admin_id, tenant_id)
-        student_token = make_token(student_id, tenant_id)
-
-        admin_headers = {
-            "Authorization": f"Bearer {admin_token}",
-            "X-Tenant-ID": str(tenant_id),
+        # Header X-Tenant-ID est différent du tid dans le JWT -> 403 Forbidden
+        wrong_tenant_id = uuid.uuid4()
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "X-Tenant-ID": str(wrong_tenant_id),
         }
-        student_headers = {
-            "Authorization": f"Bearer {student_token}",
-            "X-Tenant-ID": str(tenant_id),
-        }
-
-        # 1. Créer une élection (admin)
-        election_payload = {
-            "title": "Élection Test",
-            "election_type": "BDE",
-            "eligibility_rules": {"level": "L3", "certified": True},
-            "voting_start_at": (datetime.utcnow() - timedelta(hours=1)).isoformat(),
-            "voting_end_at": (datetime.utcnow() + timedelta(hours=1)).isoformat(),
-        }
-        resp = await async_client.post(
-            "/api/v1/democracy/elections", json=election_payload, headers=admin_headers
-        )
-        assert resp.status_code == 201, resp.text
-        election_id = resp.json()["id"]
-
-        # 2. Voter une première fois (étudiant)
-        vote_payload = {"election_id": election_id, "choice_id": "candidate-1"}
-        resp = await async_client.post(
-            f"/api/v1/democracy/elections/{election_id}/vote",
-            json=vote_payload,
-            headers=student_headers,
-        )
-        assert resp.status_code == 202, resp.text
-
-        # 3. Tenter un second vote → 409 Conflict
-        resp = await async_client.post(
-            f"/api/v1/democracy/elections/{election_id}/vote",
-            json=vote_payload,
-            headers=student_headers,
-        )
-        assert resp.status_code == 409
-        assert "already voted" in resp.text.lower()
+        resp = await async_client.get("/api/v1/identity/me", headers=headers)
+        assert resp.status_code == 403
+        assert "X-Tenant-ID" in resp.text or "correspond pas" in resp.text

@@ -1,0 +1,49 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import siteConfig from '../../../site.config.json';
+---
+
+<Layout
+  title="Mentions Légales & Confidentialité"
+  description="Mentions légales, conditions d'utilisation et politique de protection des données personnelles de Pineapple OS."
+  lang="fr"
+  alternateUrlFr="/fr/mentions-legales/"
+  alternateUrlEn="/en/legal/"
+>
+  <section class="py-16 bg-slate-900 text-white border-b border-slate-800 text-center">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-extrabold tracking-tight mb-4">Mentions Légales & Confidentialité</h1>
+      <p class="text-lg text-slate-300 max-w-2xl mx-auto">
+        Transparence juridique et protection des données personnelles.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-20 bg-slate-50 text-slate-900">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 text-sm text-slate-700 leading-relaxed">
+      <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-md">
+        <h2 class="text-xl font-bold text-slate-900 mb-4">1. Éditeur de la Plateforme</h2>
+        <p>
+          Pineapple OS est édité par la société Pineapple Academic Systems S.A.R.L.<br />
+          Siège social : Yaoundé & Douala, République du Cameroun.<br />
+          Email de contact : {siteConfig.contactEmail}<br />
+          WhatsApp Support : +{siteConfig.whatsappNumber}
+        </p>
+      </div>
+
+      <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-md">
+        <h2 class="text-xl font-bold text-slate-900 mb-4">2. Propriété Intellectuelle</h2>
+        <p>
+          L'ensemble des contenus, marques, algorithmes, interfaces et graphismes de Pineapple OS est protégé par le droit d'auteur et le droit des marques au Cameroun et dans l'espace OAPI.
+        </p>
+      </div>
+
+      <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-md">
+        <h2 class="text-xl font-bold text-slate-900 mb-4">3. Protection des Données Personnelles</h2>
+        <p>
+          Les données administratives et académiques collectées sont traitées exclusivement pour l'exécution du service de gestion de votre établissement. Aucune donnée personnelle n'est revendue à des tiers. Les utilisateurs disposent d'un droit d'accès et de rectification à tout moment.
+        </p>
+      </div>
+    </div>
+  </section>
+</Layout>

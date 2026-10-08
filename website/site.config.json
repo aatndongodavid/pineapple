@@ -1,0 +1,15 @@
+{
+  "siteName": "Pineapple OS",
+  "domain": "pineapple.cm",
+  "baseUrl": "https://pineapple.cm",
+  "tagline_fr": "Le système de gestion académique pensé pour les établissements d'enseignement supérieur au Cameroun.",
+  "tagline_en": "The academic management system built for higher education institutions in Cameroon.",
+  "whatsappNumber": "237690000000",
+  "whatsappDefaultMessage_fr": "Bonjour Pineapple, je souhaite demander une démonstration pour mon établissement.",
+  "whatsappDefaultMessage_en": "Hello Pineapple, I would like to request a demo for my institution.",
+  "contactEmail": "contact@pineapple.cm",
+  "demoUrl": "https://demo.pineapple.cm",
+  "enableSocialProof": false,
+  "defaultLocale": "fr",
+  "supportedLocales": ["fr", "en"]
+}

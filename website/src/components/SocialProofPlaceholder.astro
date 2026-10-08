@@ -1,0 +1,31 @@
+---
+import siteConfig from '../../site.config.json';
+
+interface Props {
+  lang?: 'fr' | 'en';
+}
+
+const { lang = 'fr' } = Astro.props;
+const isFr = lang === 'fr';
+
+// Rule V3: ZERO Fake Social Proof. Controlled by siteConfig.enableSocialProof (default: false)
+const showSocialProof = siteConfig.enableSocialProof === true;
+---
+
+{showSocialProof ? (
+  <!-- Rendered ONLY when real verified partner schools are added -->
+  <section class="py-12 bg-slate-900 border-y border-slate-800 text-center">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h3 class="text-xs uppercase tracking-widest font-semibold text-slate-400 mb-6">
+        {isFr ? 'Ils font confiance à Pineapple OS' : 'Trusted by Higher Education Institutions'}
+      </h3>
+      <div id="verified-partners-list" class="flex flex-wrap items-center justify-center gap-8 opacity-90">
+        <!-- Real partner logos injected here when verified -->
+      </div>
+    </div>
+  </section>
+) : (
+  <!-- When false, zero fake logos or fake testimonials are displayed -->
+  <!-- Hidden in production until real partner metrics are verified -->
+  <div data-social-proof-disabled="true" class="hidden"></div>
+)}

@@ -19,9 +19,8 @@ from democracy_context.domain.entities import (
     Election,
     ElectionStatus,
     MovementStatus,
-    VoterHash,
 )
-from democracy_context.domain.value_objects import AcademicStatus as DemoAcademicStatus
+
 from democracy_context.domain.ports import (
     ElectionRepositoryPort,
     VoteRepositoryPort,

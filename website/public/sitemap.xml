@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://pineapple.cm/fr/</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pineapple.cm/fr/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pineapple.cm/en/"/>
+  </url>
+  <url>
+    <loc>https://pineapple.cm/en/</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pineapple.cm/fr/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pineapple.cm/en/"/>
+  </url>
+  <url>
+    <loc>https://pineapple.cm/fr/fonctionnalites/</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pineapple.cm/fr/fonctionnalites/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pineapple.cm/en/features/"/>
+  </url>
+  <url>
+    <loc>https://pineapple.cm/en/features/</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pineapple.cm/fr/fonctionnalites/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pineapple.cm/en/features/"/>
+  </url>
+  <url>
+    <loc>https://pineapple.cm/fr/securite/</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pineapple.cm/fr/securite/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pineapple.cm/en/security/"/>
+  </url>
+  <url>
+    <loc>https://pineapple.cm/en/security/</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pineapple.cm/fr/securite/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pineapple.cm/en/security/"/>
+  </url>
+  <url>
+    <loc>https://pineapple.cm/fr/tarifs/</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pineapple.cm/fr/tarifs/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pineapple.cm/en/pricing/"/>
+  </url>
+  <url>
+    <loc>https://pineapple.cm/en/pricing/</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pineapple.cm/fr/tarifs/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pineapple.cm/en/pricing/"/>
+  </url>
+  <url>
+    <loc>https://pineapple.cm/fr/demo/</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pineapple.cm/fr/demo/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pineapple.cm/en/demo/"/>
+  </url>
+  <url>
+    <loc>https://pineapple.cm/en/demo/</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pineapple.cm/fr/demo/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pineapple.cm/en/demo/"/>
+  </url>
+</urlset>

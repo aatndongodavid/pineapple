@@ -1,0 +1,89 @@
+---
+interface Plan {
+  id: string;
+  name_fr: string;
+  name_en: string;
+  capacity: string;
+  capacity_en: string;
+  price: number | null;
+  period_fr?: string;
+  period_en?: string;
+  custom_quote_fr?: string;
+  custom_quote_en?: string;
+  featured: boolean;
+  features_fr: string[];
+  features_en: string[];
+}
+
+interface Props {
+  plan: Plan;
+  lang?: 'fr' | 'en';
+}
+
+const { plan, lang = 'fr' } = Astro.props;
+const isFr = lang === 'fr';
+
+const planName = isFr ? plan.name_fr : plan.name_en;
+const capacity = isFr ? plan.capacity : plan.capacity_en;
+const features = isFr ? plan.features_fr : plan.features_en;
+---
+
+<div class={`relative rounded-2xl p-8 flex flex-col justify-between transition-all duration-300 ${
+  plan.featured
+    ? 'bg-slate-900 border-2 border-amber-500 shadow-2xl shadow-amber-500/10 scale-105'
+    : 'bg-white border border-slate-200 shadow-lg hover:shadow-xl'
+}`}>
+  {plan.featured && (
+    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-extrabold text-xs uppercase tracking-wider px-4 py-1.5 rounded-full shadow-md">
+      {isFr ? 'Recommandé' : 'Most Popular'}
+    </div>
+  )}
+
+  <div>
+    <h3 class={`font-extrabold text-xl mb-1 ${plan.featured ? 'text-white' : 'text-slate-900'}`}>
+      {planName}
+    </h3>
+    <p class={`text-xs font-medium mb-6 ${plan.featured ? 'text-amber-400' : 'text-amber-700'}`}>
+      👥 {capacity}
+    </p>
+
+    <!-- Price Section (Rule V4: Integer XAF FCFA or Sur Devis) -->
+    <div class="mb-8">
+      {plan.price !== null ? (
+        <div class="flex items-baseline gap-2">
+          <span class={`text-4xl font-extrabold tracking-tight ${plan.featured ? 'text-white' : 'text-slate-900'}`}>
+            {plan.price.toLocaleString('fr-FR')} FCFA
+          </span>
+          <span class={`text-xs font-semibold ${plan.featured ? 'text-slate-400' : 'text-slate-500'}`}>
+            / {isFr ? 'an' : 'year'}
+          </span>
+        </div>
+      ) : (
+        <div class={`text-3xl font-extrabold tracking-tight ${plan.featured ? 'text-amber-400' : 'text-slate-900'}`}>
+          {isFr ? plan.custom_quote_fr : plan.custom_quote_en}
+        </div>
+      )}
+    </div>
+
+    <!-- Feature List -->
+    <ul class="space-y-3 mb-8 text-sm">
+      {features.map((feat) => (
+        <li class="flex items-start gap-3">
+          <span class="text-emerald-500 font-bold">✓</span>
+          <span class={plan.featured ? 'text-slate-300' : 'text-slate-700'}>{feat}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <a
+    href={isFr ? '/fr/demo/' : '/en/demo/'}
+    class={`w-full text-center py-3 px-6 rounded-xl font-bold text-sm transition-all shadow-md ${
+      plan.featured
+        ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 hover:from-amber-400 hover:to-amber-500'
+        : 'bg-slate-900 text-white hover:bg-slate-800'
+    }`}
+  >
+    {isFr ? 'Choisir cette formule' : 'Select Plan'}
+  </a>
+</div>

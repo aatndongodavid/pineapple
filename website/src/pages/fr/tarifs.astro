@@ -1,0 +1,47 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PricingCard from '../../components/PricingCard.astro';
+import pricingConfig from '../../../pricing.config.json';
+---
+
+<Layout
+  title="Tarification transparente en FCFA (XAF)"
+  description="Découvrez nos formules d'abonnement annuel adaptées à la taille de votre établissement d'enseignement supérieur au Cameroun."
+  lang="fr"
+  alternateUrlFr="/fr/tarifs/"
+  alternateUrlEn="/en/pricing/"
+>
+  <section class="py-16 bg-slate-900 text-white border-b border-slate-800 text-center">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-extrabold tracking-tight mb-4">Tarifs clairs, prévisibles et sans frais cachés</h1>
+      <p class="text-lg text-slate-300 max-w-2xl mx-auto">
+        Facturation annuelle en Francs CFA (XAF). Tout est inclus : hébergement, mises à jour et support technique local.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-20 bg-slate-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch mb-16">
+        {pricingConfig.plans.map((plan) => (
+          <PricingCard plan={plan} lang="fr" />
+        ))}
+      </div>
+
+      <!-- Add-on options -->
+      <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-md max-w-4xl mx-auto">
+        <h3 class="text-xl font-bold text-slate-900 mb-4">🧩 Options complémentaires</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm text-slate-700">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="font-extrabold text-amber-600 block mb-1">📲 Pack SMS Officiel (10 FCFA / SMS)</span>
+            Envoi de relances directes sur le téléphone des parents ou étudiants en absence d'Internet.
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="font-extrabold text-amber-600 block mb-1">📢 Module Régie Publicitaire Visiteurs</span>
+            Partage de revenus publicitaires pour financer ou rentabiliser votre abonnement.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
