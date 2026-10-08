@@ -33,12 +33,29 @@ class Settings(BaseSettings):
     AWS_S3_BUCKET_NAME: str = "pineapple-dev-bucket"
 
     def validate_production_security(self) -> None:
-        """Vérifie qu'en environnement de production, les clés secrètes de dev ne sont pas utilisées."""
-        if self.ENVIRONMENT.lower() == "production":
-            if "development" in self.JWT_SECRET_KEY.lower() or "secret" in self.JWT_SECRET_KEY.lower() or len(self.JWT_SECRET_KEY) < 32:
-                raise RuntimeError("PROD_SECRET_KEY_INVALID: Clé JWT non sécurisée en production.")
-            if "dev" in self.ELECTION_PEPPER_SECRET.lower() or len(self.ELECTION_PEPPER_SECRET) < 16:
-                raise RuntimeError("PROD_SECRET_KEY_INVALID: Secret d'élection non sécurisé en production.")
+        """
+        Vérifie qu'en environnement de production, aucune configuration non sécurisée ou clé de dev n'est utilisée (Gate O-10).
+        L'application refuse catégoriquement de démarrer si une faille ou configuration non sécurisée est détectée.
+        """
+        if self.ENVIRONMENT.lower() in ("production", "prod"):
+            # 1. DEBUG doit obligatoirement être False
+            if self.DEBUG:
+                raise RuntimeError("PROD_DEBUG_ACTIVE: DEBUG=true est interdit en environnement de production.")
+
+            # 2. Clé secrète JWT sécurisée (>= 32 caractères, sans mot-clé dev)
+            jwt_lower = self.JWT_SECRET_KEY.lower()
+            if any(bad in jwt_lower for bad in ["dev", "secret", "change_me", "pineapple"]) or len(self.JWT_SECRET_KEY) < 32:
+                raise RuntimeError("PROD_SECRET_KEY_INVALID: Clé JWT secrète non sécurisée ou utilisant un défaut de dev en production.")
+
+            # 3. Secret d'élection sécurisé (>= 16 caractères, sans mot-clé dev)
+            pepper_lower = self.ELECTION_PEPPER_SECRET.lower()
+            if any(bad in pepper_lower for bad in ["dev", "secret", "change_me"]) or len(self.ELECTION_PEPPER_SECRET) < 16:
+                raise RuntimeError("PROD_PEPPER_SECRET_INVALID: Secret d'élection non sécurisé ou de développement en production.")
+
+            # 4. URL de base de données de production (pas de SQLite, ni mot de passe dev par défaut)
+            db_lower = self.DATABASE_URL.lower()
+            if "sqlite" in db_lower or "pineapple_dev_password" in db_lower:
+                raise RuntimeError("PROD_DATABASE_URL_INVALID: URL de base de données non sécurisée ou utilisant un mot de passe dev par défaut en production.")
 
 
 settings = Settings()

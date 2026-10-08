@@ -6,7 +6,7 @@ PROD_COMPOSE = docker compose -f docker-compose.prod.yml
 GREEN = \033[0;32m
 NC = \033[0m
 
-.PHONY: help up up-build down logs ps prod-up prod-down prod-logs prod-ps migrate seed test lint gen-api e2e clean restart
+.PHONY: help up up-build down logs ps prod-up prod-down prod-logs prod-ps migrate seed test lint gen-api e2e clean restart deploy rollback backup restore-test test-load
 
 help: ## Affiche l'aide
 	@echo "Commandes disponibles :"
@@ -39,6 +39,21 @@ prod-logs: ## Affiche les logs de production
 prod-ps: ## Affiche l'état des conteneurs de production
 	$(PROD_COMPOSE) ps
 
+deploy: ## Lance le déploiement de production sans interruption
+	bash ./scripts/deploy.sh
+
+rollback: ## Exécute le retour arrière automatique (-1 migration)
+	bash ./scripts/rollback.sh
+
+backup: ## Déclenche une sauvegarde chiffrée AES-256 de la base de données
+	bash ./scripts/backup.sh
+
+restore-test: ## Exécute un test chronométré de restauration post-sinistre (Gate O-3)
+	bash ./scripts/restore.sh
+
+test-load: ## Exécute le test de charge et de latence p95 sur le backend (Gate O-8)
+	pytest tests/load_test_10k.py
+
 migrate: ## Applique les migrations Alembic dans le conteneur backend
 	$(DOCKER_COMPOSE) exec backend alembic upgrade head
 
@@ -46,7 +61,7 @@ seed: ## Injecte les données de démonstration dans le conteneur backend
 	$(DOCKER_COMPOSE) exec backend python -m scripts.seed_data
 
 test: ## Exécute les tests unitaires et d'intégration
-	$(DOCKER_COMPOSE) exec backend pytest
+	pytest tests
 
 lint: ## Vérifie le code avec ruff/eslint/tsc
 	$(DOCKER_COMPOSE) exec backend ruff check .
@@ -64,4 +79,3 @@ clean: ## Nettoie les fichiers temporaires et conteneurs
 
 restart: ## Redémarre les services locaux
 	$(DOCKER_COMPOSE) restart
-

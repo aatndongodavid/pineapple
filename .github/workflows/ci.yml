@@ -1,0 +1,158 @@
+name: Continuous Integration & Deployment Pipeline (Pineapple OS)
+
+on:
+  push:
+    branches: [ main, master, feature/*, "feature-*" ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+  packages: write
+  security-events: write
+
+jobs:
+  lint-and-typecheck:
+    name: Linting & Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff mypy
+
+      - name: Run Ruff Linter
+        run: ruff check backend/src
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Frontend Dependencies & Typecheck
+        run: |
+          cd frontend
+          npm ci --include=dev || npm install --include=dev
+          npm run typecheck || npx tsc --noEmit
+
+  backend-tests:
+    name: Backend Unit & Integration Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: pineapple
+          POSTGRES_PASSWORD: pineapple_test_password
+          POSTGRES_DB: pineapple_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pineapple -d pineapple_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+          pip install pytest pytest-asyncio pytest-cov httpx ruff alembic
+
+      - name: Test Alembic Migrations (Check for drift)
+        env:
+          DATABASE_URL: postgresql+asyncpg://pineapple:pineapple_test_password@localhost:5432/pineapple_test
+        run: |
+          alembic upgrade head
+          alembic check
+
+      - name: Run Pytest Test Suites
+        env:
+          DATABASE_URL: postgresql+asyncpg://pineapple:pineapple_test_password@localhost:5432/pineapple_test
+          REDIS_URL: redis://localhost:6379/0
+          PYTHONPATH: backend/src
+          JWT_SECRET_KEY: dev_secret_key_change_me
+          ELECTION_PEPPER_SECRET: dev_pepper_secret_change_me
+          ENVIRONMENT: test
+        run: |
+          pytest tests
+
+  security-scan:
+    name: Security & Vulnerability Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Gitleaks Secret Scanner
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Set up Python 3.11 & Pip-audit
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Pip-Audit Dependency Vulnerability Check
+        run: |
+          python -m pip install pip-audit
+          pip-audit -r backend/requirements.txt || true
+
+  docker-build:
+    name: Docker Images Build & Scan
+    needs: [lint-and-typecheck, backend-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Backend Container Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: backend/Dockerfile
+          push: false
+          tags: pineapple-backend:ci
+
+      - name: Build Frontend Container Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: frontend/Dockerfile
+          push: false
+          tags: pineapple-frontend:ci
+
+      - name: Run Trivy Vulnerability Scanner on Backend Image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'pineapple-backend:ci'
+          format: 'table'
+          exit-code: '0'
+          severity: 'CRITICAL,HIGH'

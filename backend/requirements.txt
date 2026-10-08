@@ -23,6 +23,7 @@ python-multipart==0.0.9
 
 # --- Cache & Task Queue ---
 redis==5.0.8
+prometheus-client==0.20.0
 
 # --- Utilitaires & PDFs ---
 weasyprint==62.3

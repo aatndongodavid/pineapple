@@ -1,0 +1,17 @@
+{
+  "files": [
+    {
+      "path": "frontend/dist/assets/*.js",
+      "maxSize": "170kB",
+      "compression": "gzip"
+    },
+    {
+      "path": "frontend/dist/assets/*.css",
+      "maxSize": "50kB",
+      "compression": "gzip"
+    }
+  ],
+  "ci": {
+    "trackBranches": ["main", "master", "feature/*"]
+  }
+}

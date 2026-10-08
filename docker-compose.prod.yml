@@ -1,21 +1,39 @@
-# docker-compose.prod.yml
+# docker-compose.prod.yml — Pineapple OS Production Architecture
+
+version: '3.8'
+
+networks:
+  pineapple_prod_net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  backup_data:
 
 services:
   db:
-    image: postgres:16
+    image: postgres:16-alpine
     container_name: pineapple_db_prod
     restart: always
+    networks:
+      - pineapple_prod_net
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER:-pineapple_prod}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-prod_secure_password_change_me}
+      POSTGRES_DB: ${POSTGRES_DB:-pineapple_prod}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-pineapple_prod} -d $${POSTGRES_DB:-pineapple_prod}"]
       interval: 10s
       timeout: 5s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1.50'
+          memory: 1500M
     logging:
       driver: json-file
       options:
@@ -23,14 +41,24 @@ services:
         max-file: "3"
 
   redis:
-    image: redis:alpine
+    image: redis:7-alpine
     container_name: pineapple_redis_prod
     restart: always
+    networks:
+      - pineapple_prod_net
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 3s
       retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
     logging:
       driver: json-file
       options:
@@ -43,6 +71,8 @@ services:
       dockerfile: backend/Dockerfile
     container_name: pineapple_backend_prod
     restart: always
+    networks:
+      - pineapple_prod_net
     depends_on:
       db:
         condition: service_healthy
@@ -52,24 +82,59 @@ services:
       APP_NAME: "Pineapple OS"
       ENVIRONMENT: production
       DEBUG: "false"
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-pineapple_prod}:${POSTGRES_PASSWORD:-prod_secure_password_change_me}@db:5432/${POSTGRES_DB:-pineapple_prod}
       REDIS_URL: redis://redis:6379/0
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
       ELECTION_PEPPER_SECRET: ${ELECTION_PEPPER_SECRET}
-      AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME}
+      AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME:-pineapple-prod-backups}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-eu-west-1}
-    ports:
-      - "8000:8000"
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
-      interval: 30s
-      timeout: 10s
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\" || exit 1"]
+      interval: 15s
+      timeout: 5s
       retries: 3
-      start_period: 40s
+      start_period: 20s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.50'
+          memory: 1500M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: pineapple_worker_prod
+    restart: always
+    networks:
+      - pineapple_prod_net
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      APP_NAME: "Pineapple OS Worker"
+      ENVIRONMENT: production
+      DEBUG: "false"
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-pineapple_prod}:${POSTGRES_PASSWORD:-prod_secure_password_change_me}@db:5432/${POSTGRES_DB:-pineapple_prod}
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+    command: python -m notification_context.worker
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
     logging:
       driver: json-file
       options:
@@ -82,20 +147,25 @@ services:
       dockerfile: frontend/Dockerfile
     container_name: pineapple_frontend_prod
     restart: always
+    networks:
+      - pineapple_prod_net
     depends_on:
       - backend
     ports:
       - "80:80"
+      - "443:443"
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O- http://localhost/ > /dev/null || exit 1"]
-      interval: 30s
-      timeout: 10s
+      test: ["CMD-SHELL", "wget -q -O- http://localhost/health > /dev/null || exit 1"]
+      interval: 15s
+      timeout: 5s
       retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
-
-volumes:
-  postgres_data:

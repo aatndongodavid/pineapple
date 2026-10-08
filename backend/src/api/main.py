@@ -53,10 +53,23 @@ app.add_middleware(
 app.add_middleware(TenantMiddleware)
 
 
+from shared_kernel.infrastructure.metrics import prometheus_metrics_middleware, get_prometheus_metrics_response
+from shared_kernel.infrastructure.logging_config import correlation_id_middleware
+
+# Middleware de correlation ID & Métriques Prometheus
+app.middleware("http")(correlation_id_middleware)
+app.middleware("http")(prometheus_metrics_middleware)
+
 # Health Check
 @app.get("/health", tags=["Health"])
 async def health_check():
     return {"status": "ok", "service": "pineapple-api", "version": "3.0.0"}
+
+
+# Metrics Prometheus (Gate O-5)
+@app.get("/metrics", tags=["Observability"])
+async def get_metrics():
+    return get_prometheus_metrics_response()
 
 
 from api.v1.timetable_router import router as timetable_router
