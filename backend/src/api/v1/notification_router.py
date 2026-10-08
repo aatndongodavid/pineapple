@@ -107,7 +107,7 @@ async def list_user_notifications(
     if category:
         query = query.where(NotificationModel.category == category)
     if unread_only:
-        query = query.where(NotificationModel.is_read == False)
+        query = query.where(NotificationModel.read_at.is_(None))
 
     query = query.order_by(NotificationModel.created_at.desc()).offset(offset).limit(page_size)
     res = await db.execute(query)
@@ -118,11 +118,11 @@ async def list_user_notifications(
             id=str(n.id),
             tenant_id=str(n.tenant_id),
             user_id=str(n.user_id),
-            category=n.category,
+            category=n.category.value if hasattr(n.category, "value") else str(n.category),
             title=n.title,
             body=n.body,
             deep_link=n.deep_link,
-            is_read=n.is_read,
+            is_read=n.read_at is not None,
             read_at=n.read_at.isoformat() if n.read_at else None,
             created_at=n.created_at.isoformat(),
         )
@@ -141,7 +141,7 @@ async def get_unread_count(
     stmt = select(func.count(NotificationModel.id)).where(
         NotificationModel.user_id == auth.user_id,
         NotificationModel.tenant_id == auth.tenant_id,
-        NotificationModel.is_read == False,
+        NotificationModel.read_at.is_(None),
     )
     res = await db.execute(stmt)
     count = res.scalar_one() or 0

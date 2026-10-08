@@ -50,8 +50,9 @@ async def get_current_user(
             token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
         )
         user_id = uuid.UUID(payload.get("sub"))
-        token_tenant = uuid.UUID(payload.get("tenant_id"))
-        if token_tenant != tenant_id:
+        raw_tid = payload.get("tid") or payload.get("tenant_id")
+        token_tenant = uuid.UUID(raw_tid) if raw_tid else None
+        if token_tenant and token_tenant != tenant_id:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token tenant mismatch",
