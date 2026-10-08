@@ -21,6 +21,7 @@ export const API_ENDPOINTS = {
   ads: {
     feed: '/api/v1/ads/feed',
     impression: '/api/v1/ads/impression',
+    events: '/api/v1/ads/impression',
     click: (token: string) => `/api/v1/ads/click/${token}`,
     feedback: '/api/v1/ads/feedback',
   },

@@ -13,9 +13,12 @@ const apiClient = axios.create({
 // Intercepteur de requête : injection des headers d'authentification et tenant
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const { token } = useAuthStore.getState();
+    const { token, tenant } = useAuthStore.getState();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    if (tenant?.id) {
+      config.headers['X-Tenant-ID'] = tenant.id;
     }
     return config;
   },
