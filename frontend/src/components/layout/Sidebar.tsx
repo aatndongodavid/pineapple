@@ -1,225 +1,148 @@
-// frontend/src/components/layout/Sidebar.tsx
-
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   Home,
   DoorOpen,
-  Users,
   Vote,
   GraduationCap,
-  Briefcase,
-  ShoppingBag,
   User,
-  ShieldAlert,
   Building2,
   Megaphone,
-  PlusCircle,
-  ShieldCheck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/lib/store/authStore';
 
 export const Sidebar: React.FC = () => {
-  const { membership, can, hasRole, user } = useAuthStore();
+  const { membership, hasRole } = useAuthStore();
 
-  const isVisitor = !membership;
-  const isDelegate = can('class.announce');
-  const isTenantAdmin = hasRole('TENANT_ADMIN') || hasRole('STAFF');
-  const isPlatformAdmin = hasRole('PLATFORM_SUPER_ADMIN');
+  const isTenantAdmin = hasRole('TENANT_ADMIN') || hasRole('STAFF') || true;
 
   return (
-    <aside className="hidden md:flex flex-col w-64 h-screen bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-r border-white/20 dark:border-slate-800 shadow-xl">
-      {/* Logo */}
-      <div className="flex items-center gap-3 p-6">
-        <div className="w-10 h-10 rounded-xl bg-pineapple flex items-center justify-center text-white font-bold text-xl shadow-md">
-          P
+    <aside className="hidden md:flex flex-col w-64 h-screen bg-slate-950 border-r border-slate-800 text-slate-300 shadow-2xl">
+      {/* Logo & Brand Header matching website */}
+      <a href="/" className="flex items-center gap-3 p-6 group border-b border-slate-800/80">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center font-bold text-slate-950 text-xl shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform">
+          🍍
         </div>
         <div>
-          <span className="text-lg font-bold text-gray-800 dark:text-white leading-none">
-            Pineapple
+          <span className="font-extrabold text-lg tracking-tight text-white group-hover:text-amber-400 transition-colors">
+            Pineapple OS
           </span>
-          <p className="text-[10px] text-gray-400 font-semibold tracking-wider uppercase">
-            {isVisitor ? 'Mode Visiteur' : 'Campus Hub'}
-          </p>
+          <span className="block text-[10px] text-amber-400 font-semibold tracking-wider uppercase">
+            Bac à sable Démo
+          </span>
         </div>
-      </div>
+      </a>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
+      {/* Navigation Links */}
+      <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
         <NavLink
           to="/"
           className={({ isActive }) =>
             cn(
-              'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all',
-              'text-gray-600 dark:text-gray-400 hover:bg-pineapple/10 hover:text-pineapple',
-              isActive ? 'bg-pineapple/15 text-pineapple shadow-sm font-bold' : ''
+              'flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all',
+              'text-slate-300 hover:bg-slate-800 hover:text-amber-400',
+              isActive ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md font-extrabold' : ''
             )
           }
         >
-          <Home className="h-5 w-5" />
-          Fil d'actualité
+          <Home className="h-4 w-4" />
+          Tableau de Bord
         </NavLink>
 
-        {isVisitor ? (
+        <NavLink
+          to="/rooms"
+          className={({ isActive }) =>
+            cn(
+              'flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-all',
+              'text-slate-300 hover:bg-slate-800 hover:text-amber-400',
+              isActive ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md font-extrabold' : ''
+            )
+          }
+        >
+          <DoorOpen className="h-4 w-4" />
+          Salles & Amphis
+        </NavLink>
+
+        <NavLink
+          to="/class"
+          className={({ isActive }) =>
+            cn(
+              'flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-all',
+              'text-slate-300 hover:bg-slate-800 hover:text-amber-400',
+              isActive ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md font-extrabold' : ''
+            )
+          }
+        >
+          <Megaphone className="h-4 w-4" />
+          Espace Délégués
+        </NavLink>
+
+        <NavLink
+          to="/academy/library"
+          className={({ isActive }) =>
+            cn(
+              'flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-all',
+              'text-slate-300 hover:bg-slate-800 hover:text-amber-400',
+              isActive ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md font-extrabold' : ''
+            )
+          }
+        >
+          <GraduationCap className="h-4 w-4" />
+          Scolarité & Registres
+        </NavLink>
+
+        <NavLink
+          to="/democracy"
+          className={({ isActive }) =>
+            cn(
+              'flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-all',
+              'text-slate-300 hover:bg-slate-800 hover:text-amber-400',
+              isActive ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md font-extrabold' : ''
+            )
+          }
+        >
+          <Vote className="h-4 w-4" />
+          Élections Délégués
+        </NavLink>
+
+        <div className="pt-4 border-t border-slate-800/80 space-y-1.5">
           <NavLink
-            to="/join-school"
+            to="/admin"
             className={({ isActive }) =>
               cn(
-                'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all',
-                'bg-pineapple text-white hover:bg-pineapple-hover shadow-md',
-                isActive ? 'ring-2 ring-pineapple/50' : ''
+                'flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-extrabold transition-all',
+                'bg-slate-900 text-amber-400 hover:bg-slate-800 border border-slate-800',
+                isActive ? 'ring-2 ring-amber-500' : ''
               )
             }
           >
-            <PlusCircle className="h-5 w-5" />
-            Rejoindre mon école
+            <Building2 className="h-4 w-4 text-amber-400" />
+            Administration Scolarité
           </NavLink>
-        ) : (
-          <>
-            <NavLink
-              to="/rooms"
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all',
-                  'text-gray-600 dark:text-gray-400 hover:bg-pineapple/10 hover:text-pineapple',
-                  isActive ? 'bg-pineapple/15 text-pineapple shadow-sm font-bold' : ''
-                )
-              }
-            >
-              <DoorOpen className="h-5 w-5" />
-              Salles
-            </NavLink>
-
-            <NavLink
-              to="/class"
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all',
-                  'text-gray-600 dark:text-gray-400 hover:bg-pineapple/10 hover:text-pineapple',
-                  isActive ? 'bg-pineapple/15 text-pineapple shadow-sm font-bold' : ''
-                )
-              }
-            >
-              <Megaphone className="h-5 w-5" />
-              Ma Classe
-            </NavLink>
-
-            <NavLink
-              to="/academy/library"
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all',
-                  'text-gray-600 dark:text-gray-400 hover:bg-pineapple/10 hover:text-pineapple',
-                  isActive ? 'bg-pineapple/15 text-pineapple shadow-sm font-bold' : ''
-                )
-              }
-            >
-              <GraduationCap className="h-5 w-5" />
-              Academy
-            </NavLink>
-
-            <NavLink
-              to="/democracy"
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all',
-                  'text-gray-600 dark:text-gray-400 hover:bg-pineapple/10 hover:text-pineapple',
-                  isActive ? 'bg-pineapple/15 text-pineapple shadow-sm font-bold' : ''
-                )
-              }
-            >
-              <Vote className="h-5 w-5" />
-              Démocratie
-            </NavLink>
-
-            <NavLink
-              to="/campus-life/marketplace"
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all',
-                  'text-gray-600 dark:text-gray-400 hover:bg-pineapple/10 hover:text-pineapple',
-                  isActive ? 'bg-pineapple/15 text-pineapple shadow-sm font-bold' : ''
-                )
-              }
-            >
-              <ShoppingBag className="h-5 w-5" />
-              Market & Covoiturage
-            </NavLink>
-
-            <NavLink
-              to="/opportunities"
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all',
-                  'text-gray-600 dark:text-gray-400 hover:bg-pineapple/10 hover:text-pineapple',
-                  isActive ? 'bg-pineapple/15 text-pineapple shadow-sm font-bold' : ''
-                )
-              }
-            >
-              <Briefcase className="h-5 w-5" />
-              Opportunités
-            </NavLink>
-          </>
-        )}
-
-        <div className="pt-4 border-t border-gray-100 dark:border-slate-800 space-y-1">
-          {isTenantAdmin && (
-            <NavLink
-              to="/admin"
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all',
-                  'bg-gray-900 text-white dark:bg-slate-800 hover:bg-black',
-                  isActive ? 'ring-2 ring-pineapple' : ''
-                )
-              }
-            >
-              <Building2 className="h-5 w-5 text-pineapple" />
-              Admin Établissement
-            </NavLink>
-          )}
-
-          {isPlatformAdmin && (
-            <NavLink
-              to="/platform/tenants"
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all',
-                  'bg-amber-600 text-white hover:bg-amber-700',
-                  isActive ? 'ring-2 ring-white' : ''
-                )
-              }
-            >
-              <ShieldCheck className="h-5 w-5" />
-              Super Admin
-            </NavLink>
-          )}
 
           <NavLink
             to="/profile"
             className={({ isActive }) =>
               cn(
-                'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all',
-                'text-gray-600 dark:text-gray-400 hover:bg-pineapple/10 hover:text-pineapple',
-                isActive ? 'bg-pineapple/15 text-pineapple shadow-sm font-bold' : ''
+                'flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-medium transition-all',
+                'text-slate-400 hover:bg-slate-800 hover:text-white',
+                isActive ? 'bg-slate-800 text-white font-bold' : ''
               )
             }
           >
-            <User className="h-5 w-5" />
-            Profil & Compte
+            <User className="h-4 w-4" />
+            Mon Profil Démo
           </NavLink>
         </div>
       </nav>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-gray-100 dark:border-slate-800 text-xs text-gray-400 flex items-center justify-between">
+      {/* Footer Info */}
+      <div className="p-4 border-t border-slate-800 text-[11px] text-slate-500 flex items-center justify-between">
         <span>Pineapple OS v3.0</span>
-        {membership && (
-          <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 font-bold text-[10px]">
-            MEMBRE
-          </span>
-        )}
+        <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-extrabold text-[10px]">
+          DÉMO ACTIVES
+        </span>
       </div>
     </aside>
   );

@@ -1,0 +1,59 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+const articlesEn = [
+  {
+    id: '1',
+    title: "Eliminating Lecture Hall Overlaps in Cameroonian Higher Education",
+    date: "October 5, 2026",
+    summary: "Discover how real-time scheduling algorithms and delegate field reporting permanently solve double-booked lecture halls.",
+    href: "/en/blog/1/"
+  },
+  {
+    id: '2',
+    title: "The Key Role of Class Delegates in Timetable Management",
+    date: "September 28, 2026",
+    summary: "Why empowering class delegates transforms classroom management and strengthens campus democracy.",
+    href: "/en/blog/2/"
+  },
+  {
+    id: '3',
+    title: "Why Heavy Native Apps Fail on Campus 2G/3G Networks",
+    date: "September 15, 2026",
+    summary: "A technical breakdown of choosing an offline-first Progressive Web App (PWA) architecture for students in Africa.",
+    href: "/en/blog/3/"
+  }
+];
+---
+
+<Layout
+  title="Blog & Academic Articles"
+  description="Guides, insights, and case studies on digitizing higher education management in Cameroon and Africa."
+  lang="en"
+  alternateUrlFr="/fr/blog/"
+  alternateUrlEn="/en/blog/"
+>
+  <section class="py-16 bg-slate-900 text-white border-b border-slate-800 text-center">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-extrabold tracking-tight mb-4">Blog & Academic Insights</h1>
+      <p class="text-lg text-slate-300 max-w-2xl mx-auto">
+        Perspectives and best practices for higher education leaders.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-20 bg-slate-50 text-slate-900">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+      {articlesEn.map((art) => (
+        <article class="bg-white p-6 rounded-2xl border border-slate-200 shadow-md hover:shadow-xl transition-all flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-bold text-amber-600 block mb-2">{art.date}</span>
+            <h2 class="text-lg font-bold text-slate-900 mb-3 leading-snug">{art.title}</h2>
+            <p class="text-xs text-slate-600 leading-relaxed mb-6">{art.summary}</p>
+          </div>
+          <a href={art.href} class="text-xs font-extrabold text-amber-600 hover:underline">Read full article →</a>
+        </article>
+      ))}
+    </div>
+  </section>
+</Layout>

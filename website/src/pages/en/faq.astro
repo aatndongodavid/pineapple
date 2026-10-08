@@ -1,0 +1,98 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const faqsEn = [
+  {
+    q: "1. How does Pineapple OS handle unstable mobile internet (2G/3G)?",
+    a: "Pineapple OS is built on an offline-first PWA (Progressive Web App) architecture. Timetables and daily registers are cached locally on smartphones. Browsing is instantaneous even without internet, and updates sync automatically upon reconnecting."
+  },
+  {
+    q: "2. How long does it take to deploy the platform for an institution?",
+    a: "Standard deployment takes less than 48 hours. Simply upload your student registers (CSV/Excel format) and room inventory to make the system live."
+  },
+  {
+    q: "3. How are user access privileges managed?",
+    a: "Pineapple OS features Role-Based Access Control (RBAC). Directors, Secretaries General, Registrars, Lecturers, and Delegates each get tailored permissions."
+  },
+  {
+    q: "4. Is our institutional data isolated from other universities?",
+    a: "Yes, completely. Our multi-tenant architecture enforces cryptographic data isolation using institution tokens (`tenant_id`) embedded in every connection token."
+  },
+  {
+    q: "5. What happens if a lecture hall is assigned to two classes simultaneously?",
+    a: "Our collision detection algorithm blocks double-booking and alerts the scheduler before timetable publication."
+  },
+  {
+    q: "6. What is the exact role of class delegates?",
+    a: "Verified delegates report real-time room occupancy or liberation from their smartphones, correcting discrepancies against scheduled timetables."
+  },
+  {
+    q: "7. How do we transition from our current Excel spreadsheets?",
+    a: "We provide simple CSV template files for students and timetables. Our support team can also perform initial data migration for you."
+  },
+  {
+    q: "8. What is the exact subscription cost and are there hidden fees?",
+    a: "Pricing is 100% transparent and billed annually in CFA Francs (XAF). For example, 150,000 FCFA/year for under 300 students. Hosting, updates, and support are fully included."
+  },
+  {
+    q: "9. Do students have to pay to use the application?",
+    a: "No, absolutely not. The web app is 100% free for all students and lecturers of subscribed institutions."
+  },
+  {
+    q: "10. Are there third-party advertisements in the student interface?",
+    a: "No. Zero third-party ads are displayed to members of subscribed institutions."
+  },
+  {
+    q: "11. How are data backups handled during server outages?",
+    a: "Automated encrypted backups run daily. Recovery Point Objective (RPO) is under 1 hour."
+  },
+  {
+    q: "12. Can urgent SMS alerts be sent without internet?",
+    a: "Yes, the optional SMS Pack (10 FCFA/SMS) enables direct SMS broadcast alerts to student mobile phones."
+  },
+  {
+    q: "13. Does Pineapple OS comply with data privacy regulations?",
+    a: "Yes, all personal data is encrypted (TLS 1.3 & AES-256) and hosted according to international privacy standards."
+  },
+  {
+    q: "14. Do you provide training for our administrative registrars?",
+    a: "Yes, we conduct a 1-hour training session for your administrative staff, either on-site or via videoconference."
+  },
+  {
+    q: "15. How can we test the platform before committing?",
+    a: "You can immediately access our live sandbox demo at demo.pineapple.cm or request a free personalized demo."
+  },
+  {
+    q: "16. What is the guaranteed uptime SLA?",
+    a: "We guarantee a 99.9% uptime SLA backed by 24/7 infrastructure monitoring."
+  }
+];
+---
+
+<Layout
+  title="Frequently Asked Questions (FAQ)"
+  description="Transparent answers to all your questions about Pineapple OS deployment, security, XAF pricing, offline support, and delegates."
+  lang="en"
+  alternateUrlFr="/fr/faq/"
+  alternateUrlEn="/en/faq/"
+>
+  <section class="py-16 bg-slate-900 text-white border-b border-slate-800 text-center">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-extrabold tracking-tight mb-4">Frequently Asked Questions (FAQ)</h1>
+      <p class="text-lg text-slate-300 max-w-2xl mx-auto">
+        Clear and transparent answers for Directors General, Secretaries General, and Academic Registrars.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-20 bg-slate-50 text-slate-900">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      {faqsEn.map((faq) => (
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-md">
+          <h3 class="font-extrabold text-base text-slate-900 mb-2">{faq.q}</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">{faq.a}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+</Layout>

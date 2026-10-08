@@ -1,0 +1,25 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout
+  title="Pourquoi les applications lourdes échouent sur les réseaux 2G/3G de campus"
+  description="Analyse de l'architecture PWA offline-first conçue pour les connexions mobiles instables en Afrique."
+  lang="fr"
+  alternateUrlFr="/fr/blog/3/"
+  alternateUrlEn="/en/blog/3/"
+>
+  <article class="py-20 bg-slate-50 text-slate-900">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 bg-white p-8 sm:p-12 rounded-2xl border border-slate-200 shadow-md">
+      <a href="/fr/blog/" class="text-xs font-bold text-amber-600 hover:underline mb-6 block">← Retour aux articles</a>
+      <span class="text-xs text-slate-400 block mb-2">15 Septembre 2026 • 5 min de lecture</span>
+      <h1 class="text-3xl font-extrabold text-slate-900 mb-6">Pourquoi les applications lourdes échouent sur les réseaux 2G/3G de campus</h1>
+      
+      <div class="prose prose-slate text-sm leading-relaxed space-y-4 text-slate-700">
+        <p>Télécharger une application native de 80 Mo sur le Google Play Store est souvent impossible pour un étudiant disposant d'un forfait internet limité ou bloqué dans un amphi à faible couverture réseau.</p>
+        <h2 class="text-lg font-bold text-slate-900 mt-6 mb-2">L'avantage PWA offline-first</h2>
+        <p>En utilisant des Service Workers et du stockage local IndexedDB, Pineapple OS charge l'interface en moins de 1 seconde et permet la consultation des plannings même en mode avion.</p>
+      </div>
+    </div>
+  </article>
+</Layout>

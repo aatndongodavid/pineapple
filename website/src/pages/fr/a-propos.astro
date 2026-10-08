@@ -1,0 +1,57 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import siteConfig from '../../../site.config.json';
+---
+
+<Layout
+  title="À Propos de Pineapple OS"
+  description="Notre mission : construire l'infrastructure technologique souveraine et légère pour l'enseignement supérieur au Cameroun et en Afrique francophone."
+  lang="fr"
+  alternateUrlFr="/fr/a-propos/"
+  alternateUrlEn="/en/about/"
+>
+  <section class="py-16 bg-slate-900 text-white border-b border-slate-800 text-center">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-extrabold tracking-tight mb-4">À Propos de Pineapple OS</h1>
+      <p class="text-lg text-slate-300 max-w-2xl mx-auto">
+        Bâtir des solutions technologiques souveraines, ultra-rapides et adaptées aux réalités des campus africains.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-20 bg-slate-50 text-slate-900">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-md">
+        <h2 class="text-2xl font-bold mb-4">🇨🇲 Une technologie pensée pour l'Afrique</h2>
+        <p class="text-slate-600 text-sm leading-relaxed mb-4">
+          La plupart des logiciels de gestion universitaire importés d'Europe ou d'Amérique sont lourds, coûteux en bande passante et inadaptés aux contraintes locales (réseaux mobiles instables, smartphones d'entrée de gamme, gestion décentralisée des amphis).
+        </p>
+        <p class="text-slate-600 text-sm leading-relaxed">
+          Pineapple OS a été conçu dès le premier jour pour répondre précisément à ces défis : légèreté extrême, résilience hors-ligne et collaboration étroite entre la scolarité et les délégués d'amphi.
+        </p>
+      </div>
+
+      <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-md">
+        <h2 class="text-2xl font-bold mb-4">✉️ Contact & Présentations Directes</h2>
+        <p class="text-slate-600 text-sm leading-relaxed mb-6">
+          Nos équipes d'ingénieurs et de conseillers académiques basées à Yaoundé et Douala se déplacent sur votre campus pour des présentations devant vos conseils d'administration et vos équipes de scolarité.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <a
+            href={`mailto:${siteConfig.contactEmail}`}
+            class="px-6 py-3 rounded-xl font-bold text-sm bg-slate-900 text-white hover:bg-slate-800 transition-all text-center"
+          >
+            ✉️ Écrire à contact@pineapple.cm
+          </a>
+          <a
+            href={`https://wa.me/${siteConfig.whatsappNumber}`}
+            target="_blank"
+            class="px-6 py-3 rounded-xl font-bold text-sm bg-emerald-600 text-white hover:bg-emerald-700 transition-all text-center"
+          >
+            💬 Discuter avec un conseiller WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

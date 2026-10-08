@@ -1,0 +1,47 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PricingCard from '../../components/PricingCard.astro';
+import pricingConfig from '../../../pricing.config.json';
+---
+
+<Layout
+  title="Transparent XAF (FCFA) Pricing"
+  description="Explore our annual subscription plans tailored to the size of your higher education institution in Cameroon."
+  lang="en"
+  alternateUrlFr="/fr/tarifs/"
+  alternateUrlEn="/en/pricing/"
+>
+  <section class="py-16 bg-slate-900 text-white border-b border-slate-800 text-center">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-extrabold tracking-tight mb-4">Clear, predictable pricing with zero hidden fees</h1>
+      <p class="text-lg text-slate-300 max-w-2xl mx-auto">
+        Annual billing in CFA Francs (XAF). Everything included: hosting, updates, and local technical support.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-20 bg-slate-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch mb-16">
+        {pricingConfig.plans.map((plan) => (
+          <PricingCard plan={plan} lang="en" />
+        ))}
+      </div>
+
+      <!-- Add-on options -->
+      <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-md max-w-4xl mx-auto">
+        <h3 class="text-xl font-bold text-slate-900 mb-4">🧩 Optional Add-ons</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm text-slate-700">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="font-extrabold text-amber-600 block mb-1">📲 Official SMS Pack (10 FCFA / SMS)</span>
+            Direct SMS notifications sent to parents or students without smartphone internet.
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="font-extrabold text-amber-600 block mb-1">📢 Visitor Ad Network Module</span>
+            Ad revenue sharing to offset or monetize your annual subscription costs.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

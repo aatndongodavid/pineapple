@@ -78,6 +78,8 @@ from api.v1.notification_router import router as notification_router
 from api.v1.advertiser_router import router as advertiser_router
 
 # Enregistrement des routeurs
+from api.v1.demo_request_router import public_router as demo_public_router, admin_router as demo_admin_router
+
 app.include_router(identity_router, prefix="/api/v1")
 app.include_router(schools_router, prefix="/api/v1")
 app.include_router(enrollment_router, prefix="/api/v1")
@@ -95,6 +97,9 @@ app.include_router(campus_life_router, prefix="/api/v1")
 app.include_router(opportunities_router, prefix="/api/v1")
 app.include_router(monetization_router, prefix="/api/v1")
 app.include_router(trust_safety_router, prefix="/api/v1")
+app.include_router(demo_public_router, prefix="/api/v1")
+app.include_router(demo_admin_router, prefix="/api/v1")
+
 
 
 @app.get("/", include_in_schema=False)

@@ -1,0 +1,49 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import siteConfig from '../../../site.config.json';
+---
+
+<Layout
+  title="Legal Notice & Privacy Policy"
+  description="Legal notice, terms of service, and personal data protection policy of Pineapple OS."
+  lang="en"
+  alternateUrlFr="/fr/mentions-legales/"
+  alternateUrlEn="/en/legal/"
+>
+  <section class="py-16 bg-slate-900 text-white border-b border-slate-800 text-center">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-extrabold tracking-tight mb-4">Legal Notice & Privacy Policy</h1>
+      <p class="text-lg text-slate-300 max-w-2xl mx-auto">
+        Legal transparency and data privacy protection.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-20 bg-slate-50 text-slate-900">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 text-sm text-slate-700 leading-relaxed">
+      <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-md">
+        <h2 class="text-xl font-bold text-slate-900 mb-4">1. Publisher Information</h2>
+        <p>
+          Pineapple OS is published by Pineapple Academic Systems S.A.R.L.<br />
+          Headquarters: Yaoundé & Douala, Republic of Cameroon.<br />
+          Contact Email: {siteConfig.contactEmail}<br />
+          WhatsApp Support: +{siteConfig.whatsappNumber}
+        </p>
+      </div>
+
+      <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-md">
+        <h2 class="text-xl font-bold text-slate-900 mb-4">2. Intellectual Property</h2>
+        <p>
+          All content, trademarks, algorithms, interfaces, and graphics of Pineapple OS are protected under copyright and trademark law in Cameroon and the OAPI region.
+        </p>
+      </div>
+
+      <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-md">
+        <h2 class="text-xl font-bold text-slate-900 mb-4">3. Data Privacy Protection</h2>
+        <p>
+          Administrative and academic data collected are processed exclusively to deliver management services for your institution. No personal data is sold to third parties. Users retain the right to access and rectify their data at any time.
+        </p>
+      </div>
+    </div>
+  </section>
+</Layout>

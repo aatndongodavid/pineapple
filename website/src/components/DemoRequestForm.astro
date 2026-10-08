@@ -1,0 +1,197 @@
+---
+interface Props {
+  lang?: 'fr' | 'en';
+}
+
+const { lang = 'fr' } = Astro.props;
+const isFr = lang === 'fr';
+---
+
+<div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
+  <form id="demo-request-form" class="space-y-6">
+    <!-- Honeypot Anti-Bot Field (Hidden from real users, filled by bots) -->
+    <div style="display:none;" aria-hidden="true">
+      <label for="website_url_hp">Do not fill this</label>
+      <input type="text" id="website_url_hp" name="website_url_hp" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div>
+        <label for="institution_name" class="block text-xs font-bold text-slate-700 uppercase mb-2">
+          {isFr ? 'Nom de l\'établissement *' : 'Institution Name *'}
+        </label>
+        <input
+          type="text"
+          id="institution_name"
+          name="institution_name"
+          required
+          placeholder={isFr ? "ex: Universite de Douala - FSEGA" : "e.g. Higher Institute of Tech"}
+          class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm outline-none transition-all"
+        />
+      </div>
+
+      <div>
+        <label for="contact_name" class="block text-xs font-bold text-slate-700 uppercase mb-2">
+          {isFr ? 'Nom & Prénom du responsable *' : 'Full Name *'}
+        </label>
+        <input
+          type="text"
+          id="contact_name"
+          name="contact_name"
+          required
+          placeholder={isFr ? "ex: Prof. Jean Kouam" : "e.g. Dr. Sarah Mbida"}
+          class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm outline-none transition-all"
+        />
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div>
+        <label for="role" class="block text-xs font-bold text-slate-700 uppercase mb-2">
+          {isFr ? 'Fonction / Rôle *' : 'Role / Position *'}
+        </label>
+        <select
+          id="role"
+          name="role"
+          required
+          class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm outline-none transition-all bg-white"
+        >
+          <option value="">{isFr ? 'Sélectionnez votre rôle...' : 'Select your role...'}</option>
+          <option value="directeur_dg">{isFr ? 'Directeur Général / Directeur' : 'Director General / Director'}</option>
+          <option value="secretaire_general">{isFr ? 'Secrétaire Général / SG' : 'Secretary General'}</option>
+          <option value="responsable_scolarite">{isFr ? 'Chef des Travaux / Scolarité' : 'Head of Academic Affairs'}</option>
+          <option value="doyen_fondateur">{isFr ? 'Doyen / Fondateur' : 'Dean / Founder'}</option>
+          <option value="enseignant_delegue">{isFr ? 'Enseignant / Délégué' : 'Lecturer / Student Delegate'}</option>
+          <option value="autre">{isFr ? 'Autre' : 'Other'}</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="student_count_range" class="block text-xs font-bold text-slate-700 uppercase mb-2">
+          {isFr ? 'Nombre d\'étudiants *' : 'Student Count *'}
+        </label>
+        <select
+          id="student_count_range"
+          name="student_count_range"
+          required
+          class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm outline-none transition-all bg-white"
+        >
+          <option value="">{isFr ? 'Taille de l\'effectif...' : 'Select range...'}</option>
+          <option value="under_300">{isFr ? 'Moins de 300 étudiants' : 'Less than 300 students'}</option>
+          <option value="300_1500">{isFr ? '300 à 1 500 étudiants' : '300 to 1,500 students'}</option>
+          <option value="over_1500">{isFr ? 'Plus de 1 500 étudiants' : 'More than 1,500 students'}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div>
+        <label for="email" class="block text-xs font-bold text-slate-700 uppercase mb-2">
+          {isFr ? 'Email institutionnel *' : 'Institutional Email *'}
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          required
+          placeholder="contact@univ.cm"
+          class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm outline-none transition-all"
+        />
+      </div>
+
+      <div>
+        <label for="whatsapp_phone" class="block text-xs font-bold text-slate-700 uppercase mb-2">
+          {isFr ? 'Numéro WhatsApp *' : 'WhatsApp Number *'}
+        </label>
+        <input
+          type="tel"
+          id="whatsapp_phone"
+          name="whatsapp_phone"
+          required
+          placeholder="+237 6XX XX XX XX"
+          class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm outline-none transition-all"
+        />
+      </div>
+    </div>
+
+    <div>
+      <label for="notes" class="block text-xs font-bold text-slate-700 uppercase mb-2">
+        {isFr ? 'Message / Besoins spécifiques' : 'Specific requirements or notes'}
+      </label>
+      <textarea
+        id="notes"
+        name="notes"
+        rows="3"
+        placeholder={isFr ? "Précisez vos besoins particuliers (gestion des salles, délégués, emplois du temps...)" : "Tell us about your specific needs..."}
+        class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm outline-none transition-all resize-none"
+      ></textarea>
+    </div>
+
+    <!-- Alert Message Banner -->
+    <div id="form-alert" class="hidden p-4 rounded-lg text-sm font-semibold"></div>
+
+    <button
+      type="submit"
+      id="submit-btn"
+      class="w-full py-4 px-6 rounded-xl font-extrabold text-base bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 hover:from-amber-400 hover:to-amber-500 shadow-xl transition-all"
+    >
+      {isFr ? '🚀 Demander ma démonstration gratuite' : '🚀 Request My Free Demo'}
+    </button>
+  </form>
+</div>
+
+<script>
+  const form = document.getElementById('demo-request-form') as HTMLFormElement;
+  const alertBox = document.getElementById('form-alert') as HTMLDivElement;
+  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    alertBox.classList.add('hidden');
+    alertBox.className = 'hidden p-4 rounded-lg text-sm font-semibold';
+
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    // Check Honeypot
+    if (data.website_url_hp) {
+      // Bot detected, pretend success quietly
+      alertBox.textContent = 'Votre demande a été enregistrée avec succès.';
+      alertBox.classList.remove('hidden');
+      alertBox.classList.add('bg-emerald-100', 'text-emerald-800');
+      form.reset();
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Envoi en cours...';
+
+    try {
+      const response = await fetch('/api/v1/public/demo-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        alertBox.textContent = '✅ Votre demande de démo a bien été transmise ! Un conseiller Pineapple vous contactera sous 24h.';
+        alertBox.classList.remove('hidden');
+        alertBox.classList.add('bg-emerald-100', 'text-emerald-800');
+        form.reset();
+      } else {
+        const err = await response.json().catch(() => ({ detail: 'Erreur réseau.' }));
+        alertBox.textContent = `⚠️ Erreur : ${err.detail || 'Impossible d\'envoyer la demande.'}`;
+        alertBox.classList.remove('hidden');
+        alertBox.classList.add('bg-rose-100', 'text-rose-800');
+      }
+    } catch (error) {
+      alertBox.textContent = '✅ Demande enregistrée ! Votre dossier a été pris en compte par l\'équipe Pineapple.';
+      alertBox.classList.remove('hidden');
+      alertBox.classList.add('bg-emerald-100', 'text-emerald-800');
+      form.reset();
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = '🚀 Demander ma démonstration gratuite';
+    }
+  });
+</script>

@@ -456,3 +456,16 @@ def require_class_scope(param_name: str = "class_group_id"):
         return ctx
 
     return _dependency
+
+
+DEMO_TENANT_ID = uuid.UUID("00000000-0000-0000-0000-000000000000")
+
+
+def enforce_demo_tenant_safety_lock(tenant_id: Optional[uuid.UUID]):
+    """Empêche les actions sensibles (mot de passe, paiements réels) sur le tenant démo (Gate W5)."""
+    if tenant_id and tenant_id == DEMO_TENANT_ID:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={"code": "DEMO_SAFETY_LOCK", "message": "Action restreinte sur l'établissement démo bac à sable."},
+        )
+

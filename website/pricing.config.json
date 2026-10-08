@@ -1,0 +1,80 @@
+{
+  "currency": "XAF",
+  "plans": [
+    {
+      "id": "starter",
+      "name_fr": "Starter (Petit Établissement)",
+      "name_en": "Starter (Small Institution)",
+      "capacity": "< 300 étudiants",
+      "capacity_en": "< 300 students",
+      "price": 150000,
+      "period_fr": "FCFA / an",
+      "period_en": "FCFA / year",
+      "featured": false,
+      "features_fr": [
+        "Gestion scolarité & registres d'étudiants",
+        "Emplois du temps & attribution des salles",
+        "Espace Délégués & gestion des élections",
+        "Notifications in-app & web push gratuit",
+        "Support technique par email & WhatsApp"
+      ],
+      "features_en": [
+        "Student records & management",
+        "Timetables & room allocation",
+        "Delegate portal & elections",
+        "Free in-app & web push notifications",
+        "Email & WhatsApp technical support"
+      ]
+    },
+    {
+      "id": "pro",
+      "name_fr": "Pro (Moyen Établissement)",
+      "name_en": "Pro (Medium Institution)",
+      "capacity": "300 - 1500 étudiants",
+      "capacity_en": "300 - 1500 students",
+      "price": 350000,
+      "period_fr": "FCFA / an",
+      "period_en": "FCFA / year",
+      "featured": true,
+      "features_fr": [
+        "Toutes les fonctionnalités Starter",
+        "Détection temps réel des conflits de salles",
+        "Notifications multicanal (In-App, Push, Email)",
+        "Pack SMS disponible (10 FCFA / SMS)",
+        "Support prioritaire sous 4 heures ouvrées"
+      ],
+      "features_en": [
+        "All Starter features",
+        "Real-time room conflict detection",
+        "Multichannel notifications (In-App, Push, Email)",
+        "SMS pack available (10 FCFA / SMS)",
+        "Priority support within 4 business hours"
+      ]
+    },
+    {
+      "id": "enterprise",
+      "name_fr": "Enterprise (Grand Établissement)",
+      "name_en": "Enterprise (Large Institution)",
+      "capacity": "> 1500 étudiants",
+      "capacity_en": "> 1500 students",
+      "price": null,
+      "custom_quote_fr": "Sur devis",
+      "custom_quote_en": "Custom quote",
+      "featured": false,
+      "features_fr": [
+        "Toutes les fonctionnalités Pro",
+        "Serveur dédié / Isolation renforcée",
+        "Intégration SI existant & API dédiée",
+        "Formation sur site des secrétariats",
+        "SLA 99.9% avec astreinte téléphonique"
+      ],
+      "features_en": [
+        "All Pro features",
+        "Dedicated server / enhanced isolation",
+        "Existing IT integration & dedicated API",
+        "On-site administrative staff training",
+        "99.9% SLA with phone emergency response"
+      ]
+    }
+  ]
+}
